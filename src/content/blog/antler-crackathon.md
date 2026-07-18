@@ -1,31 +1,34 @@
 ---
-title: 'Antler Crackathon submission'
-description: 'copperhead is an AI agent that designs, documents, and validates real PCBs from a prompt, working on your existing KiCad repository. Built and proven on a shipping open source board.'
+title: "Antler Crackathon submission"
+description: "copperhead is an AI agent that designs, documents, and validates real PCBs from a prompt, working on your existing KiCad repository. Built and proven on a shipping open source board."
 date: 2026-07-18
-kind: 'Submission'
+kind: "Submission"
 ---
 
 **Cursor for circuit boards: an AI agent that designs, documents, and validates
 real PCBs from a prompt.**
 
 Everyone here is pointing an agent at code. copperhead points one at a circuit
-board. It works on the KiCad files already in your repository — the schematic,
-the layout, the bill of materials, the pinout, the design docs — and it does not
+board. It works on the KiCad files already in your repository: the schematic,
+the layout, the bill of materials, the pinout, the design docs, and it does not
 finish until KiCad's own checkers say the result is clean.
 
-| Submission | |
-|---|---|
-| Team | Chouhan Industries |
-| Built by | Animesh Chouhan |
-| Repo | [chouhanindustries/copperhead](https://github.com/chouhanindustries/copperhead) |
+| Submission  |                                                                                     |
+| ----------- | ----------------------------------------------------------------------------------- |
+| Team        | Chouhan Industries                                                                  |
+| Built by    | Animesh Chouhan                                                                     |
+| Repo        | [chouhanindustries/copperhead](https://github.com/chouhanindustries/copperhead)     |
 | Proof board | [animesh-chouhan/open-telegraph](https://github.com/animesh-chouhan/open-telegraph) |
-| Demo | [1-minute walkthrough](/copperhead-demo.mp4) |
+| Demo        | [1-minute walkthrough](/copperhead-demo.mp4)                                        |
+
+![Render of the Open Telegraph board, a 40 by 40 mm ESP32-S3 Morse key](/pcb.png)
+_The Open Telegraph board, designed with copperhead_
 
 ## The problem, and who hurts
 
 Hardware design is one specialist holding an entire board's constraints in their
 head for months. Input range, quiescent current, package, sourceability, strapping
-pins, antenna keepout — every part choice touches all of them at once, and every
+pins, antenna keepout, every part choice touches all of them at once, and every
 change ripples into five documents that nobody updates in time.
 
 So the docs drift from the schematic. The BOM drifts from both. And the traps get
@@ -35,8 +38,8 @@ weeks a spin.
 This is not a guess. It is what building
 [Open Telegraph](https://github.com/animesh-chouhan/open-telegraph) looked like
 before the agent existed: a 40×40 mm ESP32-S3 Morse key with a 25 microamp deep
-sleep budget, where one wrong regulator — a part whose quiescent draw alone eats
-the entire budget — silently kills the product.
+sleep budget, where one wrong regulator, a part whose quiescent draw alone eats
+the entire budget, silently kills the product.
 
 ## What we built
 
@@ -59,7 +62,8 @@ by real validation tooling before the next one starts.
 
 ![copperhead routing a board](/routing.gif)
 
-The draft layout is correct, not optimal — and it says so itself, in a
+The draft layout is correct, not optimal, and it says so itself, in a
+`LAYOUT.md` that lists exactly what a specialist should redo before fab.
 `LAYOUT.md` that lists exactly what a specialist should redo before fab.
 Non-optimal is acceptable. Unlabeled non-optimal is not.
 
@@ -67,12 +71,12 @@ Non-optimal is acceptable. Unlabeled non-optimal is not.
 
 The honest before-and-after on a real board:
 
-| | Today | With copperhead |
-|---|---|---|
-| Idea to manufacturable files | Weeks to months | Days |
-| Docs vs. schematic | Drift by default | Regenerated on every change |
-| Datasheet traps | Caught at bring-up | Caught before commit |
-| Who can do it | A hardware specialist | One person with a repo |
+|                              | Today                 | With copperhead             |
+| ---------------------------- | --------------------- | --------------------------- |
+| Idea to manufacturable files | Weeks to months       | Days                        |
+| Docs vs. schematic           | Drift by default      | Regenerated on every change |
+| Datasheet traps              | Caught at bring-up    | Caught before commit        |
+| Who can do it                | A hardware specialist | One person with a repo      |
 
 That is a 10x jump in time plus a collapse in error rate. The second effect is the
 one that makes it stick: once a change to your board propagates everywhere and
@@ -80,20 +84,15 @@ self-verifies, going back to updating five documents by hand feels broken.
 
 ## What exists that didn't this morning
 
-- The `copperhead do` loop running against a real repository, with ERC/DRC gating
-- Cross-document propagation — one prompt, five files updated consistently
-- The strapping-pin and quiescent-current trap checks, run against the ESP32-S3
-- A public, shipping board designed entirely through this workflow
-
 ## Where we sit against the field
 
-| Competitor | What they do | The gap |
-|---|---|---|
-| Flux.ai | AI copilot inside their own browser ECAD | You must move into their editor |
-| Quilter | Physics-driven AI layout, per board | Routing only — no design reasoning or docs |
-| DeepPCB | RL placement and routing | Same, and you pay for bad results too |
-| siliXon | Text to PCB from scratch | Doesn't iterate on designs that exist |
-| Siemens Fuse | Agentic copilot in Xpedition | Enterprise-only, locked toolchain |
+| Competitor   | What they do                             | The gap                                    |
+| ------------ | ---------------------------------------- | ------------------------------------------ |
+| Flux.ai      | AI copilot inside their own browser ECAD | You must move into their editor            |
+| Quilter      | Physics-driven AI layout, per board      | Routing only - no design reasoning or docs |
+| DeepPCB      | RL placement and routing                 | Same, and you pay for bad results too      |
+| siliXon      | Text to PCB from scratch                 | Doesn't iterate on designs that exist      |
+| Siemens Fuse | Agentic copilot in Xpedition             | Enterprise-only, locked toolchain          |
 
 Everyone else is an autorouter, a walled-garden editor, or an enterprise EDA
 add-on. copperhead is the only agentic workflow that runs on open, real files in
@@ -113,8 +112,8 @@ Three segments, in order: indie hardware builders, crowdfunded-device startups,
 and small EE consultancies who bill by the board.
 
 The channel is the product. copperhead is Apache-2.0 and Open Telegraph is fully
-public, so the first hundred users land through the repo itself — Hacker News,
-r/PrintedCircuitBoard, the KiCad community — with the board as the proof that
+public, so the first hundred users land through the repo itself - Hacker News,
+r/PrintedCircuitBoard, the KiCad community - with the board as the proof that
 none of this is a demo. Monetization is a design-agent SaaS on top of the open
 CLI: hosted runs, longer context over a design history, and team-level review.
 
