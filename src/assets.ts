@@ -9,5 +9,5 @@ export const has = {
   video: fs.existsSync('public/copperhead-demo.mp4'),
   poster: fs.existsSync('public/demo-poster.png'),
   captions: fs.existsSync('public/copperhead-demo.vtt'),
-  boardRender: fs.existsSync('public/open-telegraph.webp'),
+  boardRender: fs.existsSync('public/pcb.png'),
 };
