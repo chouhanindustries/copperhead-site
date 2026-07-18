@@ -92,13 +92,15 @@ const jsonLd = {
 </Base>
 
 <style>
-  /* The bar is fixed, so the first section needs its own top clearance. */
+  /* The bar is fixed, so the first section needs its own top clearance. The
+     rule between head and list gets a tighter gap than a full section break:
+     it separates the masthead from the index, not two arguments. */
   .head {
-    padding-block: 168px var(--pad-y);
+    padding-block: 168px 72px;
   }
 
   .list {
-    padding-top: var(--pad-y);
+    padding-block: 72px 0;
   }
 
   ul {
@@ -174,7 +176,11 @@ const jsonLd = {
 
   @media (max-width: 720px) {
     .head {
-      padding-block: 128px var(--pad-y);
+      padding-block: 128px 56px;
+    }
+
+    .list {
+      padding-top: 56px;
     }
 
     li a {

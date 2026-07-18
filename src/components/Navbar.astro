@@ -6,8 +6,9 @@ import { links } from '../config';
 // link; this replaces it and satisfies W-2 more directly (the CTA is in reach
 // at every scroll position). Pure CSS, no JS: the bar is always translucent
 // rather than switching state on scroll.
-// Plain links, no CTA button: the install block sits in the hero and again in
-// the closing CTA, so the bar does not need to carry the primary action.
+// The install block sits in the hero and again in the closing CTA, so the bar
+// carries no install action; GitHub is the one link given emphasis, since the
+// repo is where a reader who is already sold goes next.
 // Discord renders only once a handle exists in config (it is still empty).
 interface Props {
   /** False on subpages, where the brand mark has to navigate rather than scroll. */
@@ -18,10 +19,10 @@ const { home = true } = Astro.props;
 
 const nav = [
   { label: 'Blog', href: links.blog },
-  { label: 'FAQ', href: links.faq },
   { label: 'Docs', href: links.docs },
+  { label: 'FAQ', href: links.faq },
   ...(links.discord ? [{ label: 'Discord', href: links.discord }] : []),
-  { label: 'GitHub', href: links.repo },
+  { label: 'GitHub', href: links.repo, mark: true },
 ];
 ---
 
@@ -33,7 +34,23 @@ const nav = [
 
     <nav aria-label="Primary">
       <ul>
-        {nav.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+        {
+          nav.map((l) => (
+            <li>
+              <a href={l.href} class={l.mark ? 'mark' : undefined}>
+                {l.mark && (
+                  <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" focusable="false">
+                    <path
+                      fill="currentColor"
+                      d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+                    />
+                  </svg>
+                )}
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </nav>
   </div>
@@ -92,6 +109,29 @@ const nav = [
     color: var(--text);
   }
 
+  /* GitHub is the one emphasised link: a copper-tinted pill so it reads as the
+     destination rather than another peer in the list. */
+  nav a.mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--copper-hi);
+    border: 1px solid var(--trace);
+    border-radius: 999px;
+    padding: 6px 13px;
+    background: rgba(184, 115, 51, 0.08);
+  }
+
+  nav a.mark:hover {
+    color: var(--copper-hi);
+    border-color: var(--copper);
+    background: rgba(184, 115, 51, 0.16);
+  }
+
+  nav a.mark svg {
+    flex: none;
+  }
+
   /* Three or four short links fit at every width, so no hamburger and nothing
      gets hidden; the gaps just tighten and the tap targets grow. */
   @media (max-width: 860px) {
@@ -123,6 +163,11 @@ const nav = [
 
     nav a {
       font-size: 0.82rem;
+    }
+
+    nav a.mark {
+      padding-inline: 10px;
+      gap: 6px;
     }
   }
 </style>

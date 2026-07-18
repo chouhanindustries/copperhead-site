@@ -9,7 +9,9 @@ Single-page marketing site for copperhead. Live at **copperhead.chouhan.ai**. Co
 3. Ship today: hero + video + quickstart minimum; full page preferred
 4. Zero backend. Static, fast, boring infrastructure
 
-Non-goals: blog (lives on chouhan.ai), docs site (lives in the repo README for now), waitlist/payments (later, via Dodo checkout link when Cloud tier opens).
+Non-goals: docs site (lives in the repo for now), waitlist/payments (later, via Dodo checkout link when Cloud tier opens).
+
+**Superseded:** the blog was originally a non-goal (it was to live on chouhan.ai). It now ships on this site at `/blog`, with an FAQ at `/blog/faq`. See §4a.
 
 ## 2. Stack
 
@@ -60,6 +62,17 @@ One route (`/`). Sections in order, anchor-linkable:
 | 9 | footer | Links, licenses, credit line | Single row, dim text |
 
 Sticky header: none in v1 (page is short). A minimal top-right `GitHub` link floats on scroll.
+
+## 4a. Blog
+
+Routes: `/blog/` (index), `/blog/<slug>/` (posts), `/blog/faq/`.
+
+- Posts are markdown in `src/content/blog/`, typed by the collection schema in `src/content.config.ts` (title, description, date, kind). Adding a file is the whole publishing step: index, routing, and sitemap follow from it
+- The FAQ is a hand-built page rather than a post, because it carries `FAQPage` JSON-LD and native `<details>` accordions. It is listed on the index alongside the posts
+- Same design system, no new tokens. Post prose styles live in the post route; the measure is 760px against the 1120px page max
+- Structured data: `Blog` on the index, `BlogPosting` per post, `FAQPage` on the FAQ, each alongside the site-wide `SoftwareApplication` node. `og:type` is `article` on posts
+- `sitemap.xml` is generated from the collection (`src/pages/sitemap.xml.ts`), replacing the hand-maintained file in `public/`
+- No JS on any blog route. The accordions are native `<details>`, so W-1 holds
 
 ## 5. Behavior
 
