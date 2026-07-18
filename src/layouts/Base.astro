@@ -1,0 +1,100 @@
+---
+import '../styles/global.css';
+import { site, repo, links } from '../config';
+
+interface Props {
+  /** Full <title>. Defaults to the home page title. */
+  title?: string;
+  description?: string;
+  /** Site-root-relative path of this page, e.g. '/blog/'. Sets canonical + og:url. */
+  path?: string;
+  /** Extra JSON-LD appended after the SoftwareApplication node (blog posts, FAQ). */
+  jsonLd?: Record<string, unknown>;
+  /** 'article' for blog posts, so link unfurls read as posts rather than a product page. */
+  ogType?: 'website' | 'article';
+}
+
+const {
+  title = 'copperhead. Cursor for circuit boards.',
+  description = 'An open source AI agent that designs, documents, and verifies real PCBs from a prompt. It works on your KiCad files, in your repo, and nothing is done until the checks pass.',
+  path = '/',
+  jsonLd: extraJsonLd,
+  ogType = 'website',
+} = Astro.props;
+
+const canonical = new URL(path, site).href;
+const ogImage = new URL('/og.png', site).href;
+
+// The product node stays on every page: it is the thing the whole site is about,
+// and search engines get one consistent description of it wherever they land.
+const appJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'copperhead',
+  description:
+    'An open source AI agent that designs, documents, and verifies real PCBs from a prompt.',
+  url: site,
+  codeRepository: repo,
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  license: 'https://www.apache.org/licenses/LICENSE-2.0',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  author: { '@type': 'Organization', name: 'Chouhan Industries', url: links.chouhan },
+};
+
+const jsonLd = extraJsonLd ? [appJsonLd, extraJsonLd] : appJsonLd;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#121212" />
+
+    {/* the two faces that render above the fold first */}
+    <link
+      rel="preload"
+      href="/fonts/space-grotesk-700.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/ibm-plex-sans-400.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="copperhead" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(jsonLd)}
+    />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

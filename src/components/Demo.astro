@@ -1,0 +1,69 @@
+---
+import { has } from '../assets';
+
+// Per build decision: render this section only when the video actually exists,
+// so there is no empty player box before the demo is recorded. Drop
+// public/copperhead-demo.mp4 (plus optional poster/captions) and it appears.
+const video = 'copperhead-demo.mp4';
+const { video: hasVideo, poster: hasPoster, captions: hasCaptions } = has;
+---
+
+{
+  hasVideo && (
+    <>
+      <section id="demo">
+        <div class="wrap">
+          <div class="frame">
+            <video
+              controls
+              preload="metadata"
+              playsinline
+              poster={hasPoster ? '/demo-poster.png' : undefined}
+            >
+              <source src={`/${video}`} type="video/mp4" />
+              {hasCaptions && (
+                <track
+                  kind="captions"
+                  src="/copperhead-demo.vtt"
+                  srclang="en"
+                  label="English"
+                  default
+                />
+              )}
+              <a href={`/${video}`}>Download the demo video</a>
+            </video>
+          </div>
+          <p class="caption">
+            A real board, redesigned in one prompt. The agent edits the
+            schematic, updates every document that references it, then runs ERC
+            until it passes. Nothing you see is mocked.
+          </p>
+        </div>
+      </section>
+    </>
+  )
+}
+
+<style>
+  .frame {
+    max-width: 900px;
+    margin-inline: auto;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #0c0c0c;
+    line-height: 0;
+  }
+
+  video {
+    width: 100%;
+    display: block;
+  }
+
+  .caption {
+    max-width: 62ch;
+    margin: 2rem auto 0;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    text-align: center;
+  }
+</style>

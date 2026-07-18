@@ -1,0 +1,286 @@
+---
+import Base from '../../layouts/Base.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import { site, links, pkg } from '../../config';
+
+// Answers are authored as small HTML fragments so a few can carry links and
+// inline code. The JSON-LD copy is the same string with tags stripped, which
+// keeps the structured data and the visible answer from drifting apart.
+const groups = [
+  {
+    title: 'The basics',
+    items: [
+      {
+        q: 'What is copperhead?',
+        a: `An open source AI agent that designs, documents, and verifies printed circuit boards. You describe a change or hand it a product brief, and it edits your real KiCad files, updates every document that references them, and runs KiCad's own checks until they pass. <a href="/blog/meet-copperhead/">Longer introduction here</a>.`,
+      },
+      {
+        q: 'What problem does it actually solve?',
+        a: `Drift. A hardware design spreads one decision across a schematic, a bill of materials, a power budget, and several documents, and nothing breaks when they fall out of sync. The inconsistency is found at bring-up, and a respin costs 5,000 to 50,000 dollars and six to eight weeks. <a href="/blog/drift-is-a-build-failure/">The full argument is here</a>.`,
+      },
+      {
+        q: 'Is this a chatbot for circuits?',
+        a: `No. It is a loop that leaves artifacts on disk. A run ends with edited KiCad source, updated documents, passing ERC and DRC, and a commit, not with a transcript you have to act on yourself.`,
+      },
+      {
+        q: 'Does it replace a hardware engineer?',
+        a: `No, and it is built not to pretend otherwise. It automates the propagation and verification work that eats the day, and it flags every assumption it made. You remain the engineer of record. It will not claim fab-readiness beyond "ERC and DRC clean".`,
+      },
+    ],
+  },
+  {
+    title: 'Using it',
+    items: [
+      {
+        q: 'What do I need installed?',
+        a: `Node 20 or newer, <a href="${links.kicad}">KiCad</a> with <code>kicad-cli</code> on your path, and a model API key of your own. Then <code>npm i -g ${pkg}</code>.`,
+      },
+      {
+        q: 'Does it work on a design that already exists?',
+        a: `That is the main case. Point it at a KiCad repository, run <code>copperhead init</code>, and start asking for changes. It can also run the full pipeline from a written brief with <code>copperhead create</code>, but iterating on real designs is what it is best at.`,
+      },
+      {
+        q: 'Which EDA tools does it support?',
+        a: `KiCad, the most widely used open PCB tool. Verification runs through <code>kicad-cli</code>, so the checks are the same ones you would run yourself. There is no support for proprietary EDA formats and none is planned.`,
+      },
+      {
+        q: 'Which model does it use?',
+        a: `It is model-agnostic. Claude and GPT-5 are both tested against the same integration suite, and you bring your own key for whichever you prefer. Set <code>ANTHROPIC_API_KEY</code> or <code>OPENAI_API_KEY</code> before the first run.`,
+      },
+      {
+        q: 'What does a run cost?',
+        a: `A single change request is roughly 0.10 to 1.00 dollars in model tokens. A full <code>create</code> pipeline run is five to ten times that. You are billed by your model provider directly; copperhead itself is free.`,
+      },
+    ],
+  },
+  {
+    title: 'Trust and safety',
+    items: [
+      {
+        q: 'What will it refuse to do?',
+        a: `It refuses to run on a dirty git tree, refuses to edit any design file before a validated change proposal exists, and refuses changes that break a budget or constraint you have documented, citing the line it would violate. It also never invents a part number it cannot justify from a datasheet.`,
+      },
+      {
+        q: 'Will it rewrite my whole schematic?',
+        a: `No. Edits are surgical changes to the KiCad s-expression source, so your diffs stay small and reviewable and untouched parts of the file stay byte-identical. A tool that regenerates the file to move one net has made its own work impossible to review.`,
+      },
+      {
+        q: 'Is the board ready to send to fabrication?',
+        a: `The gerbers are producible and the layout is DRC-clean, but the draft layout is correct rather than optimal, and it says so itself. <code>LAYOUT.md</code> lists exactly what is solid and what a layout specialist should redo first. Non-optimal is acceptable. Unlabeled non-optimal is not.`,
+      },
+      {
+        q: 'Where does my design data go?',
+        a: `It stays in your own git repository. The agent runs locally, stores nothing on a server, and only sends design context as part of the model API call itself. Run transcripts live in <code>.copperhead/runs/</code> with secret patterns redacted, and the agent never reads paths outside your repository.`,
+      },
+      {
+        q: 'What is the license?',
+        a: `The agent is <a href="${links.license}">Apache-2.0</a>. Everything it writes is plain markdown, JSON, and KiCad source in your repository, so there is nothing to be locked into. Our own reference hardware is CERN-OHL-S v2.0.`,
+      },
+      {
+        q: 'Is there a hosted version?',
+        a: `Not today. The local CLI with your own key is the whole product right now. A hosted tier is planned, and teams with export-controlled designs will stay on self-hosted.`,
+      },
+    ],
+  },
+];
+
+const stripTags = (s: string) => s.replace(/<[^>]+>/g, '');
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  url: new URL('/blog/faq/', site).href,
+  mainEntity: groups.flatMap((g) =>
+    g.items.map((i) => ({
+      '@type': 'Question',
+      name: i.q,
+      acceptedAnswer: { '@type': 'Answer', text: stripTags(i.a) },
+    })),
+  ),
+};
+---
+
+<Base
+  title="FAQ. copperhead."
+  description="What copperhead costs, what it refuses to do, whether it replaces an engineer, and what happens to your design files."
+  path="/blog/faq/"
+  jsonLd={jsonLd}
+>
+  <Navbar home={false} />
+  <main id="top">
+    <article>
+      <div class="wrap">
+        <header>
+          <p class="kind">FAQ</p>
+          <h1>Frequently asked questions</h1>
+          <p class="standfirst">
+            The questions hardware engineers ask in the first five minutes. If yours
+            is not here, the <a href={links.repo}>repo</a> is the best place to ask.
+          </p>
+        </header>
+
+        {
+          groups.map((g) => (
+            <section class="group">
+              <h2>{g.title}</h2>
+              <div class="items">
+                {g.items.map((i) => (
+                  <details>
+                    <summary>{i.q}</summary>
+                    <div class="answer">
+                      <p set:html={i.a} />
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </section>
+          ))
+        }
+
+        <footer class="end">
+          <a href="/blog/">All posts</a>
+          <a href={links.repo}>View on GitHub</a>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  article {
+    padding-block: 168px var(--pad-y);
+  }
+
+  .wrap {
+    max-width: 760px;
+  }
+
+  .kind {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--copper);
+    margin: 0 0 1.5rem;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    color: var(--text-dim);
+    font-size: 1.12rem;
+    margin: 1.5rem 0 0;
+    max-width: 58ch;
+  }
+
+  .group {
+    padding: 0;
+    margin-top: 4rem;
+  }
+
+  .group h2 {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1.5rem;
+  }
+
+  .items {
+    border-top: 1px solid var(--hairline);
+  }
+
+  details {
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  summary {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1.15rem 0;
+    cursor: pointer;
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 1.05rem;
+    line-height: 1.4;
+    letter-spacing: -0.015em;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Copper plus/minus drawn from text so it needs no icon asset. */
+  summary::after {
+    content: '+';
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 1rem;
+    color: var(--copper);
+    line-height: 1;
+  }
+
+  details[open] summary::after {
+    content: '\2212';
+  }
+
+  summary:hover {
+    color: var(--copper-hi);
+  }
+
+  .answer {
+    padding: 0 3rem 1.5rem 0;
+  }
+
+  .answer :global(p) {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.99rem;
+  }
+
+  .end {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+  }
+
+  .end a {
+    text-decoration: none;
+  }
+
+  @media (max-width: 720px) {
+    article {
+      padding-block: 128px var(--pad-y);
+    }
+
+    .standfirst {
+      font-size: 1.05rem;
+    }
+
+    .group {
+      margin-top: 3rem;
+    }
+
+    summary {
+      font-size: 1rem;
+      padding-block: 1.1rem;
+    }
+
+    .answer {
+      padding-right: 1.5rem;
+    }
+  }
+</style>

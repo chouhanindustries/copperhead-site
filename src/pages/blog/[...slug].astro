@@ -1,0 +1,241 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import { site, links } from '../../config';
+import { postPath, formatDate } from '../../blog';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const path = postPath(post.id);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.date.toISOString(),
+  url: new URL(path, site).href,
+  mainEntityOfPage: new URL(path, site).href,
+  author: { '@type': 'Organization', name: 'Chouhan Industries', url: links.chouhan },
+  publisher: { '@type': 'Organization', name: 'Chouhan Industries', url: links.chouhan },
+};
+---
+
+<Base
+  title={`${post.data.title}. copperhead.`}
+  description={post.data.description}
+  path={path}
+  ogType="article"
+  jsonLd={jsonLd}
+>
+  <Navbar home={false} />
+  <main id="top">
+    <article>
+      <div class="wrap">
+        <header>
+          <div class="meta">
+            <span class="kind">{post.data.kind}</span>
+            <time datetime={post.data.date.toISOString()}>
+              {formatDate(post.data.date)}
+            </time>
+          </div>
+          <h1>{post.data.title}</h1>
+          <p class="standfirst">{post.data.description}</p>
+        </header>
+
+        <div class="prose">
+          <Content />
+        </div>
+
+        <footer class="end">
+          <a href="/blog/">All posts</a>
+          <a href={links.repo}>View on GitHub</a>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  article {
+    padding-block: 168px var(--pad-y);
+  }
+
+  /* Measure is set on the column, not on each element, so code blocks and the
+     output table line up with the paragraphs instead of running wide. */
+  .wrap {
+    max-width: 760px;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin-bottom: 1.5rem;
+  }
+
+  .kind {
+    color: var(--copper);
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    color: var(--text-dim);
+    font-size: 1.12rem;
+    margin: 1.5rem 0 0;
+    max-width: 58ch;
+  }
+
+  .prose {
+    margin-top: 3.5rem;
+    border-top: 1px solid var(--hairline);
+    padding-top: 3.5rem;
+  }
+
+  .prose :global(p) {
+    margin: 0 0 1.4rem;
+  }
+
+  .prose :global(h2) {
+    font-size: 1.5rem;
+    margin: 3.25rem 0 1.25rem;
+  }
+
+  .prose :global(h3) {
+    font-size: 1.15rem;
+    margin: 2.5rem 0 1rem;
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin: 0 0 1.4rem;
+    padding-left: 1.25rem;
+  }
+
+  .prose :global(li) {
+    margin-bottom: 0.6rem;
+  }
+
+  .prose :global(li)::marker {
+    color: var(--copper);
+    font-family: var(--mono);
+    font-size: 0.85em;
+  }
+
+  .prose :global(strong) {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Terminal block, matching the quickstart section on the home page. */
+  .prose :global(pre) {
+    background: #0c0c0c;
+    border: 1px solid var(--hairline);
+    border-radius: 3px;
+    padding: 1.25rem 1.35rem;
+    margin: 0 0 1.4rem;
+    overflow-x: auto;
+    line-height: 1.7;
+  }
+
+  .prose :global(:not(pre) > code) {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 3px;
+    padding: 0.1em 0.4em;
+    font-size: 0.85em;
+  }
+
+  .prose :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 1.4rem;
+    font-size: 0.94rem;
+  }
+
+  .prose :global(th) {
+    text-align: left;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 0 1rem 0.75rem 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .prose :global(td) {
+    padding: 0.85rem 1rem 0.85rem 0;
+    border-bottom: 1px solid var(--hairline);
+    vertical-align: top;
+  }
+
+  .prose :global(td:first-child) {
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .prose :global(td:last-child) {
+    color: var(--text-dim);
+  }
+
+  /* Tables can still exceed the measure on a phone; let this one scroll rather
+     than forcing the page body sideways. */
+  @media (max-width: 560px) {
+    .prose :global(table) {
+      display: block;
+      overflow-x: auto;
+    }
+  }
+
+  .end {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+  }
+
+  .end a {
+    text-decoration: none;
+  }
+
+  @media (max-width: 720px) {
+    article {
+      padding-block: 128px var(--pad-y);
+    }
+
+    .prose {
+      margin-top: 2.5rem;
+      padding-top: 2.5rem;
+    }
+
+    .standfirst {
+      font-size: 1.05rem;
+    }
+  }
+</style>

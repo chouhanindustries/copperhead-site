@@ -1,0 +1,74 @@
+---
+title: 'Meet copperhead'
+description: 'An open source AI agent that designs, documents, and verifies real PCBs from a prompt, working on your KiCad files inside your own repository.'
+date: 2026-07-14
+kind: 'Product'
+---
+
+copperhead is an open source AI agent for hardware design. You give it a brief or a
+change request in plain English. It edits your real KiCad files, updates every
+document that references them, and runs KiCad's own checks until they pass.
+
+It is not a chatbot that describes a circuit to you. It is a loop that leaves
+artifacts on disk: a schematic, a board, gerbers, a bill of materials, a firmware
+scaffold, and a bring-up plan. All of it inside the git repository you already have.
+
+## Two ways to use it
+
+**Iterate on a design that exists.** This is the common case. You ask for one thing
+and the agent handles the fan-out:
+
+```
+copperhead do "move the key input to a different RTC-capable pin"
+```
+
+It consults the MCU strapping table it has in memory, picks an RTC-capable pin that
+is not a strapping pin, edits the schematic, updates the pinout and subsystem docs
+to match, runs ERC until it is clean, and commits with the reasoning attached.
+
+**Start from nothing.** Hand it a product brief and it runs the full pipeline:
+specification with every assumption flagged, architecture, part selection,
+schematic, draft layout, gerbers and renders, firmware scaffold, dev plan. Every
+stage is gated by validation tooling before the next one begins.
+
+```
+copperhead create --brief brief.md
+```
+
+## What it actually produces
+
+| Artifact | State it lands in |
+|---|---|
+| Schematic | ERC-clean `.kicad_sch` |
+| Board | DRC-clean first-draft `.kicad_pcb`, honestly labeled |
+| Gerbers and drill | Ready for JLC or PCBWay |
+| Outline | DXF and STEP for the enclosure |
+| Renders | Schematic and board SVGs |
+| BOM | Orderable, with part numbers and the reason behind every pick |
+| Firmware | A scaffold that compiles, with pins generated from the design |
+| Dev plan | Bring-up steps, test points, what to meter first |
+
+The draft layout is correct, not optimal, and it says so itself. `LAYOUT.md` lists
+exactly what is solid and what a specialist should redo before fabrication.
+Non-optimal is acceptable. Unlabeled non-optimal is not.
+
+## Where it runs
+
+A Node.js CLI on your machine, against your repository, with your own API key. The
+agent is model-agnostic: GPT-5 and Claude are both tested against the same
+integration suite. Design data never leaves your repo except as part of the model
+call itself, and run transcripts stay local in `.copperhead/runs/` with secret
+patterns redacted.
+
+It is Apache-2.0. Everything it writes is plain markdown, JSON, and KiCad source.
+There is no proprietary format to get stuck in.
+
+## Proof
+
+Open Telegraph is a pocket-size Morse key: an ESP32-S3, one button, one RGB LED, and
+a battery, living inside a 25 microamp sleep budget. It was designed with this
+workflow, and every decision, every trap the agent caught, and every file is public.
+
+The next post covers [the problem this exists to
+solve](/blog/drift-is-a-build-failure/), and after that, [how the loop keeps itself
+honest](/blog/spec-gated-in-verification-gated-out/).

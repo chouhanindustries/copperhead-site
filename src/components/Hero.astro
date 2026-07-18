@@ -1,0 +1,110 @@
+---
+import InstallBlock from './InstallBlock.astro';
+import { pkg } from '../config';
+
+// Single-column hero: headline, one-sentence subhead, a Quick start link and
+// the one-line install. The `--help` terminal that used to hold the right
+// column moved out; the CLI surface is covered by the feature cards, and the
+// full five-line block lives in the closing CTA.
+---
+
+<section id="top" class="hero">
+  <div class="grid-dots" aria-hidden="true"></div>
+
+  <div class="wrap copy">
+    <h1>Cursor for circuit boards.</h1>
+
+    <p class="sub">
+      copperhead is an open source AI agent that designs, documents, and
+      verifies real PCBs from a prompt. On your files, in your repo, with
+      KiCad's own checks as the gate.
+    </p>
+
+    <a class="quick" href="#quickstart">Quick start<span aria-hidden="true"> →</span></a>
+
+    <div class="install">
+      <InstallBlock lines={[`npm i -g ${pkg}`]} compact />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    /* top pad clears the fixed bar */
+    padding-block: clamp(112px, 15svh, 168px) clamp(56px, 8svh, 104px);
+    overflow: hidden;
+  }
+
+  .grid-dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      var(--text) 1px,
+      transparent 0
+    );
+    background-size: 28px 28px;
+    opacity: 0.022;
+    /* centred now that the copy is centred */
+    -webkit-mask-image: radial-gradient(
+      100% 75% at 50% 0%,
+      #000 0%,
+      transparent 78%
+    );
+    mask-image: radial-gradient(100% 75% at 50% 0%, #000 0%, transparent 78%);
+    pointer-events: none;
+  }
+
+  .copy {
+    position: relative;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: clamp(2.3rem, 5.2vw, 3.9rem);
+    letter-spacing: -0.035em;
+    max-width: 15ch;
+    margin-inline: auto;
+    text-wrap: balance;
+  }
+
+  .sub {
+    color: var(--text-dim);
+    font-size: 1.08rem;
+    line-height: 1.6;
+    max-width: 56ch;
+    margin: 1.4rem auto 0;
+    text-wrap: pretty;
+  }
+
+  .quick {
+    display: inline-block;
+    margin-top: 1.75rem;
+    font-size: 0.95rem;
+  }
+
+  .install {
+    max-width: 30rem;
+    margin: 1.4rem auto 0;
+    text-align: left;
+  }
+
+  @media (max-width: 720px) {
+    h1 {
+      font-size: clamp(2rem, 8.6vw, 2.6rem);
+      letter-spacing: -0.028em;
+      max-width: 14ch;
+    }
+
+    .sub {
+      font-size: 1rem;
+      line-height: 1.55;
+      margin-top: clamp(0.9rem, 2svh, 1.35rem);
+    }
+
+    .quick {
+      margin-top: 1.4rem;
+    }
+  }
+</style>

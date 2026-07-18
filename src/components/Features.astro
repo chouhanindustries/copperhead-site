@@ -1,0 +1,136 @@
+---
+import { links } from '../config';
+
+// Card grid, in the autoloops shape. This is where the four old prose sections
+// (Stepper, Invariants, Outputs, WhyOpen) went: one card each for the two
+// invariants, one for the docs-first loop, one for propagation, one for what
+// lands on disk, one for the open stack. Copy is lifted from those sections
+// rather than rewritten, so nothing here promises more than the CLI does.
+const features = [
+  {
+    title: 'Starts from the docs',
+    body: 'Every decision lives in the design docs, so the agent knows the whole design, not just the part in front of it.',
+  },
+  {
+    title: 'Nothing starts without a spec',
+    body: 'The agent cannot touch a design file until a validated change proposal exists. The edit tools stay locked until it passes.',
+  },
+  {
+    title: 'Nothing is done until the tools agree',
+    body: 'Every change is followed by ERC on the schematic and DRC on the board. Violations get read, fixed, and re-run.',
+  },
+  {
+    title: 'Changes propagate',
+    body: 'Change one value and it carries across every file that references it. The boring, easy-to-get-wrong step is the one the agent is best at.',
+  },
+  {
+    title: 'A product, not a chat log',
+    body: 'Schematic, board, gerbers and drill, DXF and STEP, renders, an orderable BOM, a firmware scaffold, and a bring-up plan. All on disk, in your repo.',
+  },
+  {
+    title: 'Open because it has to be',
+    body: 'Apache-2.0, on an open stack. Everything it writes is plain markdown and JSON in your own repository. No proprietary formats, no lock-in.',
+    // the only card that earns a link: the claim is checkable
+    link: { label: 'KiCad', href: links.kicad },
+  },
+];
+---
+
+<section id="features">
+  <div class="wrap">
+    <h2 class="section-title">A loop, not a chatbot.</h2>
+    <p class="section-intro">
+      It looks a lot like pair programming, except the codebase is a circuit
+      board.
+    </p>
+
+    <ul class="grid">
+      {
+        features.map((f) => (
+          <li class="card">
+            <h3>{f.title}</h3>
+            <p>{f.body}</p>
+            {f.link && (
+              <p class="more">
+                Built on <a href={f.link.href}>{f.link.label}</a> and{' '}
+                <a href={links.openspec}>OpenSpec</a>.
+              </p>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="footnote">
+      The draft layout is correct, not optimal, and says so itself.
+      <code>LAYOUT.md</code> lists exactly what is solid and what a specialist
+      should redo before fab. Non-optimal is acceptable. Unlabeled non-optimal is
+      not.
+    </p>
+  </div>
+</section>
+
+<style>
+  .grid {
+    list-style: none;
+    margin: 3.25rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    /* hairline gutters read as a grid of cells rather than floating cards */
+    background: var(--hairline);
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .card {
+    background: var(--bg);
+    padding: 30px 28px 32px;
+  }
+
+  .card h3 {
+    font-size: 1.06rem;
+  }
+
+  .card p {
+    color: var(--text-dim);
+    font-size: 0.94rem;
+    line-height: 1.6;
+    margin: 0.75rem 0 0;
+  }
+
+  .card .more {
+    font-size: 0.88rem;
+  }
+
+  .footnote {
+    margin: 2.25rem 0 0;
+    color: var(--text-dim);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    max-width: 62ch;
+  }
+
+  .footnote code {
+    font-size: 0.82rem;
+    color: var(--text);
+  }
+
+  @media (max-width: 940px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 620px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      padding: 24px 20px 26px;
+    }
+  }
+</style>

@@ -1,0 +1,48 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+      # W-6: no em-dashes anywhere in rendered copy
+      - name: check for em-dashes
+        run: |
+          if grep -q "—\|&mdash;\|&#8212;" dist/index.html; then
+            echo "em-dash found in rendered HTML (W-6)"; exit 1
+          fi
+
+      # spec §9: no dead links to the repo or blog
+      - name: link check
+        run: |
+          fail=0
+          for url in $(grep -o 'href="https\?://[^"]*"' dist/index.html \
+                       | sed 's/href="//;s/"$//' | sort -u); do
+            code=$(curl -sL -o /dev/null -w "%{http_code}" --max-time 20 "$url")
+            printf '%-64s %s\n' "$url" "$code"
+            case "$code" in 2*|3*) ;; *) fail=1 ;; esac
+          done
+          exit $fail
+
+      # W-10: total transfer excluding video stays under 100 KB
+      - name: transfer budget
+        run: |
+          total=0
+          for f in dist/index.html dist/fonts/*.woff2 dist/favicon.svg dist/favicon-32.png; do
+            [ -f "$f" ] || continue
+            total=$((total + $(gzip -c "$f" | wc -c)))
+          done
+          echo "gzipped transfer: $total bytes"
+          [ "$total" -le 102400 ] || { echo "over 100 KB budget (W-10)"; exit 1; }

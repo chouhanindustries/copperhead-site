@@ -1,0 +1,184 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import { site } from '../../config';
+import { postPath, formatDate } from '../../blog';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+// The FAQ is a hand-built page rather than a markdown post (it carries FAQPage
+// JSON-LD and native <details> accordions), so it is listed here explicitly.
+const entries = [
+  ...posts.map((p) => ({
+    href: postPath(p.id),
+    title: p.data.title,
+    description: p.data.description,
+    kind: p.data.kind,
+    date: p.data.date,
+  })),
+  {
+    href: '/blog/faq/',
+    title: 'Frequently asked questions',
+    description:
+      'What it costs, what it refuses to do, whether it replaces an engineer, and what happens to your design files.',
+    kind: 'FAQ',
+    date: new Date('2026-07-17'),
+  },
+].sort((a, b) => b.date.valueOf() - a.date.valueOf());
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: 'The copperhead blog',
+  url: new URL('/blog/', site).href,
+  blogPost: posts.map((p) => ({
+    '@type': 'BlogPosting',
+    headline: p.data.title,
+    description: p.data.description,
+    datePublished: p.data.date.toISOString(),
+    url: new URL(postPath(p.id), site).href,
+  })),
+};
+---
+
+<Base
+  title="Blog. copperhead."
+  description="How copperhead works, the drift problem it exists to solve, and the invariants that make an AI agent safe to point at real KiCad files."
+  path="/blog/"
+  jsonLd={jsonLd}
+>
+  <Navbar home={false} />
+  <main id="top">
+    <section class="head">
+      <div class="wrap">
+        <p class="index">Blog</p>
+        <h1 class="section-title">Notes from the copper.</h1>
+        <p class="section-intro">
+          What the agent is, the problem it exists to solve, and the rules it runs
+          under. Every claim here is demonstrable in the repo today.
+        </p>
+      </div>
+    </section>
+
+    <hr class="trace-rule" />
+
+    <section class="list">
+      <div class="wrap">
+        <ul>
+          {
+            entries.map((e) => (
+              <li>
+                <a href={e.href}>
+                  <div class="meta">
+                    <span class="kind">{e.kind}</span>
+                    <time datetime={e.date.toISOString()}>{formatDate(e.date)}</time>
+                  </div>
+                  <h2>{e.title}</h2>
+                  <p>{e.description}</p>
+                  <span class="more">Read</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  /* The bar is fixed, so the first section needs its own top clearance. */
+  .head {
+    padding-block: 168px var(--pad-y);
+  }
+
+  .list {
+    padding-top: var(--pad-y);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1px;
+    background: var(--hairline);
+    border-block: 1px solid var(--hairline);
+  }
+
+  /* Full-card links: the whole row is the target, no separate title anchor. */
+  li a {
+    display: block;
+    background: var(--bg);
+    padding: 2.25rem 0;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  li a:hover {
+    background: var(--surface);
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .kind {
+    color: var(--copper);
+  }
+
+  li h2 {
+    font-size: clamp(1.35rem, 2.6vw, 1.75rem);
+    max-width: 24ch;
+    text-wrap: balance;
+  }
+
+  li p {
+    color: var(--text-dim);
+    max-width: 64ch;
+    margin: 0.85rem 0 0;
+    font-size: 0.97rem;
+  }
+
+  .more {
+    display: inline-block;
+    margin-top: 1.15rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--copper);
+  }
+
+  li a:hover .more {
+    color: var(--copper-hi);
+  }
+
+  /* Hover fill needs to reach past the text column or it reads as a stray band. */
+  @media (min-width: 721px) {
+    li a {
+      padding-inline: 24px;
+      margin-inline: -24px;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .head {
+      padding-block: 128px var(--pad-y);
+    }
+
+    li a {
+      padding-block: 1.85rem;
+    }
+  }
+</style>

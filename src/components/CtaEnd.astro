@@ -1,0 +1,71 @@
+---
+import InstallBlock from './InstallBlock.astro';
+import { quickstart } from '../config';
+
+// Closing CTA: tagline, one line of copy, and the install repeated. This is
+// also the page's #quickstart target, so the hero's "Quick start" link and the
+// footer both land here. W-3 lives on this block, not the hero one: it is the
+// exact five-line quickstart from website-content.md §8.
+---
+
+<section id="quickstart" class="cta">
+  <div class="wrap">
+    <h2>Never ship a board your docs no longer describe.</h2>
+
+    <p class="lede">
+      copperhead is open source and free to use. Install once, point it at a
+      KiCad repo, and run <code>do</code>.
+    </p>
+
+    <div class="install">
+      <InstallBlock lines={quickstart} />
+    </div>
+
+    <p class="footnote">
+      Requires Node 20+ and kicad-cli. The agent refuses to run on a dirty git
+      tree, refuses edits without a validated proposal, and refuses changes that
+      break your documented budgets. You will come to like being told no.
+    </p>
+  </div>
+</section>
+
+<style>
+  .cta {
+    border-top: 1px solid var(--hairline);
+  }
+
+  .cta .wrap {
+    text-align: center;
+  }
+
+  h2 {
+    font-size: clamp(1.85rem, 3.4vw, 2.6rem);
+    max-width: 22ch;
+    margin-inline: auto;
+    text-wrap: balance;
+  }
+
+  .lede {
+    color: var(--text-dim);
+    max-width: 52ch;
+    margin: 1.25rem auto 0;
+  }
+
+  .lede code {
+    color: var(--text);
+  }
+
+  .install {
+    max-width: 42rem;
+    margin: 2.5rem auto 0;
+    text-align: left;
+  }
+
+  .footnote {
+    margin: 1.75rem auto 0;
+    color: var(--text-dim);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    max-width: 58ch;
+  }
+</style>

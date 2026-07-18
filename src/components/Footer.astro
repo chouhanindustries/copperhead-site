@@ -1,0 +1,186 @@
+---
+import Wordmark from './Wordmark.astro';
+import { links, repo } from '../config';
+
+// Three columns, in the autoloops shape: Product / Connect / a copyright line.
+// Every link is verified to resolve; nothing is invented. Discord and X are
+// omitted because no handle appears in any source doc: add them to `links` in
+// src/config.ts and they render here automatically.
+const columns = [
+  {
+    title: 'Product',
+    items: [
+      // Root-relative, not a bare fragment: the footer also renders on /blog/*.
+      { label: 'Quickstart', href: '/#quickstart' },
+      { label: 'Docs', href: links.docs },
+      { label: 'Blog', href: links.blog },
+      { label: 'FAQ', href: links.faq },
+      { label: 'Open Telegraph', href: links.telegraphRepo },
+    ],
+  },
+  {
+    title: 'Connect',
+    items: [
+      { label: 'GitHub', href: links.repo },
+      ...(links.discord ? [{ label: 'Discord', href: links.discord }] : []),
+      ...(links.x ? [{ label: 'X', href: links.x }] : []),
+      { label: 'Chouhan Industries', href: links.chouhan },
+    ],
+  },
+  {
+    title: 'Built on',
+    items: [
+      { label: 'KiCad', href: links.kicad },
+      { label: 'OpenSpec', href: links.openspec },
+    ],
+  },
+];
+---
+
+<hr class="trace-rule" />
+<footer>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <Wordmark size="0.95rem" />
+        <p>An open source AI agent that designs, documents, and verifies real PCBs.</p>
+      </div>
+
+      <div class="cols">
+        {
+          columns.map((col) => (
+            <div class="col">
+              <h2>{col.title}</h2>
+              <ul>
+                {col.items.map((i) => (
+                  <li>
+                    <a href={i.href}>{i.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="bottom">
+      <p>
+        <a href={links.license}>Apache-2.0</a>. Hardware designs referenced here
+        are <a href="https://cern-ohl.web.cern.ch/">CERN-OHL-S v2.0</a>.
+      </p>
+      <p>copperhead is a Chouhan Industries project.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  footer {
+    padding-block: 72px 64px;
+    color: var(--text-dim);
+    font-size: 0.88rem;
+  }
+
+  .top {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) 2.2fr;
+    gap: 56px;
+  }
+
+  .brand p {
+    margin: 1rem 0 0;
+    font-size: 0.85rem;
+    max-width: 32ch;
+    line-height: 1.6;
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+
+  /* h2 because the page already has one h1 and these are real headings;
+     styled down to a small label (spec §8 landmark rules) */
+  .col h2 {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin: 0 0 1rem;
+  }
+
+  .col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .col a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.86rem;
+  }
+
+  .col a:hover {
+    color: var(--text);
+  }
+
+  .bottom {
+    margin-top: 64px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .bottom p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: rgba(154, 154, 154, 0.7);
+  }
+
+  .bottom a {
+    color: rgba(154, 154, 154, 0.85);
+  }
+
+  @media (max-width: 860px) {
+    .top {
+      grid-template-columns: 1fr;
+      gap: 44px;
+    }
+  }
+
+  @media (max-width: 560px) {
+    footer {
+      padding-block: 56px 48px;
+    }
+
+    .cols {
+      grid-template-columns: 1fr 1fr;
+      gap: 36px 24px;
+    }
+
+    /* roomier rows so links are easy to hit on a phone */
+    .col ul {
+      gap: 0.25rem;
+    }
+
+    .col a {
+      display: inline-block;
+      padding-block: 0.55rem;
+      font-size: 0.9rem;
+    }
+
+    .bottom {
+      margin-top: 48px;
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+</style>

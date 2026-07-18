@@ -1,0 +1,126 @@
+---
+// Shared terminal block. Used twice on the page (hero, closing CTA), which is
+// the autoloops pattern: the install is never more than one screen away.
+// W-3: the copy button copies the exact source lines, so the text lives in a
+// data attribute rather than being scraped from the DOM (which carries the
+// `$ ` prompt markers).
+interface Props {
+  lines: string[];
+  /** Tighter padding for the hero, where the block sits under the subhead. */
+  compact?: boolean;
+}
+const { lines, compact = false } = Astro.props;
+const block = lines.join('\n');
+---
+
+<div class:list={['terminal', { compact }]}>
+  <!-- hidden until JS wires it up, so it is never a dead control (W-1) -->
+  <button class="copy" type="button" data-clip={block} hidden>Copy</button>
+  <pre><code>{
+    lines.map((line) => (
+      <span class="line"><span class="prompt" aria-hidden="true">$ </span>{line + '\n'}</span>
+    ))
+  }</code></pre>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('button.copy').forEach((btn) => {
+    btn.hidden = false;
+    btn.addEventListener('click', async () => {
+      const text = btn.dataset.clip ?? '';
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        // Clipboard API unavailable (insecure context, denied permission)
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      btn.textContent = 'Copied';
+      btn.classList.add('done');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('done');
+      }, 2000);
+    });
+  });
+</script>
+
+<style>
+  .terminal {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    padding: 22px 24px;
+    overflow-x: auto;
+  }
+
+  .terminal.compact {
+    padding: 16px 18px;
+  }
+
+  pre {
+    margin: 0;
+    /* the block scrolls inside itself rather than widening the page */
+    min-width: max-content;
+  }
+
+  code {
+    display: block;
+    line-height: 1.9;
+    color: var(--text);
+  }
+
+  .prompt {
+    color: var(--copper);
+    user-select: none;
+  }
+
+  .copy {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    line-height: 1;
+    padding: 7px 10px;
+    border-radius: 3px;
+    border: 1px solid var(--hairline);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .copy:hover {
+    color: var(--text);
+    border-color: rgba(255, 255, 255, 0.24);
+  }
+
+  .copy.done {
+    color: var(--copper);
+    border-color: var(--trace);
+  }
+
+  @media (max-width: 720px) {
+    .terminal {
+      padding: 18px 16px;
+    }
+
+    /* the button would sit on top of the first line at this width */
+    .copy {
+      position: static;
+      display: block;
+      margin: 0 0 12px auto;
+      min-height: 32px;
+    }
+  }
+</style>

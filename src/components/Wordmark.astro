@@ -1,0 +1,36 @@
+---
+// Wordmark: "copperhead" lowercase mono, the second "o" drawn as a via
+// (annular ring). Spec §3. The via is aria-hidden and the accessible name is
+// supplied by the visually-hidden text so screen readers read "copperhead".
+interface Props {
+  size?: string;
+  href?: string;
+}
+const { size = '1rem', href } = Astro.props;
+const Tag = href ? 'a' : 'span';
+---
+
+<Tag class="wordmark" style={`font-size:${size}`} {...href ? { href } : {}}>
+  <span class="sr-only">copperhead</span>
+  <span aria-hidden="true" class="mark">
+    c<span class="via"></span>pperhead
+  </span>
+</Tag>
+
+<style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .mark {
+    display: inline-flex;
+    align-items: baseline;
+  }
+</style>
