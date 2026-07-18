@@ -17,10 +17,10 @@ export const site = 'https://copperhead.chouhan.ai';
 export const links = {
   repo,
   // The blog now lives on this site (spec §non-goals said chouhan.ai; superseded).
-  // The docs live in the repo's docs/ directory.
+  // The docs are deployed at /docs on this site (source: repo docs/).
   blog: '/blog/',
   faq: '/blog/faq/',
-  docs: `${repo}/tree/main/docs`,
+  docs: '/docs/',
   demoVideo: '/copperhead-demo.mp4',
   telegraphRepo: 'https://github.com/animesh-chouhan/open-telegraph',
   buildStory: 'https://chouhan.ai/building-with-claude',

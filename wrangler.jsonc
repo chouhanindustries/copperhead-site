@@ -1,0 +1,12 @@
+{
+  // Static site: Cloudflare serves dist/ directly, no Worker script.
+  // nodejs_compat is required because the build's prerender step runs in
+  // workerd, which otherwise has no node:fs (ERR_RUNTIME_FAILURE on deploy).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "copperhead-site",
+  "compatibility_date": "2026-07-18",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist"
+  }
+}
