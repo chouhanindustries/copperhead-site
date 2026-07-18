@@ -69,12 +69,15 @@ const nav = [
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   }
 
+  /* Three columns so the nav sits at true bar centre rather than merely centred
+     in whatever space the brand leaves; the third column stays empty. */
   .inner {
     max-width: var(--maxw);
     margin-inline: auto;
     padding: 0 28px;
     height: 60px;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: 24px;
   }
@@ -82,12 +85,9 @@ const nav = [
   .brand {
     text-decoration: none;
     display: inline-flex;
+    justify-self: start;
     /* keeps the tap target comfortable without changing the mark */
     padding: 6px 0;
-  }
-
-  nav {
-    margin-left: auto;
   }
 
   nav ul {
@@ -134,10 +134,17 @@ const nav = [
 
   /* Three or four short links fit at every width, so no hamburger and nothing
      gets hidden; the gaps just tighten and the tap targets grow. */
+  /* Below this width the empty balancing column costs room the links need, so
+     the bar drops back to brand-left / nav-right. */
   @media (max-width: 860px) {
     .inner {
       gap: 12px;
       padding-inline: 20px;
+      grid-template-columns: auto 1fr;
+    }
+
+    nav {
+      justify-self: end;
     }
 
     nav ul {

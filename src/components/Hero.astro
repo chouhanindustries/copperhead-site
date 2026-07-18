@@ -31,8 +31,14 @@ import { pkg } from '../config';
 <style>
   .hero {
     position: relative;
-    /* top pad clears the fixed bar */
-    padding-block: clamp(112px, 15svh, 168px) clamp(56px, 8svh, 104px);
+    /* full viewport on first paint; svh so mobile browser chrome doesn't
+       push the fold off-screen */
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    /* symmetric so the copy centres true; the top value also clears the
+       fixed bar when the viewport is too short to centre */
+    padding-block: clamp(96px, 12svh, 140px);
     overflow: hidden;
   }
 
