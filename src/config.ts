@@ -21,7 +21,7 @@ export const links = {
   // docs/). They cannot live at /docs here: this Worker owns the whole apex.
   blog: '/blog/',
   faq: '/blog/faq/',
-  docs: 'https://docs.copperhead.chouhan.ai/',
+  docs: 'https://docs.copperhead.sh/',
   demoVideo: '/copperhead-demo.mp4',
   telegraphRepo: 'https://github.com/animesh-chouhan/open-telegraph',
   buildStory: 'https://chouhan.ai/building-with-claude',
