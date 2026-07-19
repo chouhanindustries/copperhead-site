@@ -210,11 +210,22 @@ const jsonLd = {
   }
 
   /* Tables can still exceed the measure on a phone; let this one scroll rather
-     than forcing the page body sideways. */
-  @media (max-width: 560px) {
+     than forcing the page body sideways. The first column also gives up its
+     nowrap, which keeps most tables from needing to scroll at all. */
+  @media (max-width: 720px) {
     .prose :global(table) {
       display: block;
       overflow-x: auto;
+      font-size: 0.9rem;
+    }
+
+    .prose :global(td:first-child) {
+      white-space: normal;
+    }
+
+    .prose :global(td) {
+      padding-right: 0.85rem;
+      min-width: 7.5rem;
     }
   }
 

@@ -69,7 +69,7 @@ const columns = [
         <a href={links.license}>Apache-2.0</a>. Hardware designs referenced here
         are <a href="https://cern-ohl.web.cern.ch/">CERN-OHL-S v2.0</a>.
       </p>
-      <p>copperhead is a Chouhan Industries project.</p>
+      <p><span class="name">copperhead</span> is a <a href={links.chouhan}>Chouhan Industries</a> project.</p>
     </div>
   </div>
 </footer>
@@ -94,10 +94,13 @@ const columns = [
     line-height: 1.6;
   }
 
+  /* Content-width columns packed to the right edge, so the slack sits between
+     the brand and the link groups instead of trailing off the end. */
   .cols {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 32px;
+    grid-template-columns: repeat(3, auto);
+    justify-content: end;
+    gap: 48px;
   }
 
   /* h2 because the page already has one h1 and these are real headings;
@@ -149,10 +152,24 @@ const columns = [
     color: rgba(154, 154, 154, 0.85);
   }
 
+  .bottom a:hover {
+    color: var(--text);
+  }
+
+  .name {
+    color: var(--copper-hi);
+  }
+
+  /* Stacked under the brand, right-aligned groups would read as detached from
+     it, so they go back to the left edge. */
   @media (max-width: 860px) {
     .top {
       grid-template-columns: 1fr;
       gap: 44px;
+    }
+
+    .cols {
+      justify-content: start;
     }
   }
 

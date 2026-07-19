@@ -64,7 +64,6 @@ by real validation tooling before the next one starts.
 
 The draft layout is correct, not optimal, and it says so itself, in a
 `LAYOUT.md` that lists exactly what a specialist should redo before fab.
-`LAYOUT.md` that lists exactly what a specialist should redo before fab.
 Non-optimal is acceptable. Unlabeled non-optimal is not.
 
 ## Why this is a Delta 4
@@ -81,8 +80,6 @@ The honest before-and-after on a real board:
 That is a 10x jump in time plus a collapse in error rate. The second effect is the
 one that makes it stick: once a change to your board propagates everywhere and
 self-verifies, going back to updating five documents by hand feels broken.
-
-## What exists that didn't this morning
 
 ## Where we sit against the field
 
