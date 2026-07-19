@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://copperhead.chouhan.ai/sitemap.xml
+Sitemap: https://copperhead.sh/sitemap.xml

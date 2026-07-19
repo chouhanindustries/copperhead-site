@@ -1,7 +1,7 @@
 # copperhead-site
 
 Website for copperhead, the open source AI agent for PCB design.
-Live at [copperhead.chouhan.ai](https://copperhead.chouhan.ai/).
+Live at [copperhead.sh](https://copperhead.sh/).
 
 Single static page. Astro, vanilla CSS, no client framework, no CMS, no backend.
 Built to [website-spec.md](website-spec.md); copy is verbatim from
@@ -82,8 +82,8 @@ conflicts with the spec, the visual direction won:
 
 ## Deploy
 
-Static output in `dist/`. Same host as chouhan.ai (GitHub Pages or Cloudflare
-Pages), DNS `CNAME copperhead` to the host, HTTPS enforced. CI builds on push to
+Static output in `dist/`, served at [copperhead.sh](https://copperhead.sh/) as Cloudflare
+static assets (see `wrangler.jsonc`). CI builds on push to
 main and fails the build on em-dashes, dead links, or a transfer budget over
 100 KB.
 

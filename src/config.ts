@@ -4,12 +4,12 @@ export const pkg = 'copperhead';
 /** git remote of the copperhead repo (brand doc says animesh-chouhan; remote wins). */
 export const repo = 'https://github.com/chouhanindustries/copperhead';
 
-export const site = 'https://copperhead.chouhan.ai';
+export const site = 'https://copperhead.sh';
 
 export const links = {
   repo,
   // The blog now lives on this site (spec §non-goals said chouhan.ai; superseded).
-  // The docs are a separate VitePress site on GitHub Pages (source: repo
+  // The docs are a separate Astro Starlight site on GitHub Pages (source: repo
   // docs/). They cannot live at /docs here: this Worker owns the whole apex.
   blog: '/blog/',
   faq: '/blog/faq/',
