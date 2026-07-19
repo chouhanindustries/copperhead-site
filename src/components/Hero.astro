@@ -1,11 +1,11 @@
 ---
 import InstallBlock from './InstallBlock.astro';
-import { pkg } from '../config';
+import { quickstart } from '../config';
 
 // Single-column hero: headline, one-sentence subhead, a Quick start link and
-// the one-line install. The `--help` terminal that used to hold the right
-// column moved out; the CLI surface is covered by the feature cards, and the
-// full five-line block lives in the closing CTA.
+// the three-line quickstart (install, key, create). The `--help` terminal that
+// used to hold the right column moved out; the CLI surface is covered by the
+// feature cards.
 ---
 
 <section id="top" class="hero">
@@ -15,15 +15,30 @@ import { pkg } from '../config';
     <h1>Cursor for circuit boards.</h1>
 
     <p class="sub">
-      copperhead is an open source AI agent that designs, documents, and
-      verifies real PCBs from a prompt. On your files, in your repo, with
-      KiCad's own checks as the gate.
+      An AI agent that designs, documents, and validates real PCBs from a
+      prompt.
     </p>
 
-    <a class="quick" href="#quickstart">Quick start<span aria-hidden="true"> →</span></a>
+    <a class="quick" href="#quickstart"
+      >Quick start<svg
+        class="arrow"
+        viewBox="0 0 16 16"
+        width="13"
+        height="13"
+        aria-hidden="true"
+        focusable="false"
+        ><path
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M2.5 8h11M9 3.5 13.5 8 9 12.5"></path></svg
+      ></a
+    >
 
     <div class="install">
-      <InstallBlock lines={[`npm i -g ${pkg}`]} compact />
+      <InstallBlock lines={quickstart} compact />
     </div>
   </div>
 </section>
@@ -69,7 +84,7 @@ import { pkg } from '../config';
 
   h1 {
     font-size: clamp(2.3rem, 5.2vw, 3.9rem);
-    letter-spacing: -0.035em;
+    letter-spacing: -0.025em;
     max-width: 15ch;
     margin-inline: auto;
     text-wrap: balance;
@@ -85,9 +100,17 @@ import { pkg } from '../config';
   }
 
   .quick {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
     margin-top: 1.75rem;
     font-size: 0.95rem;
+  }
+
+  /* SVG rather than the → glyph: the arrow is not in the font subsets, and the
+     fallback face it fell to did not match the page. */
+  .quick .arrow {
+    flex: none;
   }
 
   .install {
@@ -99,7 +122,7 @@ import { pkg } from '../config';
   @media (max-width: 720px) {
     h1 {
       font-size: clamp(2rem, 8.6vw, 2.6rem);
-      letter-spacing: -0.028em;
+      letter-spacing: -0.02em;
       max-width: 14ch;
     }
 

@@ -5,7 +5,7 @@ import { quickstart } from '../config';
 // Closing CTA: tagline, one line of copy, and the install repeated. This is
 // also the page's #quickstart target, so the hero's "Quick start" link and the
 // footer both land here. W-3 lives on this block, not the hero one: it is the
-// exact five-line quickstart from website-content.md §8.
+// exact quickstart from config.ts (start-from-a-prompt demo).
 ---
 
 <section id="quickstart" class="cta">
@@ -13,13 +13,28 @@ import { quickstart } from '../config';
     <h2>Never ship a board your docs no longer describe.</h2>
 
     <p class="lede">
-      copperhead is open source and free to use. Install once, point it at a
-      KiCad repo, and run <code>do</code>.
+      copperhead is open source and free to use. Install once, describe the
+      board you want in a short <code>brief.md</code>, and run <code>create</code>.
     </p>
 
     <div class="install">
       <InstallBlock lines={quickstart} />
     </div>
+
+    <!-- What `--brief brief.md` points at. Content grounded in the Open
+         Telegraph brief (usecase-copperhead.md): ESP32-S3, BLE HID, the 25 µA
+         sleep budget, the 3.5 mm key jack. -->
+    <figure class="brief">
+      <figcaption>brief.md</figcaption>
+      <pre><code>{`# Pocket Morse key
+
+A pocket-size Morse key that types over Bluetooth as a standard keyboard.
+
+- ESP32-S3, BLE HID
+- Li-Po cell, USB-C charging
+- Sleep current budget: 25 µA
+- 3.5 mm jack for an external paddle`}</code></pre>
+    </figure>
 
     <p class="footnote">
       Requires Node 20+ and kicad-cli. The agent refuses to run on a dirty git
@@ -59,6 +74,49 @@ import { quickstart } from '../config';
     max-width: 42rem;
     margin: 2.5rem auto 0;
     text-align: left;
+  }
+
+  .brief {
+    max-width: 42rem;
+    margin: 0.75rem auto 0;
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+  }
+
+  .brief figcaption {
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  .brief pre {
+    margin: 0;
+    padding: 18px 24px;
+    /* wraps instead of scrolling: unlike the shell lines above, nothing here
+       needs to stay on one line, and this is what keeps the block compact on
+       mobile */
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  .brief code {
+    display: block;
+    line-height: 1.8;
+    color: var(--text);
+  }
+
+  @media (max-width: 720px) {
+    .brief figcaption {
+      padding: 8px 16px;
+    }
+
+    .brief pre {
+      padding: 14px 16px;
+    }
   }
 
   .footnote {

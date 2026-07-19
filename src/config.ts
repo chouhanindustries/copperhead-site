@@ -17,10 +17,11 @@ export const site = 'https://copperhead.chouhan.ai';
 export const links = {
   repo,
   // The blog now lives on this site (spec §non-goals said chouhan.ai; superseded).
-  // The docs are deployed at /docs on this site (source: repo docs/).
+  // The docs are a separate VitePress site on GitHub Pages (source: repo
+  // docs/). They cannot live at /docs here: this Worker owns the whole apex.
   blog: '/blog/',
   faq: '/blog/faq/',
-  docs: '/docs/',
+  docs: 'https://docs.copperhead.chouhan.ai/',
   demoVideo: '/copperhead-demo.mp4',
   telegraphRepo: 'https://github.com/animesh-chouhan/open-telegraph',
   buildStory: 'https://chouhan.ai/building-with-claude',
@@ -34,11 +35,14 @@ export const links = {
   license: `${repo}/blob/main/LICENSE`,
 };
 
-/** The exact five-line quickstart block (website-content.md §8, acceptance W-3). */
+/**
+ * Quickstart block (acceptance W-3: the copy button copies exactly these lines).
+ * Supersedes the website-content.md §8 `init`/`do` flow: this shows the
+ * start-from-a-prompt pipeline (`copperhead create`, usecase-copperhead.md),
+ * which scaffolds a new design from a brief rather than editing an existing repo.
+ */
 export const quickstart = [
   `npm i -g ${pkg}`,
-  'export ANTHROPIC_API_KEY=...        # or OPENAI_API_KEY',
-  'cd your-kicad-repo',
-  'copperhead init',
-  'copperhead do "add a second RGB LED on an RTC-capable pin"',
+  'export ANTHROPIC_API_KEY=<api-key>',
+  'copperhead create --brief brief.md',
 ];
