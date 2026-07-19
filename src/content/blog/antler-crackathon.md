@@ -117,7 +117,7 @@ CLI: hosted runs, longer context over a design history, and team-level review.
 ## Try it
 
 ```
-npm i -g @chouhan/copperhead
+npm i -g copperhead
 export ANTHROPIC_API_KEY=...
 cd your-kicad-repo
 copperhead init

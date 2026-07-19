@@ -1,13 +1,5 @@
-/**
- * Single source of truth for outbound links and the install command.
- *
- * NOTE on `pkg`: brand-and-business.md §1 specifies npm `@chouhan/copperhead`,
- * while website-content.md §8 shows the bare name `copperhead`. The bare name is
- * not publishable: npm returns 404 "Unpublished on 2022-05-28" and permanently
- * reserves unpublished names. `@chouhan/copperhead` is unregistered and free.
- * Change this one value if the bare name is ever recovered.
- */
-export const pkg = '@chouhan/copperhead';
+/** Single source of truth for outbound links and the install command. */
+export const pkg = 'copperhead';
 
 /** git remote of the copperhead repo (brand doc says animesh-chouhan; remote wins). */
 export const repo = 'https://github.com/chouhanindustries/copperhead';
