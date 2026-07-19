@@ -1,4 +1,4 @@
-# copperhead.chouhan.ai — Website Content
+# copperhead.chouhan.ai - Website Content
 
 Final copy, section by section, matching the layout in brand-and-business.md §2. Voice: precise, confident, understated. No em-dashes anywhere in this copy (Chouhan style rule). Every claim is demonstrable in the repo today.
 

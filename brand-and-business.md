@@ -1,6 +1,6 @@
-# copperhead — Brand, Website, Pitch & Business
+# copperhead - Brand, Website, Pitch & Business
 
-*(Companion to SPEC.md and pitch-script.md. Website copy follows Chouhan voice: precise, confident, understated. No em-dashes in customer-facing copy.)*
+_(Companion to SPEC.md and pitch-script.md. Website copy follows Chouhan voice: precise, confident, understated. No em-dashes in customer-facing copy.)_
 
 ---
 
@@ -24,7 +24,7 @@
 
 ### Visual direction
 
-- **Colors:** copper (#B87333) on near-black (#121212), with PCB soldermask green (#0E5A38) or ENIG gold (#C9A227) as accent. White text.
+- **Colors:** copper (#D08F39) on near-black (#121212), with PCB soldermask green (#0E5A38) or ENIG gold (#C9A84C, the shared brand gold from chouhan.ai) as accent. White text.
 - **Motif:** PCB traces. Logo: a snake formed from a single copper trace with a via as the eye. Fallback for today: wordmark `copperhead` in a mono font (JetBrains Mono / IBM Plex Mono) with the "o" rendered as a via (annular ring).
 - **Texture:** schematic grid dots, thin trace lines as section dividers.
 - **Terminal aesthetic** for demos: dark background, copper prompt.
@@ -40,15 +40,15 @@
 
 Stack suggestion: one static HTML page, same infra as chouhan.ai. Section order:
 
-1. **Hero** — wordmark + tagline. H1: "Cursor for circuit boards." Sub: "An open source AI agent that designs, documents, and verifies real PCBs from a prompt. On your files, in your repo." Two buttons: `GitHub` (primary), `Watch the demo` (video). Background: faint animated ratsnest resolving into routed traces.
-2. **The demo** — the 60-second video, autoplay muted. Caption: "A real board, redesigned in one prompt, checks passing."
-3. **How it works** — the six-step loop from the blog (§4.0 of SPEC.md), as a horizontal stepper: Docs → Propose → Edit → Propagate → Verify → Rationale. One line each.
-4. **Spec-gated in, verification-gated out** — the two invariants as a diptych. Left: "Nothing starts without a spec." Right: "Nothing is done until the tools agree." This is the trust section.
-5. **What comes out** — the outputs grid: schematic, board, gerbers, DXF/STEP, renders, ordering BOM, firmware, dev plan. Each with a real file icon and a sample from open-telegraph.
-6. **Proof** — Open Telegraph card: board render, "designed to a 25 µA sleep budget, every decision public", link to repo + blog post.
-7. **Why open** — three lines from the Chouhan philosophy: transparency scales, trust does not. Apache-2.0 badge, KiCad + OpenSpec logos.
-8. **Quickstart** — the four-command install block, copy button.
-9. **Footer** — Chouhan Industries, GitHub, X, license links.
+1. **Hero** - wordmark + tagline. H1: "Cursor for circuit boards." Sub: "An open source AI agent that designs, documents, and verifies real PCBs from a prompt. On your files, in your repo." Two buttons: `GitHub` (primary), `Watch the demo` (video). Background: faint animated ratsnest resolving into routed traces.
+2. **The demo** - the 60-second video, autoplay muted. Caption: "A real board, redesigned in one prompt, checks passing."
+3. **How it works** - the six-step loop from the blog (§4.0 of SPEC.md), as a horizontal stepper: Docs → Propose → Edit → Propagate → Verify → Rationale. One line each.
+4. **Spec-gated in, verification-gated out** - the two invariants as a diptych. Left: "Nothing starts without a spec." Right: "Nothing is done until the tools agree." This is the trust section.
+5. **What comes out** - the outputs grid: schematic, board, gerbers, DXF/STEP, renders, ordering BOM, firmware, dev plan. Each with a real file icon and a sample from open-telegraph.
+6. **Proof** - Open Telegraph card: board render, "designed to a 25 µA sleep budget, every decision public", link to repo + blog post.
+7. **Why open** - three lines from the Chouhan philosophy: transparency scales, trust does not. Apache-2.0 badge, KiCad + OpenSpec logos.
+8. **Quickstart** - the four-command install block, copy button.
+9. **Footer** - Chouhan Industries, GitHub, X, license links.
 
 Copy rule: every claim on the page must be demonstrable in the repo today. Nothing aspirational above the fold.
 
@@ -58,16 +58,16 @@ Copy rule: every claim on the page must be demonstrable in the repo today. Nothi
 
 ### Model: open core + hosted (GitLab/Grafana pattern)
 
-| Tier | Price | What | Who |
-|---|---|---|---|
-| **OSS** | Free forever | Full CLI, all modes, bring your own API key, public or private use | Individuals, hobbyists, funnel |
-| **Cloud** | $49/user/mo (launch) | Hosted agent (no keys to manage), private repo support, run history UI, live viewer hosted, team sharing | Small hardware teams, consultancies |
-| **Team** | $199/user/mo | CI integration (check-as-a-service, PR review bot), constraint libraries shared across projects, priority models, SSO | Funded startups, 5–50 EE orgs |
-| **Enterprise** | Custom | Self-hosted/VPC, Altium format support, audit exports (the OpenSpec paper trail is a compliance feature), SLAs | Regulated: medical, aero, defense |
+| Tier           | Price                | What                                                                                                                  | Who                                 |
+| -------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| **OSS**        | Free forever         | Full CLI, all modes, bring your own API key, public or private use                                                    | Individuals, hobbyists, funnel      |
+| **Cloud**      | $49/user/mo (launch) | Hosted agent (no keys to manage), private repo support, run history UI, live viewer hosted, team sharing              | Small hardware teams, consultancies |
+| **Team**       | $199/user/mo         | CI integration (check-as-a-service, PR review bot), constraint libraries shared across projects, priority models, SSO | Funded startups, 5–50 EE orgs       |
+| **Enterprise** | Custom               | Self-hosted/VPC, Altium format support, audit exports (the OpenSpec paper trail is a compliance feature), SLAs        | Regulated: medical, aero, defense   |
 
 ### Why customers pay when the tool is free
 
-The design runs locally forever. What's paid is *operational*: hosted compute and keys, team memory (shared constraint libraries), CI enforcement, and the audit trail as a compliance artifact. Same reason GitHub charges while git is free.
+The design runs locally forever. What's paid is _operational_: hosted compute and keys, team memory (shared constraint libraries), CI enforcement, and the audit trail as a compliance artifact. Same reason GitHub charges while git is free.
 
 ### Unit economics sanity check
 
@@ -98,7 +98,7 @@ The design runs locally forever. What's paid is *operational*: hosted compute an
 
 1. **Title:** copperhead. Cursor for circuit boards. (wordmark, one line, nothing else)
 2. **Problem:** photo of a real schematic + the five docs. "One change touches all of these. They drift. Drift ships to fab at $5–50K per respin."
-3. **[LIVE DEMO — no slide, terminal + viewer]**
+3. **[LIVE DEMO - no slide, terminal + viewer]**
 4. **Delta 4:** the before/after table. Months→days, specialist→anyone, drift→build failure. "Users never go back."
 5. **Ask/close:** global on day 0 (KiCad's install base), US GTM (Crowd Supply/YC hardware), open core business. "The Morse key is what the workflow made first."
 
