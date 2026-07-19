@@ -1,5 +1,5 @@
 ---
-title: "Antler Crackathon submission"
+title: "copperhead: Cursor for circuit boards"
 description: "copperhead is an AI agent that designs, documents, and validates real PCBs from a prompt, working on your existing KiCad repository. Built and proven on a shipping open source board."
 date: 2026-07-18
 kind: "Submission"
