@@ -27,9 +27,9 @@ Non-goals: docs site (lives in the repo for now), waitlist/payments (later, via 
 :root {
   --bg:        #121212;  /* near-black, whole page */
   --surface:   #1A1A1A;  /* cards */
-  --copper:    #B87333;  /* primary: wordmark, CTAs, links */
-  --copper-hi: #D98E4A;  /* hover state */
-  --gold:      #C9A227;  /* accent: badges, highlights, sparingly */
+  --copper:    #D08F39;  /* primary: wordmark, CTAs, links */
+  --copper-hi: #DEA754;  /* hover state */
+  --gold:      #C9A84C;  /* brand gold from chouhan.ai: badges, highlights, sparingly */
   --green:     #0E5A38;  /* soldermask green: success/check states only */
   --text:      #EAEAEA;
   --text-dim:  #9A9A9A;
@@ -38,6 +38,7 @@ Non-goals: docs site (lives in the repo for now), waitlist/payments (later, via 
 ```
 
 - Dark throughout. No light mode in v1
+- **Brand gold:** `--gold` (#C9A84C) is the Chouhan Industries brand gold, taken from the `--gold` variable on [chouhan.ai](https://chouhan.ai). Keep it in sync with the parent site; it doubles here as the ENIG-gold accent and the focus-ring color
 - **Motif:** thin 1px copper trace lines as section dividers, each terminating in a small via dot (6px circle, copper ring, bg fill). One motif, used consistently, nothing else
 - Wordmark: `copperhead` lowercase in mono, the second "o" drawn as a via (annular ring)
 - Background texture: faint schematic grid dots (2% opacity) on the hero only
@@ -100,7 +101,7 @@ Routes: `/blog/` (index), `/blog/<slug>/` (posts), `/blog/faq/`.
 
 ## 8. Accessibility
 
-- Contrast: copper #B87333 on #121212 passes AA for large text only — body text is #EAEAEA; copper reserved for headings, links (underlined), and buttons ≥ 18px
+- Contrast: copper #D08F39 on #121212 is ~6.8:1, passing AA for normal text — body text is still #EAEAEA; copper reserved for headings, links (underlined), and buttons
 - All interactive elements keyboard-reachable with visible focus ring (gold outline)
 - Video has captions file (the narration script already exists in pitch-script.md)
 - Semantic landmarks: header/main/footer, one h1, sections with h2

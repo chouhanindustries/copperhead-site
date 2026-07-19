@@ -1,26 +1,11 @@
 /* copperhead.chouhan.ai — design system
 
-   Type: Space Grotesk for display (drafting-adjacent grotesk, sits well next to
-   a mono), IBM Plex Sans for text (IBM's engineering face; brand-and-business.md
-   §1 already names Plex Mono as an alternate), JetBrains Mono for code, the
-   wordmark, and reference numbers. All self-hosted and subset to the glyphs the
-   page uses, which is why five faces still fit the §7 budget. */
-
-@font-face {
-  font-family: 'Space Grotesk';
-  src: url('/fonts/space-grotesk-500.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Space Grotesk';
-  src: url('/fonts/space-grotesk-700.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
+   Type: IBM Plex Sans for both display and text (IBM's engineering face;
+   brand-and-business.md §1 already names Plex Mono as an alternate) — 600 for
+   headings, 400/500 for text — and JetBrains Mono for code, the wordmark, and
+   reference numbers. One family keeps the page sober; all faces are self-hosted
+   and subset to the glyphs the page uses, which is why four faces still fit the
+   §7 budget. */
 
 @font-face {
   font-family: 'IBM Plex Sans';
@@ -39,6 +24,14 @@
 }
 
 @font-face {
+  font-family: 'IBM Plex Sans';
+  src: url('/fonts/ibm-plex-sans-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: 'JetBrains Mono';
   src: url('/fonts/jetbrains-mono-400.woff2') format('woff2');
   font-weight: 400;
@@ -49,14 +42,15 @@
 :root {
   --bg:        #121212;
   --surface:   #1A1A1A;
-  --copper:    #B87333;
-  --copper-hi: #D98E4A;
-  --gold:      #C9A227;
+  --copper:    #D08F39;
+  --copper-hi: #DEA754;
+  --gold:      #C9A84C; /* brand gold, shared with chouhan.ai (--gold there) */
   --green:     #0E5A38;
   --text:      #EAEAEA;
   --text-dim:  #9A9A9A;
 
-  --display: 'Space Grotesk', Georgia, sans-serif;
+  --display: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, sans-serif;
   --sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -64,7 +58,7 @@
   --maxw: 1120px;
   --pad-y: 136px;
   --hairline: rgba(255, 255, 255, 0.08);
-  --trace: rgba(184, 115, 51, 0.26);
+  --trace: color-mix(in srgb, var(--copper) 26%, transparent);
 }
 
 *,
@@ -95,9 +89,10 @@ h1,
 h2,
 h3 {
   font-family: var(--display);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.025em;
+  /* Plex Sans carries display sizes at 600; 700 reads clumsy at this scale */
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
   margin: 0;
 }
 
@@ -106,7 +101,7 @@ h3 {
 h3 {
   font-weight: 500;
   line-height: 1.3;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
 }
 
 p {
@@ -118,7 +113,7 @@ a {
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
-  text-decoration-color: rgba(184, 115, 51, 0.45);
+  text-decoration-color: color-mix(in srgb, var(--copper) 45%, transparent);
 }
 
 a:hover {
