@@ -3,13 +3,14 @@ title: "copperhead: Cursor for circuit boards"
 description: "copperhead is an AI agent that designs, documents, and validates real PCBs from a prompt, working on your existing KiCad repository. Built and proven on a shipping open source board."
 date: 2026-07-18
 kind: "Submission"
+deck: "/Copperhead.pdf"
 ---
 
 Most Claude demos are software.\
 **This one is a circuit board.**
 
 <figure class="article-figure">
-  <a class="deck-card" href="/Copperhead.pdf" target="_blank" rel="noopener noreferrer">
+  <a class="deck-card" href={frontmatter.deck} target="_blank" rel="noopener noreferrer">
     <img src="/Copperhead.png" alt="Title slide of the copperhead pitch deck" width="960" height="540" loading="lazy" decoding="async" />
     <span class="deck-cta">View the full deck (PDF)</span>
   </a>
@@ -28,7 +29,7 @@ ERC and DRC until the checks pass.
 | Built by    | Animesh Chouhan                                                                     |
 | Repo        | [chouhanindustries/copperhead](https://github.com/chouhanindustries/copperhead)     |
 | Proof board | [animesh-chouhan/open-telegraph](https://github.com/animesh-chouhan/open-telegraph) |
-| Slides      | [Copperhead.pdf](/Copperhead.pdf)                                                   |
+| Slides      | <a href={frontmatter.deck}>Copperhead.pdf</a>                                       |
 | License     | Apache-2.0                                                                           |
 
 ![Open Telegraph board, a 40 by 40 mm ESP32-S3 Morse key, 3D render](/pcb.png)
@@ -159,7 +160,7 @@ copperhead is open source and now live at [copperhead.sh](/). Docs:
 [copperhead.sh/docs](https://copperhead.sh/docs).
 
 ```
-npm i -g @chouhan/copperhead
+npm i -g copperhead
 export ANTHROPIC_API_KEY=<api-key>
 
 copperhead create --brief brief.md
@@ -197,5 +198,5 @@ came together, see
 [building open hardware with Claude](https://chouhan.ai/building-with-claude.html).
 
 [copperhead on GitHub](https://github.com/chouhanindustries/copperhead) ·
-[The deck (PDF)](/Copperhead.pdf) ·
+<a href={frontmatter.deck}>The deck (PDF)</a> ·
 [Open Telegraph](https://chouhan.ai/products/open-telegraph.html)

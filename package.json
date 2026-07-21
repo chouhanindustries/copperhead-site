@@ -12,6 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/mdx": "^7.0.3",
     "astro": "^7.1.1"
   },
   "description": "Website for copperhead, the open source AI agent for PCB design. Live at copperhead.sh",

@@ -372,7 +372,7 @@ section {
 .prose .deck-cta {
   position: absolute;
   left: 50%;
-  bottom: 48px;
+  bottom: 64px;
   transform: translateX(-50%);
   z-index: 1;
   display: inline-block;
@@ -400,7 +400,7 @@ section {
 
 @media (max-width: 768px) {
   .prose .deck-cta {
-    bottom: 26px;
+    bottom: 36px;
     padding: 9px 16px;
     font-size: 0.62rem;
   }
