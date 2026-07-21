@@ -210,7 +210,7 @@ section {
   background: var(--bg);
 }
 
-/* ---- Wordmark: the "o" is a via (annular ring) ---- */
+/* ---- Wordmark: fiducial mark + lowercase mono ---- */
 
 .wordmark {
   font-family: var(--mono);
@@ -224,17 +224,6 @@ section {
 
 .wordmark:hover {
   color: var(--text);
-}
-
-.wordmark .via {
-  display: inline-block;
-  width: 0.6em;
-  height: 0.6em;
-  border-radius: 50%;
-  border: 0.155em solid var(--copper);
-  background: transparent;
-  margin-inline: 0.05em;
-  transform: translateY(0.02em);
 }
 
 /* ---- Buttons ---- */

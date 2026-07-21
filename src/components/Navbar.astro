@@ -135,6 +135,14 @@ const nav = [
     flex: none;
   }
 
+  /* Larger type where there is room; phones keep the tighter 0.88/0.82 sizes. */
+  @media (min-width: 861px) {
+    nav a,
+    a.mark {
+      font-size: 0.95rem;
+    }
+  }
+
   /* Three or four short links fit at every width, so no hamburger and nothing
      gets hidden; the gaps just tighten and the tap targets grow. */
   @media (max-width: 860px) {

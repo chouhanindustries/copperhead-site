@@ -1,7 +1,9 @@
 ---
-// Wordmark: "copperhead" lowercase mono, the second "o" drawn as a via
-// (annular ring). Spec §3. The via is aria-hidden and the accessible name is
-// supplied by the visually-hidden text so screen readers read "copperhead".
+// Wordmark: the fiducial mark (circle plus crosshair ticks, the brand icon
+// from the docs branding masters) followed by "copperhead" in lowercase mono,
+// matching the official lockup. The mark is aria-hidden and the accessible
+// name is supplied by the visually-hidden text so screen readers read
+// "copperhead".
 interface Props {
   size?: string;
   href?: string;
@@ -13,7 +15,13 @@ const Tag = href ? 'a' : 'span';
 <Tag class="wordmark" style={`font-size:${size}`} {...href ? { href } : {}}>
   <span class="sr-only">copperhead</span>
   <span aria-hidden="true" class="mark">
-    c<span class="via"></span>pperhead
+    <svg class="fiducial" viewBox="4.625 4.625 22.75 22.75" focusable="false">
+      <circle cx="16" cy="16" r="5.25" fill="none" stroke="var(--copper)" stroke-width="2.25"
+      ></circle>
+      <path d="M16 5.75v5M16 21.25v5M5.75 16h5M21.25 16h5" stroke="var(--copper)" stroke-width="2.25"
+      ></path>
+    </svg>
+    copperhead
   </span>
 </Tag>
 
@@ -31,6 +39,12 @@ const Tag = href ? 'a' : 'span';
   }
   .mark {
     display: inline-flex;
-    align-items: baseline;
+    align-items: center;
+    gap: 0.35em;
+  }
+  .fiducial {
+    width: 1em;
+    height: 1em;
+    flex: none;
   }
 </style>
