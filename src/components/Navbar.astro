@@ -1,15 +1,13 @@
 ---
 import Wordmark from './Wordmark.astro';
 import { links } from '../config';
+import { stats, compact } from '../stats';
 
-// Fixed top bar. Spec §4 called for no header in v1, just a floating GitHub
-// link; this replaces it and satisfies W-2 more directly (the CTA is in reach
-// at every scroll position). Pure CSS, no JS: the bar is always translucent
-// rather than switching state on scroll.
-// The install block sits in the hero and again in the closing CTA, so the bar
-// carries no install action; GitHub is the one link given emphasis, since the
-// repo is where a reader who is already sold goes next.
-// Discord renders only once a handle exists in config (it is still empty).
+// Fixed top bar, proportioned after mastra.ai: a solid 60px antigrid bar, 15px
+// medium links sitting left of centre next to the logo, a near-white GitHub
+// chip, and a copper "Try for Free" pill where mastra runs its white Sign Up
+// button. Below the tablet width the links and CTAs collapse into a hamburger
+// drop panel (mastra's mobile behaviour); a few lines of JS drive the toggle.
 interface Props {
   /** False on subpages, where the brand mark has to navigate rather than scroll. */
   home?: boolean;
@@ -25,53 +23,76 @@ const nav = [
 ];
 ---
 
-<header class="bar">
+<header class="bar" data-open="false">
   <div class="inner">
     <a class="brand" href={home ? '#top' : '/'}>
-      <Wordmark size="0.95rem" />
+      <Wordmark size="1.02rem" />
     </a>
 
-    <nav aria-label="Primary">
-      <ul>
-        {
-          nav.map((l) => (
-            <li>
-              <a href={l.href}>{l.label}</a>
-            </li>
-          ))
-        }
-      </ul>
-    </nav>
+    <button
+      class="burger"
+      type="button"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+      aria-controls="nav-menu"
+    >
+      <span></span>
+      <span></span>
+    </button>
 
-    <a class="mark" href={links.repo} aria-label="GitHub">
-      <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" focusable="false">
-        <path
-          fill="currentColor"
-          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.42 7.42 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
-        />
-      </svg>
-      <span class="mark-label">GitHub</span>
-    </a>
+    <div class="menu" id="nav-menu">
+      <nav aria-label="Primary">
+        <ul>
+          {
+            nav.map((l) => (
+              <li>
+                <a href={l.href}>{l.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="actions">
+        <a
+          class="gh"
+          href={links.repo}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={stats.stars !== null ? `GitHub, ${stats.stars} stars` : 'GitHub repository'}
+        >
+          <svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" focusable="false">
+            <path
+              fill="currentColor"
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"
+            />
+          </svg>
+          {stats.stars !== null && <span class="count">{compact(stats.stars)}</span>}
+        </a>
+
+        <a class="waitlist" href={links.getStarted}>Try for Free</a>
+      </div>
+    </div>
   </div>
 </header>
 
 <style>
+  /* Solid antigrid bar with a 2px lower border a hair lighter than the surface,
+     matching mastra's --ds-nav-height of 60px. */
   .bar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 20;
-    background: rgba(18, 18, 18, 0.72);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    background: #0d0d0d;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.06);
   }
 
   .inner {
     max-width: var(--maxw);
     margin-inline: auto;
-    padding: 0 28px;
+    padding: 0 32px;
     height: 60px;
     display: flex;
     align-items: center;
@@ -81,20 +102,23 @@ const nav = [
   .brand {
     text-decoration: none;
     display: inline-flex;
-    /* keeps the tap target comfortable without changing the mark */
+    align-items: center;
     padding: 6px 0;
+    /* mastra sets the logo an mr-[32px] off the first link */
+    margin-right: 8px;
   }
 
-  /* Brand left, links and repo button right; the slack collects between the
-     brand and the nav rather than at either edge. */
-  nav {
-    margin-left: auto;
+  /* On desktop the wrapper collapses so nav and actions become direct flex
+     children of .inner: links left next to the brand, actions pushed right. */
+  .menu {
+    display: contents;
   }
 
   nav ul {
     list-style: none;
     display: flex;
-    gap: 28px;
+    align-items: center;
+    gap: 2px;
     margin: 0;
     padding: 0;
   }
@@ -102,90 +126,208 @@ const nav = [
   nav a {
     color: var(--text-dim);
     text-decoration: none;
-    font-size: 0.88rem;
+    font-size: 0.9375rem; /* 15px */
+    font-weight: 500;
     white-space: nowrap;
+    padding: 7px 11px;
+    border-radius: 8px;
+    transition: color 0.16s ease, background-color 0.16s ease;
   }
 
   nav a:hover {
     color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
   }
 
-  /* GitHub is the one emphasised link: a copper-tinted button so it reads as
-     the destination rather than another peer in the list. */
-  a.mark {
+  /* Right cluster: mastra pairs a GitHub chip with a solid CTA pill. */
+  .actions {
+    margin-left: auto;
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    font-size: 0.88rem;
+    gap: 10px;
+  }
+
+  /* GitHub chip: the octocat + star count, near-white so the mark reads clearly
+     (mastra's is light too), 34px tall, 6px radius, 15px medium. */
+  a.gh {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 10px 0 7px;
+    border-radius: 6px;
+    font-size: 0.9375rem; /* 15px */
+    font-weight: 500;
     white-space: nowrap;
     text-decoration: none;
-    color: var(--copper-hi);
-    border: 1px solid var(--trace);
-    border-radius: 6px;
-    padding: 6px 13px;
-    background: color-mix(in srgb, var(--copper) 8%, transparent);
+    color: var(--text);
+    transition: color 0.16s ease, background-color 0.16s ease;
   }
 
-  a.mark:hover {
-    border-color: var(--copper);
-    background: color-mix(in srgb, var(--copper) 16%, transparent);
+  a.gh:hover {
+    background: rgba(255, 255, 255, 0.06);
   }
 
-  a.mark svg {
+  a.gh svg {
     flex: none;
   }
 
-  /* Larger type where there is room; phones keep the tighter 0.88/0.82 sizes. */
-  @media (min-width: 861px) {
-    nav a,
-    a.mark {
-      font-size: 0.95rem;
-    }
+  .count {
+    font-variant-numeric: tabular-nums;
   }
 
-  /* Three or four short links fit at every width, so no hamburger and nothing
-     gets hidden; the gaps just tighten and the tap targets grow. */
-  @media (max-width: 860px) {
+  /* Solid CTA pill: mastra's Sign Up metrics (34px, 10px radius, 15px medium),
+     copper where mastra is white — the one emphasised destination in the bar. */
+  a.waitlist {
+    display: inline-flex;
+    align-items: center;
+    height: 34px;
+    padding: 0 16px;
+    border-radius: 10px;
+    font-size: 0.9375rem; /* 15px */
+    font-weight: 500;
+    white-space: nowrap;
+    text-decoration: none;
+    color: #100d0a;
+    background: var(--copper);
+    transition: background-color 0.16s ease;
+  }
+
+  a.waitlist:hover {
+    background: var(--copper-hi);
+  }
+
+  /* Hamburger: two bars that cross into an X when open. Hidden on desktop. */
+  .burger {
+    display: none;
+    margin-left: auto;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    position: relative;
+    color: var(--text);
+  }
+
+  .burger span {
+    position: absolute;
+    left: 11px;
+    width: 18px;
+    height: 1.5px;
+    background: currentColor;
+    border-radius: 1px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .burger span:nth-child(1) {
+    transform: translateY(-3.5px);
+  }
+
+  .burger span:nth-child(2) {
+    transform: translateY(3.5px);
+  }
+
+  .bar[data-open='true'] .burger span:nth-child(1) {
+    transform: rotate(45deg);
+  }
+
+  .bar[data-open='true'] .burger span:nth-child(2) {
+    transform: rotate(-45deg);
+  }
+
+  /* ── Mobile: links and CTAs move into a drop panel (mastra behaviour) ── */
+  @media (max-width: 768px) {
     .inner {
       gap: 12px;
-      padding-inline: 20px;
-    }
-
-    nav ul {
-      gap: 18px;
-    }
-
-    nav a,
-    a.mark {
-      display: inline-flex;
-      align-items: center;
-      min-height: 44px;
+      padding-inline: 22px;
     }
 
     .brand {
-      min-height: 44px;
-      align-items: center;
-    }
-  }
-
-  /* The four items no longer fit with the GitHub label at this width (the
-     button ran past the right edge at 320px), so the button goes icon-only. */
-  @media (max-width: 420px) {
-    nav ul {
-      gap: 14px;
+      margin-right: 0;
     }
 
-    nav a,
-    a.mark {
-      font-size: 0.82rem;
+    .burger {
+      display: block;
     }
 
-    a.mark {
-      padding-inline: 10px;
-    }
-
-    .mark-label {
+    /* Panel drops from under the bar, full width, closed by default so its
+       links stay out of the tab order until opened. */
+    .menu {
       display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+      padding: 14px 22px 20px;
+      background: #0d0d0d;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .bar[data-open='true'] .menu {
+      display: flex;
+    }
+
+    nav ul {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 2px;
+    }
+
+    nav a {
+      padding: 12px 12px;
+      font-size: 1rem;
+    }
+
+    .actions {
+      margin-left: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    a.gh {
+      height: 44px;
+      justify-content: flex-start;
+      padding-inline: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    a.waitlist {
+      height: 44px;
+      justify-content: center;
+      font-size: 1rem;
     }
   }
 </style>
+
+<script>
+  // Toggle the mobile drop panel. Kept tiny and dependency-free; the panel is
+  // display:none when closed so its links stay out of the tab order.
+  const bar = document.querySelector<HTMLElement>('.bar');
+  const burger = bar?.querySelector<HTMLButtonElement>('.burger');
+  const menu = bar?.querySelector<HTMLElement>('.menu');
+
+  if (bar && burger && menu) {
+    const setOpen = (open: boolean) => {
+      bar.dataset.open = String(open);
+      burger.setAttribute('aria-expanded', String(open));
+    };
+
+    burger.addEventListener('click', () => setOpen(bar.dataset.open !== 'true'));
+
+    // A tap on any link closes the panel before the navigation resolves.
+    menu.addEventListener('click', (e) => {
+      if ((e.target as HTMLElement).closest('a')) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  }
+</script>

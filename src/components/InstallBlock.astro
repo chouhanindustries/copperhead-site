@@ -65,12 +65,14 @@ const block = lines.join('\n');
 </script>
 
 <style>
+  /* mastra's elevated code surface: a raised #171717 fill, a hairline #262626
+     frame, soft 12px corners. */
   .terminal {
     position: relative;
-    background: var(--surface);
-    border: 1px solid var(--hairline);
-    border-radius: 4px;
-    padding: 22px 24px;
+    background: #171717;
+    border: 1px solid #262626;
+    border-radius: 12px;
+    padding: 20px 22px;
   }
 
   .terminal.compact {
@@ -89,7 +91,7 @@ const block = lines.join('\n');
 
   code {
     display: block;
-    line-height: 1.9;
+    line-height: 1.75;
     color: var(--text);
   }
 
@@ -108,18 +110,19 @@ const block = lines.join('\n');
     width: 32px;
     height: 32px;
     padding: 0;
-    border-radius: 3px;
-    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    border: 1px solid #262626;
     /* solid surface fill so text scrolling beneath never shows through */
-    background: var(--surface);
+    background: #171717;
     color: var(--text-dim);
     cursor: pointer;
-    transition: color 0.15s ease, border-color 0.15s ease;
+    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
   }
 
   .copy:hover {
     color: var(--text);
-    border-color: rgba(255, 255, 255, 0.24);
+    background: #262626;
+    border-color: #333;
   }
 
   .copy .ic-done {

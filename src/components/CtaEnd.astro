@@ -10,23 +10,24 @@ import { quickstart } from '../config';
 
 <section id="quickstart" class="cta">
   <div class="wrap">
-    <h2>Never ship a board your docs no longer describe.</h2>
+    <div class="card">
+      <h2>Never ship a board your docs no longer describe.</h2>
 
-    <p class="lede">
-      copperhead is open source and free to use. Install once, describe the
-      board you want in a short <code>brief.md</code>, and run <code>create</code>.
-    </p>
+      <p class="lede">
+        copperhead is open source and free to use. Install once, describe the
+        board you want in a short <code>brief.md</code>, and run <code>create</code>.
+      </p>
 
-    <div class="install">
-      <InstallBlock lines={quickstart} />
-    </div>
+      <div class="install">
+        <InstallBlock lines={quickstart} />
+      </div>
 
-    <!-- What `--brief brief.md` points at. Content grounded in the Open
-         Telegraph brief (usecase-copperhead.md): ESP32-S3, BLE HID, the 25 µA
-         sleep budget, the 3.5 mm key jack. -->
-    <figure class="brief">
-      <figcaption>brief.md</figcaption>
-      <pre><code>{`# Pocket Morse key
+      <!-- What `--brief brief.md` points at. Content grounded in the Open
+           Telegraph brief (usecase-copperhead.md): ESP32-S3, BLE HID, the 25 µA
+           sleep budget, the 3.5 mm key jack. -->
+      <figure class="brief">
+        <figcaption>brief.md</figcaption>
+        <pre><code>{`# Pocket Morse key
 
 A pocket-size Morse key that types over Bluetooth as a standard keyboard.
 
@@ -34,27 +35,34 @@ A pocket-size Morse key that types over Bluetooth as a standard keyboard.
 - Li-Po cell, USB-C charging
 - Sleep current budget: 25 µA
 - 3.5 mm jack for an external paddle`}</code></pre>
-    </figure>
+      </figure>
 
-    <p class="footnote">
-      Requires Node 20+ and kicad-cli. The agent refuses to run on a dirty git
-      tree, refuses edits without a validated proposal, and refuses changes that
-      break your documented budgets. You will come to like being told no.
-    </p>
+      <p class="footnote">
+        Requires Node 20+ and kicad-cli. The agent refuses to run on a dirty git
+        tree, refuses edits without a validated proposal, and refuses changes that
+        break your documented budgets. You will come to like being told no.
+      </p>
+    </div>
   </div>
 </section>
 
 <style>
-  .cta {
-    border-top: 1px solid var(--hairline);
-  }
-
+  /* Closing CTA sits inside the mastra card, so the section itself carries no
+     divider — the 2px frame provides the separation. */
   .cta .wrap {
     text-align: center;
   }
 
+  .card {
+    border: 2px solid #1c1c1c;
+    background: #0a0a0a;
+    border-radius: 32px;
+    padding: clamp(44px, 6vw, 88px) clamp(24px, 5vw, 72px);
+  }
+
   h2 {
-    font-size: clamp(1.85rem, 3.4vw, 2.6rem);
+    /* mastra headline-2xl, matching the section titles elsewhere */
+    font-size: clamp(1.875rem, 3.8vw, 3.375rem);
     max-width: 22ch;
     margin-inline: auto;
     text-wrap: balance;
@@ -62,8 +70,9 @@ A pocket-size Morse key that types over Bluetooth as a standard keyboard.
 
   .lede {
     color: var(--text-dim);
+    font-size: 1.2rem;
     max-width: 52ch;
-    margin: 1.25rem auto 0;
+    margin: 1.35rem auto 0;
   }
 
   .lede code {

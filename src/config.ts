@@ -8,6 +8,8 @@ export const site = 'https://copperhead.sh';
 
 export const links = {
   repo,
+  // Primary navbar CTA ("Try for Free") — the docs quickstart.
+  getStarted: 'https://docs.copperhead.sh/getting-started/quickstart/',
   // The blog now lives on this site (spec §non-goals said chouhan.ai; superseded).
   // The docs are a separate Astro Starlight site on GitHub Pages (source: repo
   // docs/). They cannot live at /docs here: this Worker owns the whole apex.
@@ -17,10 +19,12 @@ export const links = {
   demoVideo: '/copperhead-demo.mp4',
   telegraphRepo: 'https://github.com/animesh-chouhan/open-telegraph',
   buildStory: 'https://chouhan.ai/building-with-claude',
-  // TODO(unverified): no Discord/X handle appears in any source doc. Confirm or
-  // drop these two before launch; the CI link-check (spec §9) will flag them.
-  discord: '',
-  x: '',
+  // TODO(launch): confirm the real inbox before launch; copperhead.sh has no MX
+  // record yet, so this address may bounce.
+  contact: 'mailto:hello@copperhead.sh',
+  discord: 'https://discord.gg/24zYXuR3Pq',
+  x: 'https://x.com/copperheadhq',
+  linkedin: 'https://www.linkedin.com/company/copperheadhq',
   chouhan: 'https://chouhan.ai',
   kicad: 'https://www.kicad.org/',
   openspec: 'https://github.com/Fission-AI/OpenSpec',

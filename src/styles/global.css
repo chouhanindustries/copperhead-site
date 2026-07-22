@@ -40,7 +40,7 @@
 }
 
 :root {
-  --bg:        #121212;
+  --bg:        #080808;
   --surface:   #1A1A1A;
   --copper:    #D08F39;
   --copper-hi: #DEA754;
@@ -55,7 +55,7 @@
     sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --maxw: 1120px;
+  --maxw: 1328px; /* mastra --ds-layout-content-v2 */
   --pad-y: 136px;
   --hairline: rgba(255, 255, 255, 0.08);
   --trace: color-mix(in srgb, var(--copper) 26%, transparent);
@@ -78,8 +78,10 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--sans);
-  font-size: 1.02rem;
-  line-height: 1.65;
+  /* Type scale ported from mastra.ai: 17px body on a tighter 1.5 leading (mastra
+     runs 136%; 1.5 keeps Plex's taller x-height readable across blog prose). */
+  font-size: 1.0625rem; /* 17px */
+  line-height: 1.5;
   font-feature-settings: 'kern' 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -173,15 +175,18 @@ section {
 }
 
 .section-title {
-  font-size: clamp(1.85rem, 3.4vw, 2.6rem);
+  /* mastra headline-2xl: clamp(30px … 54px) */
+  font-size: clamp(1.875rem, 3.8vw, 3.375rem);
   max-width: 20ch;
   text-wrap: balance;
 }
 
 .section-intro {
   color: var(--text-dim);
-  max-width: 56ch;
-  margin: 1.25rem 0 0;
+  /* a step above the 17px body, toward mastra's body-lg */
+  font-size: 1.25rem;
+  max-width: 54ch;
+  margin: 1.35rem 0 0;
 }
 
 /* ---- Motif: copper trace terminating in a via dot ---- */
@@ -233,11 +238,13 @@ section {
   align-items: center;
   justify-content: center;
   font-family: var(--sans);
-  font-size: 0.95rem;
+  font-size: 0.9375rem; /* 15px, matching the navbar CTA */
   font-weight: 500;
   line-height: 1;
-  padding: 0.95rem 1.5rem;
-  border-radius: 3px;
+  padding: 0.85rem 1.4rem;
+  /* mastra pills use a 10px radius; the sharper 3px PCB corner is retired so the
+     buttons read consistently with the navbar waitlist pill. */
+  border-radius: 10px;
   text-decoration: none;
   border: 1px solid transparent;
   transition: background-color 0.16s ease, color 0.16s ease,
@@ -287,7 +294,7 @@ section {
   }
 
   body {
-    font-size: 1rem;
+    font-size: 1.0125rem; /* ~16.2px */
   }
 
   .wrap {
@@ -295,7 +302,7 @@ section {
   }
 
   .section-title {
-    font-size: clamp(1.7rem, 7.4vw, 2.05rem);
+    font-size: clamp(1.8rem, 7.6vw, 2.2rem);
     max-width: 17ch;
   }
 
@@ -304,7 +311,7 @@ section {
   }
 
   .section-intro {
-    font-size: 0.97rem;
+    font-size: 1.08rem;
   }
 
   .trace-rule {
@@ -319,7 +326,7 @@ section {
    styles in blog/[...slug].astro cannot reach markdown-rendered HTML the same
    way). Scoped under .prose so they only apply inside a post, and specific
    enough to override the generic .prose img rule. Colours use the copperhead.sh
-   tokens (bg #121212, brand gold), not chouhan.ai's palette. */
+   tokens (bg #080808, brand gold), not chouhan.ai's palette. */
 
 .prose figure {
   margin: 0 0 1.4rem;
@@ -354,7 +361,7 @@ section {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 55%, rgba(18, 18, 18, 0.85));
+  background: linear-gradient(180deg, transparent 55%, rgba(8, 8, 8, 0.85));
   pointer-events: none;
 }
 
@@ -365,7 +372,7 @@ section {
   transform: translateX(-50%);
   z-index: 1;
   display: inline-block;
-  background: rgba(18, 18, 18, 0.7);
+  background: rgba(8, 8, 8, 0.7);
   color: var(--gold);
   font-family: var(--sans);
   font-size: 0.72rem;

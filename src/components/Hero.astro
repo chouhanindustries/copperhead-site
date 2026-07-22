@@ -1,60 +1,179 @@
 ---
-import InstallBlock from './InstallBlock.astro';
-import { quickstart } from '../config';
+import { Image } from "astro:assets";
+import InstallBlock from "./InstallBlock.astro";
+import pcbRender from "../assets/pcb.png";
+import { quickstart, links } from "../config";
+import { stats, compact } from "../stats";
 
 // Single-column hero: headline, one-sentence subhead, a Quick start link and
 // the three-line quickstart (install, key, create). The `--help` terminal that
 // used to hold the right column moved out; the CLI surface is covered by the
 // feature cards.
+// A thin live-stats line sits under the install: highest-credibility spot on
+// the page, next to the `npm i` line the numbers vindicate. Each stat renders
+// only when its build-time fetch succeeded (stats.ts), so the row disappears
+// cleanly until the repo and package are public.
+const showStats = stats.stars !== null || stats.downloads !== null;
 ---
 
 <section id="top" class="hero">
   <div class="grid-dots" aria-hidden="true"></div>
 
-  <div class="wrap copy">
-    <h1>Cursor for circuit boards.</h1>
+  <div class="wrap hero-grid">
+    <div class="copy">
+      <h1>Cursor for circuit boards.</h1>
 
-    <p class="sub">
-      An AI agent that designs, documents, and validates real PCBs from a
-      prompt.
-    </p>
+      <p class="sub">
+        An AI agent that designs, documents and validates real PCBs from a
+        prompt.
+      </p>
 
-    <a class="quick" href="#quickstart"
-      >Quick start<svg
-        class="arrow"
-        viewBox="0 0 16 16"
-        width="13"
-        height="13"
-        aria-hidden="true"
-        focusable="false"
-        ><path
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.6"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M2.5 8h11M9 3.5 13.5 8 9 12.5"></path></svg
-      ></a
-    >
+      <a class="quick" href="#quickstart"
+        >Quickstart<svg
+          class="arrow"
+          viewBox="0 0 16 16"
+          width="13"
+          height="13"
+          aria-hidden="true"
+          focusable="false"
+          ><path
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4 12 12 4M6.5 4H12v5.5"></path></svg
+        ></a
+      >
 
-    <div class="install">
-      <InstallBlock lines={quickstart} compact />
+      <div class="install">
+        <InstallBlock lines={quickstart} compact />
+      </div>
+
+      {
+        showStats && (
+          <p class="stats" role="status">
+            {stats.stars !== null && (
+              <span class="stat">
+                <svg
+                  class="ico"
+                  viewBox="0 0 16 16"
+                  width="14"
+                  height="14"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M8 .5l2.3 4.66 5.15.75-3.72 3.63.88 5.13L8 12.34l-4.6 2.42.88-5.13L.55 5.9l5.15-.75L8 .5z"
+                  />
+                </svg>
+                <strong class="num">{compact(stats.stars)}</strong>
+                <span class="lbl">GitHub stars</span>
+              </span>
+            )}
+            {stats.stars !== null && stats.downloads !== null && (
+              <span class="sep" aria-hidden="true" />
+            )}
+            {stats.downloads !== null && (
+              <span class="stat">
+                <strong class="num">{compact(stats.downloads)}</strong>
+                <span class="lbl">installs / month</span>
+              </span>
+            )}
+          </p>
+        )
+      }
     </div>
+
+    <figure class="hero-visual">
+      <div class="frame">
+        <Image
+          src={pcbRender}
+          alt="A copperhead-designed board: the Open Telegraph key — ESP32-S3, USB-C, and the copper switch — rendered from its KiCad files."
+          width={840}
+          height={615}
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+      <figcaption class="caption">
+        <h2>Proven on real copper.</h2>
+        <p>
+          Open Telegraph: pocket-size ESP32-S3 Morse key, built end to end with
+          this workflow to a 25 µA sleep budget. Every decision, every check,
+          every file is public.
+        </p>
+        <p class="links">
+          <a href={links.buildStory}>Read the build story</a>
+          <a href={links.telegraphRepo}>Browse the repo</a>
+        </p>
+      </figcaption>
+    </figure>
+  </div>
+
+  <div class="scroll-cue" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width="22"
+      height="22"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M6 9l6 6 6-6"></path>
+    </svg>
   </div>
 </section>
 
 <style>
+  /* Split hero: copy left-aligned on the left, the framed product render and its
+     caption on the right — filling the first viewport (svh so mobile browser
+     chrome doesn't push the fold off-screen). */
   .hero {
     position: relative;
-    /* full viewport on first paint; svh so mobile browser chrome doesn't
-       push the fold off-screen */
     min-height: 100svh;
     display: flex;
     align-items: center;
-    /* symmetric so the copy centres true; the top value also clears the
-       fixed bar when the viewport is too short to centre */
-    padding-block: clamp(96px, 12svh, 140px);
+    padding-block: clamp(92px, 12svh, 136px);
     overflow: hidden;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: clamp(40px, 5vw, 88px);
+  }
+
+  /* Floating scroll cue: a generic chevron that bounces at the foot of the fold
+     to signal there is more below — reads the same on touch or pointer. */
+  .scroll-cue {
+    position: absolute;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    color: var(--text-dim);
+  }
+
+  .scroll-cue svg {
+    display: block;
+    animation: scroll-bounce 1.6s ease-in-out infinite;
+  }
+
+  @keyframes scroll-bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.45;
+    }
+    50% {
+      transform: translateY(6px);
+      opacity: 0.9;
+    }
   }
 
   .grid-dots {
@@ -79,32 +198,117 @@ import { quickstart } from '../config';
 
   .copy {
     position: relative;
-    text-align: center;
+    text-align: left;
+  }
+
+  .hero-visual {
+    margin: 0;
+    max-width: 410px;
+    justify-self: center;
+  }
+
+  /* Product render framed in the mastra card language: a 2px #1c1c1c frame on a
+     raised fill with soft corners, so the render's own backdrop reads as a
+     contained viewport rather than clashing with the page black. */
+  .frame {
+    border: 2px solid #1c1c1c;
+    border-radius: 24px;
+    overflow: hidden;
+    background: #0a0a0a;
+    box-shadow: 0 40px 120px -40px rgba(0, 0, 0, 0.8);
+  }
+
+  .frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Caption below the render — the old Proof block, now anchored to the image it
+     is evidence for. */
+  .caption {
+    margin-top: 1.4rem;
+  }
+
+  .caption h2 {
+    font-size: 1.3rem;
+    line-height: 1.15;
+  }
+
+  .caption p {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    max-width: 44ch;
+    margin: 0.55rem 0 0;
+  }
+
+  /* Actions read as a tight, aligned pair with a trailing arrow each. */
+  .caption .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+    margin-top: 0.95rem;
+  }
+
+  .caption .links a {
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .caption .links a::after {
+    content: " ↗";
+    white-space: nowrap;
   }
 
   h1 {
-    font-size: clamp(2.3rem, 5.2vw, 3.9rem);
+    /* mastra headline-3xl: clamp(36px … 68px) */
+    font-size: clamp(2.25rem, 5.4vw, 4.25rem);
     letter-spacing: -0.025em;
     max-width: 15ch;
-    margin-inline: auto;
     text-wrap: balance;
   }
 
   .sub {
     color: var(--text-dim);
-    font-size: 1.08rem;
-    line-height: 1.6;
-    max-width: 56ch;
-    margin: 1.4rem auto 0;
+    /* mastra body-lg: 22px */
+    font-size: 1.375rem;
+    line-height: 1.45;
+    max-width: 46ch;
+    margin: 1.4rem 0 0;
     text-wrap: pretty;
   }
 
+  /* Quickstart styled as mastra's .cta pill: a 44px rounded-50 pill on the
+     raised #171717 surface with a subtle frame, white label, arrow. */
   .quick {
     display: inline-flex;
     align-items: center;
-    gap: 0.4em;
+    gap: 0.5em;
     margin-top: 1.75rem;
+    height: 44px;
+    padding: 0 22px;
     font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    background: #171717;
+    border: 2px solid #262626;
+    border-radius: 50px;
+    transition:
+      background-color 0.16s ease,
+      border-color 0.16s ease;
+  }
+
+  .quick:hover {
+    color: var(--text);
+    background: #262626;
+    border-color: #333;
+  }
+
+  .quick:active {
+    scale: 0.98;
   }
 
   /* SVG rather than the → glyph: the arrow is not in the font subsets, and the
@@ -114,9 +318,78 @@ import { quickstart } from '../config';
   }
 
   .install {
-    max-width: 30rem;
-    margin: 1.4rem auto 0;
+    max-width: 34rem;
+    margin: 1.6rem 0 0;
     text-align: left;
+  }
+
+  /* High-credibility readout under the install: the number carries the weight
+     (bright, tabular) and the unit sits dim beside it, the two stats parted by a
+     hairline rule rather than a floating dot. Wraps to a centred stack on very
+     narrow screens, where the rule collapses to keep the seam clean. */
+  .stats {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.15rem;
+    margin: 1.6rem 0 0;
+    font-family: var(--mono);
+    font-size: 0.86rem;
+    color: var(--text-dim);
+  }
+
+  .stat {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.45em;
+    white-space: nowrap;
+  }
+
+  .stat .ico {
+    flex: none;
+    align-self: center;
+    color: var(--copper);
+  }
+
+  .stat .num {
+    color: var(--text);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat .lbl {
+    color: var(--text-dim);
+  }
+
+  .stats .sep {
+    width: 1px;
+    height: 0.95em;
+    align-self: center;
+    background: var(--hairline);
+  }
+
+  /* Stack the split: copy first (still left-aligned), then the render + caption
+     below it, full column width. */
+  @media (max-width: 900px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: clamp(30px, 6vw, 52px);
+    }
+
+    .frame {
+      max-width: 640px;
+    }
+
+    .caption p {
+      max-width: 60ch;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .stats .sep {
+      display: none;
+    }
   }
 
   @media (max-width: 720px) {
@@ -127,13 +400,65 @@ import { quickstart } from '../config';
     }
 
     .sub {
-      font-size: 1rem;
-      line-height: 1.55;
+      font-size: 1.12rem;
+      line-height: 1.5;
       margin-top: clamp(0.9rem, 2svh, 1.35rem);
     }
 
     .quick {
       margin-top: 1.4rem;
+    }
+  }
+
+  /* Phone: pull the whole fold in — tighter top gap, smaller render, and shorter
+     rhythm between the copy rows so it reads as one compact unit. */
+  @media (max-width: 560px) {
+    .hero {
+      padding-block: 80px 44px;
+    }
+
+    .hero-grid {
+      gap: 30px;
+    }
+
+    .sub {
+      margin-top: 0.9rem;
+    }
+
+    .quick {
+      margin-top: 1.25rem;
+      height: 42px;
+    }
+
+    .install {
+      margin-top: 1.25rem;
+    }
+
+    .stats {
+      margin-top: 1.25rem;
+    }
+
+    /* figure/caption keep the full content width, but the render itself is
+       trimmed and centred so the whole fold fits svh */
+    .hero-visual {
+      max-width: none;
+    }
+
+    .frame {
+      max-width: 252px;
+      margin-inline: auto;
+    }
+
+    .caption {
+      margin-top: 1.4rem;
+    }
+
+    .caption h2 {
+      font-size: 1.35rem;
+    }
+
+    .caption p {
+      max-width: none;
     }
   }
 </style>

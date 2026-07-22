@@ -71,6 +71,8 @@ const features = [
 </section>
 
 <style>
+  /* mastra card system: a 2px #1c1c1c frame with #0a0a0a cells divided by
+     1px gutters of the same tone, soft 24px corners, and a quiet hover-lift. */
   .grid {
     list-style: none;
     margin: 3.25rem 0 0;
@@ -78,27 +80,31 @@ const features = [
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1px;
-    /* hairline gutters read as a grid of cells rather than floating cards */
-    background: var(--hairline);
-    border: 1px solid var(--hairline);
-    border-radius: 4px;
+    background: #1c1c1c;
+    border: 2px solid #1c1c1c;
+    border-radius: 24px;
     overflow: hidden;
   }
 
   .card {
-    background: var(--bg);
-    padding: 30px 28px 32px;
+    background: #0a0a0a;
+    padding: 32px 30px 34px;
+    transition: background-color 0.16s ease;
+  }
+
+  .card:hover {
+    background: #101010;
   }
 
   .card h3 {
-    font-size: 1.06rem;
+    font-size: 1.12rem;
   }
 
   .card p {
     color: var(--text-dim);
-    font-size: 0.94rem;
+    font-size: 1rem;
     line-height: 1.6;
-    margin: 0.75rem 0 0;
+    margin: 0.8rem 0 0;
   }
 
   .card .more {
