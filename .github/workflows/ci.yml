@@ -30,9 +30,11 @@ jobs:
           fail=0
           for url in $(grep -o 'href="https\?://[^"]*"' dist/index.html \
                        | sed 's/href="//;s/"$//' | sort -u); do
-            code=$(curl -sL -o /dev/null -w "%{http_code}" --max-time 20 "$url")
+            code=$(curl -sL -o /dev/null -w "%{http_code}" --max-time 20 \
+                   -A "Mozilla/5.0 (compatible; copperhead-linkcheck)" "$url")
             printf '%-64s %s\n' "$url" "$code"
-            case "$code" in 2*|3*) ;; *) fail=1 ;; esac
+            # 999 is LinkedIn's bot-block response, not a dead link
+            case "$code" in 2*|3*|999) ;; *) fail=1 ;; esac
           done
           exit $fail
 
