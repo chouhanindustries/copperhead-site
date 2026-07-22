@@ -12,18 +12,24 @@ interface Props {
   jsonLd?: Record<string, unknown>;
   /** 'article' for blog posts, so link unfurls read as posts rather than a product page. */
   ogType?: 'website' | 'article';
+  /** Alt text for the social share image. */
+  ogImageAlt?: string;
+  /** ISO date for article:published_time (blog posts only). */
+  publishedTime?: string;
 }
 
 const {
   title = 'copperhead. Cursor for circuit boards.',
-  description = 'An open source AI agent that designs, documents, and verifies real PCBs from a prompt. It works on your KiCad files, in your repo, and nothing is done until the checks pass.',
+  description = 'An open source AI agent that designs, documents and validates real PCBs from a prompt.',
   path = '/',
   jsonLd: extraJsonLd,
   ogType = 'website',
+  ogImageAlt = 'copperhead: an open source AI agent for circuit board design',
+  publishedTime,
 } = Astro.props;
 
 const canonical = new URL(path, site).href;
-const ogImage = new URL('/pcb.png', site).href;
+const ogImage = new URL('/og-image.png', site).href;
 
 // The product node stays on every page: it is the thing the whole site is about,
 // and search engines get one consistent description of it wherever they land.
@@ -32,7 +38,7 @@ const appJsonLd = {
   '@type': 'SoftwareApplication',
   name: 'copperhead',
   description:
-    'An open source AI agent that designs, documents, and verifies real PCBs from a prompt.',
+    'An open source AI agent that designs, documents and validates real PCBs from a prompt.',
   url: site,
   codeRepository: repo,
   applicationCategory: 'DeveloperApplication',
@@ -98,12 +104,20 @@ const jsonLd = extraJsonLd ? [appJsonLd, extraJsonLd] : appJsonLd;
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
     <meta property="og:site_name" content="copperhead" />
+    <meta property="og:locale" content="en_US" />
+    {publishedTime && (
+      <meta property="article:published_time" content={publishedTime} />
+    )}
 
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@copperheadhq" />
+    <meta name="twitter:creator" content="@copperheadhq" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
     <script
       type="application/ld+json"
