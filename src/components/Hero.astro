@@ -420,6 +420,12 @@ const showStats = stats.stars !== null || stats.downloads !== null;
       padding-block: 80px 44px;
     }
 
+    /* The fold stacks tall on a phone, so the "more below" cue is redundant and
+       just crowds the foot of the viewport — drop it. */
+    .scroll-cue {
+      display: none;
+    }
+
     .hero-grid {
       gap: 30px;
     }
