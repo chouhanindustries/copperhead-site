@@ -373,7 +373,10 @@ const showStats = stats.stars !== null || stats.downloads !== null;
      below it, full column width. */
   @media (max-width: 900px) {
     .hero-grid {
-      grid-template-columns: 1fr;
+      /* minmax(0, …) not the `1fr` shorthand (= minmax(auto, …)): the auto
+         minimum would let the render's intrinsic width force the column past
+         the viewport, so the copy could not wrap and the fold overflowed. */
+      grid-template-columns: minmax(0, 1fr);
       gap: clamp(30px, 6vw, 52px);
     }
 

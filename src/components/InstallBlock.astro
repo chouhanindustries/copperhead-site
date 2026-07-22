@@ -155,4 +155,25 @@ const block = lines.join('\n');
       right: 6px;
     }
   }
+
+  /* Phone: wrap long commands instead of scrolling them off the right edge,
+     where the tail (…<api-key>, …brief.md) got clipped and read as broken. The
+     hanging indent keeps continuation lines aligned past the "$ " prompt; the
+     inherited 40px right padding keeps the first rows clear of the copy button. */
+  @media (max-width: 560px) {
+    pre {
+      overflow-x: visible;
+    }
+
+    code {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .line {
+      display: block;
+      padding-left: 2ch;
+      text-indent: -2ch;
+    }
+  }
 </style>
