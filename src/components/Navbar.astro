@@ -5,7 +5,7 @@ import { stats, compact } from '../stats';
 
 // Fixed top bar, proportioned after mastra.ai: a solid 60px antigrid bar, 15px
 // medium links sitting left of centre next to the logo, a near-white GitHub
-// chip, and a copper "Try for Free" pill where mastra runs its white Sign Up
+// chip, and a copper "Let's talk" pill where mastra runs its white Sign Up
 // button. Below the tablet width the links and CTAs collapse into a hamburger
 // drop panel (mastra's mobile behaviour); a few lines of JS drive the toggle.
 interface Props {
@@ -29,17 +29,6 @@ const nav = [
       <Wordmark size="1.02rem" />
     </a>
 
-    <button
-      class="burger"
-      type="button"
-      aria-label="Toggle menu"
-      aria-expanded="false"
-      aria-controls="nav-menu"
-    >
-      <span></span>
-      <span></span>
-    </button>
-
     <div class="menu" id="nav-menu">
       <nav aria-label="Primary">
         <ul>
@@ -52,8 +41,9 @@ const nav = [
           }
         </ul>
       </nav>
+    </div>
 
-      <div class="actions">
+    <div class="actions">
         <a
           class="gh"
           href={links.repo}
@@ -67,12 +57,28 @@ const nav = [
               d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"
             />
           </svg>
-          {stats.stars !== null && <span class="count">{compact(stats.stars)}</span>}
+          {stats.stars !== null && (
+            <span class="count">
+              {compact(stats.stars)}
+              <span class="star" aria-hidden="true">★</span>
+            </span>
+          )}
         </a>
 
-        <a class="waitlist" href={links.getStarted}>Try for Free</a>
-      </div>
+      <a class="waitlist" href={links.getStarted}>Let's talk</a>
     </div>
+
+    <button
+      class="burger"
+      type="button"
+      aria-label="Toggle menu"
+      aria-expanded="false"
+      aria-controls="nav-menu"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
 </header>
 
@@ -173,7 +179,16 @@ const nav = [
   }
 
   .count {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     font-variant-numeric: tabular-nums;
+  }
+
+  .count .star {
+    color: var(--copper, #c67b45);
+    font-size: 0.875em;
+    line-height: 1;
   }
 
   /* Solid CTA pill: mastra's Sign Up metrics (34px, 10px radius, 15px medium),
@@ -213,35 +228,41 @@ const nav = [
 
   .burger span {
     position: absolute;
+    top: 50%;
     left: 11px;
     width: 18px;
     height: 1.5px;
+    margin-top: -0.75px;
     background: currentColor;
     border-radius: 1px;
     transition: transform 0.2s ease, opacity 0.2s ease;
   }
 
   .burger span:nth-child(1) {
-    transform: translateY(-3.5px);
+    transform: translateY(-5px);
   }
 
-  .burger span:nth-child(2) {
-    transform: translateY(3.5px);
+  .burger span:nth-child(3) {
+    transform: translateY(5px);
   }
 
   .bar[data-open='true'] .burger span:nth-child(1) {
-    transform: rotate(45deg);
+    transform: translateY(0) rotate(45deg);
   }
 
   .bar[data-open='true'] .burger span:nth-child(2) {
-    transform: rotate(-45deg);
+    opacity: 0;
+  }
+
+  .bar[data-open='true'] .burger span:nth-child(3) {
+    transform: translateY(0) rotate(-45deg);
   }
 
   /* ── Mobile: links and CTAs move into a drop panel (mastra behaviour) ── */
   @media (max-width: 768px) {
     .inner {
-      gap: 12px;
-      padding-inline: 22px;
+      gap: 6px;
+      padding-inline: 16px;
     }
 
     .brand {
@@ -250,6 +271,13 @@ const nav = [
 
     .burger {
       display: block;
+      /* .actions carries the margin-left:auto that pushes the cluster right, so
+         the burger sits tight against it rather than floating apart. */
+      margin-left: 0;
+      /* Narrower than desktop and nudged toward the edge so the right cluster
+         reads tight; the bars stay centred (left:11px + 18px width). */
+      width: 30px;
+      margin-right: -4px;
     }
 
     /* Panel drops from under the bar, full width, closed by default so its
@@ -283,25 +311,34 @@ const nav = [
       font-size: 1rem;
     }
 
+    /* The GitHub chip and CTA stay in the bar (not the drop panel), as a tight
+       inline cluster pushed to the right, with the burger just past it. */
     .actions {
-      margin-left: 0;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 10px;
-      margin-top: 8px;
+      margin-left: auto;
+      flex-direction: row;
+      align-items: center;
+      gap: 4px;
+      margin-top: 0;
     }
 
     a.gh {
-      height: 44px;
-      justify-content: flex-start;
-      padding-inline: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      height: 32px;
+      gap: 5px;
+      justify-content: center;
+      padding: 0 6px;
+      border: 0;
+      font-size: 0.875rem; /* 14px */
+    }
+
+    a.gh svg {
+      width: 16px;
+      height: 16px;
     }
 
     a.waitlist {
-      height: 44px;
-      justify-content: center;
-      font-size: 1rem;
+      height: 32px;
+      padding: 0 12px;
+      font-size: 0.875rem; /* 14px */
     }
   }
 </style>

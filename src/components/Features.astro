@@ -1,5 +1,5 @@
 ---
-import { links } from '../config';
+import { links } from "../config";
 
 // Card grid, in the autoloops shape. This is where the four old prose sections
 // (Stepper, Invariants, Outputs, WhyOpen) went: one card each for the two
@@ -8,30 +8,30 @@ import { links } from '../config';
 // rather than rewritten, so nothing here promises more than the CLI does.
 const features = [
   {
-    title: 'Starts from the docs',
-    body: 'Every decision lives in the design docs, so the agent knows the whole design, not just the part in front of it.',
+    title: "Starts from the docs",
+    body: "Every decision lives in the design docs, so the agent knows the whole design, not just the part in front of it.",
   },
   {
-    title: 'Nothing starts without a spec',
-    body: 'The agent cannot touch a design file until a validated change proposal exists. The edit tools stay locked until it passes.',
+    title: "Nothing starts without a spec",
+    body: "The agent cannot touch a design file until a validated change proposal exists. The edit tools stay locked until it passes.",
   },
   {
-    title: 'Nothing is done until the tools agree',
-    body: 'Every change is followed by ERC on the schematic and DRC on the board. Violations get read, fixed, and re-run.',
+    title: "Nothing is done until the tools agree",
+    body: "Every change is followed by ERC on the schematic and DRC on the board. Violations get read, fixed, and re-run.",
   },
   {
-    title: 'Changes propagate',
-    body: 'Change one value and it carries across every file that references it. The boring, easy-to-get-wrong step is the one the agent is best at.',
+    title: "Changes propagate",
+    body: "Change one value and it carries across every file that references it. The boring, easy-to-get-wrong step is the one the agent is best at.",
   },
   {
-    title: 'A product, not a chat log',
-    body: 'Schematic, board, gerbers and drill, DXF and STEP, renders, an orderable BOM, a firmware scaffold, and a bring-up plan. All on disk, in your repo.',
+    title: "A product, not a chat log",
+    body: "Schematic, board, gerbers and drill, DXF and STEP, renders, an orderable BOM, a firmware scaffold, and a bring-up plan. All on disk, in your repo.",
   },
   {
-    title: 'Open because it has to be',
-    body: 'Apache-2.0, on an open stack. Everything it writes is plain markdown and JSON in your own repository. No proprietary formats, no lock-in.',
+    title: "Open because it has to be",
+    body: "Apache-2.0, on an open stack. Everything it writes is plain markdown and JSON in your own repository. No proprietary formats, no lock-in.",
     // the only card that earns a link: the claim is checkable
-    link: { label: 'KiCad', href: links.kicad },
+    link: { label: "KiCad", href: links.kicad },
   },
 ];
 ---
@@ -52,7 +52,7 @@ const features = [
             <p>{f.body}</p>
             {f.link && (
               <p class="more">
-                Built on <a href={f.link.href}>{f.link.label}</a> and{' '}
+                Built on <a href={f.link.href}>{f.link.label}</a> and{" "}
                 <a href={links.openspec}>OpenSpec</a>.
               </p>
             )}
@@ -61,12 +61,12 @@ const features = [
       }
     </ul>
 
-    <p class="footnote">
+    <!-- <p class="footnote">
       The draft layout is correct, not optimal, and says so itself.{' '}
       <code>LAYOUT.md</code> lists exactly what is solid and what a specialist
       should redo before fab. Non-optimal is acceptable. Unlabeled non-optimal is
       not.
-    </p>
+    </p> -->
   </div>
 </section>
 
@@ -82,7 +82,7 @@ const features = [
     gap: 1px;
     background: #1c1c1c;
     border: 2px solid #1c1c1c;
-    border-radius: 24px;
+    border-radius: 16px;
     overflow: hidden;
   }
 
@@ -133,10 +133,21 @@ const features = [
   @media (max-width: 620px) {
     .grid {
       grid-template-columns: 1fr;
+      margin-top: 2rem;
     }
 
     .card {
-      padding: 24px 20px 26px;
+      padding: 18px 18px 20px;
+    }
+
+    .card h3 {
+      font-size: 1.05rem;
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-top: 0.5rem;
     }
   }
 </style>

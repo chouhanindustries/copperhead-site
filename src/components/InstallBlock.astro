@@ -147,6 +147,11 @@ const block = lines.join('\n');
       padding: 18px 16px;
     }
 
+    /* Smaller type on phone so longer commands fit more comfortably. */
+    code {
+      font-size: 0.8125rem; /* 13px */
+    }
+
     /* icon-only fits in the corner even at 320px; grow the tap target */
     .copy {
       width: 38px;
@@ -168,6 +173,7 @@ const block = lines.join('\n');
     code {
       white-space: pre-wrap;
       overflow-wrap: anywhere;
+      font-size: 0.75rem; /* 12px — narrowest phones */
     }
 
     .line {
