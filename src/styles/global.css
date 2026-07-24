@@ -290,7 +290,7 @@ section {
 
 @media (max-width: 720px) {
   :root {
-    --pad-y: 84px;
+    --pad-y: 60px;
   }
 
   body {

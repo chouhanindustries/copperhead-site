@@ -8,8 +8,8 @@ export const site = 'https://copperhead.sh';
 
 export const links = {
   repo,
-  // Primary navbar CTA ("Try for Free") — the docs quickstart.
-  getStarted: 'https://docs.copperhead.sh/getting-started/quickstart/',
+  // Primary navbar CTA ("Let's talk") — books a copperhead demo call.
+  getStarted: 'https://cal.com/animeshchouhan/demo-copperhead',
   // The blog now lives on this site (spec §non-goals said chouhan.ai; superseded).
   // The docs are a separate Astro Starlight site on GitHub Pages (source: repo
   // docs/). They cannot live at /docs here: this Worker owns the whole apex.
