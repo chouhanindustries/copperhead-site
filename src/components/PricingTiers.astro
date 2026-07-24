@@ -157,8 +157,13 @@ const tiers: Tier[] = [
 </section>
 
 <style>
+  .tiers {
+    /* Clear the 60px fixed navbar, then a comfortable gap above the headline. */
+    padding-block-start: 108px;
+  }
+
   .tiers .wrap {
-    padding-top: 10px;
+    padding-top: 0;
   }
 
   .section-intro {
@@ -301,8 +306,9 @@ const tiers: Tier[] = [
   }
 
   @media (max-width: 560px) {
-    .tiers .wrap {
-      padding-top: 16px;
+    .tiers {
+      /* Clear the 60px fixed navbar, then a comfortable gap above the headline. */
+      padding-block-start: 92px;
     }
 
     .actions {
