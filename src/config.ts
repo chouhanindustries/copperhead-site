@@ -13,6 +13,7 @@ export const links = {
   // The blog now lives on this site (spec §non-goals said chouhan.ai; superseded).
   // The docs are a separate Astro Starlight site on GitHub Pages (source: repo
   // docs/). They cannot live at /docs here: this Worker owns the whole apex.
+  pricing: '/pricing/',
   blog: '/blog/',
   faq: '/blog/faq/',
   docs: 'https://docs.copperhead.sh/',

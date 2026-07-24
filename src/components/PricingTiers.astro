@@ -1,0 +1,358 @@
+---
+import { links } from "../config";
+
+// Four tiers on one row, in the cal.com pricing shape: a large headline, a
+// one-line lede, then a card each for CLI / Cloud / Team /
+// Enterprise. Cloud is the emphasised card (cal.com highlights one column in a
+// dark fill); here it takes a copper frame instead, the site's one accent.
+// Copy is anchored to the pricing model doc; nothing paid is ever required to
+// use copperhead fully. The free CLI does every core operation.
+interface Tier {
+  name: string;
+  price: string;
+  unit?: string;
+  addon?: string;
+  blurb: string;
+  cta: { label: string; href: string };
+  note?: string;
+  featured?: boolean;
+  headline: string;
+  features: string[];
+}
+
+const tiers: Tier[] = [
+  {
+    name: "CLI",
+    price: "Free",
+    note: "Apache-2.0, forever",
+    blurb: "Design on your own, on your own machine.",
+    cta: { label: "Get started", href: "/#quickstart" },
+    headline: "Includes:",
+    features: [
+      "The full agent: do, create, init, check, watch",
+      "Bring your own Claude or GPT-5 key",
+      "Runs on your KiCad files, in your own git repo",
+      "Plain markdown, JSON, and KiCad output. No lock-in.",
+      "Runs locally, never metered",
+      "Community support",
+    ],
+  },
+  {
+    name: "Cloud",
+    price: "$49",
+    unit: "per user / month",
+    blurb: "Hosted runs on private repos, with a web viewer.",
+    cta: { label: "Let's talk", href: links.getStarted },
+    note: "Free for open hardware repos",
+    featured: true,
+    headline: "Everything in CLI, plus:",
+    features: [
+      "Hosted runs, no local setup, from anywhere",
+      "Private repositories",
+      "Web viewer: chat, live schematic and board render, ERC/DRC status",
+      "Run history and shareable check reports",
+      "One-click gerber, DXF/STEP, render, and BOM export",
+      "BYO key, or managed inference with 200 credits a seat",
+    ],
+  },
+  {
+    name: "Team",
+    price: "$49",
+    unit: "per user / month",
+    addon: "+ $199 / mo platform",
+    blurb: "Cloud, with governance and CI for a whole team.",
+    cta: { label: "Let's talk", href: links.getStarted },
+    headline: "Everything in Cloud, plus:",
+    features: [
+      "CI bot: run check as a required PR status check",
+      "Shared, versioned constraint libraries across the org",
+      "SSO / SAML, role management, central billing",
+      "Managed credits pooled across the team",
+      "Shared run history",
+    ],
+  },
+  {
+    name: "Enterprise",
+    price: "Custom",
+    unit: "annual",
+    blurb: "Self-hosted, built for procurement, one price a year.",
+    cta: { label: "Talk to sales", href: links.contact },
+    headline: "Everything in Team, plus:",
+    features: [
+      "Self-hosted or VPC, so design data never leaves your network",
+      "Altium support beyond KiCad",
+      "RBAC, security review, dedicated support and an SLA",
+      "An audit trail your compliance team can hand over",
+      "Flat annual license, no per-run metering",
+    ],
+  },
+];
+---
+
+<section id="top" class="tiers">
+  <div class="wrap">
+    <h1 class="section-title">Pay to not run it yourself.</h1>
+    <p class="section-intro">
+      copperhead is open core. The CLI is free and always will be, and it does
+      the real work on its own. You pay to host it, to work as a team, or to
+      give an auditor what they ask for.
+    </p>
+
+    <div class="actions">
+      <a class="btn btn-primary" href={links.getStarted}>Talk to sales</a>
+    </div>
+
+    <ul class="grid">
+      {
+        tiers.map((t) => (
+          <li class:list={["card", { featured: t.featured }]}>
+            {t.featured && <span class="badge">Most popular</span>}
+            <h2 class="name">{t.name}</h2>
+
+            <div class="price">
+              <span class="amount">{t.price}</span>
+              {t.unit && <span class="unit">{t.unit}</span>}
+            </div>
+            {t.addon && <p class="addon">{t.addon}</p>}
+            {t.note && <p class="tier-note">{t.note}</p>}
+
+            <p class="blurb">{t.blurb}</p>
+
+            <a
+              class:list={["btn", t.featured ? "btn-primary" : "btn-secondary"]}
+              href={t.cta.href}
+            >
+              {t.cta.label}
+            </a>
+
+            <p class="feat-head">{t.headline}</p>
+            <ul class="feats">
+              {t.features.map((f) => (
+                <li>
+                  <svg
+                    class="check"
+                    viewBox="0 0 16 16"
+                    width="15"
+                    height="15"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3 8.5l3.2 3.2L13 4.5"
+                    />
+                  </svg>
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .tiers .wrap {
+    padding-top: 10px;
+  }
+
+  .section-intro {
+    max-width: 58ch;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 2rem;
+  }
+
+  /* Four separate bordered cards with a gap, cal.com style, not the shared
+     1px-gutter frame used elsewhere, because one card needs its own accent. */
+  .grid {
+    list-style: none;
+    margin: 3.5rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    background: #0a0a0a;
+    border: 2px solid #1c1c1c;
+    border-radius: 16px;
+    padding: 28px 26px 30px;
+  }
+
+  .card.featured {
+    border-color: color-mix(in srgb, var(--copper) 60%, transparent);
+    background: color-mix(in srgb, var(--copper) 7%, #0a0a0a);
+    position: relative;
+  }
+
+  .badge {
+    position: absolute;
+    top: -11px;
+    left: 26px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--copper);
+    color: #100d0a;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .name {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .price {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1.1rem;
+  }
+
+  .amount {
+    font-family: var(--display);
+    font-size: 2.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .unit {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+
+  .addon {
+    margin: 0.55rem 0 0;
+    color: var(--text);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .tier-note {
+    margin: 0.55rem 0 0;
+    color: var(--copper);
+    font-size: 0.82rem;
+  }
+
+  .blurb {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 1rem 0 1.5rem;
+    min-height: 2.85em; /* keep the CTAs roughly aligned across cards */
+  }
+
+  .card .btn {
+    width: 100%;
+  }
+
+  .feat-head {
+    margin: 1.75rem 0 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .feats {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .feats li {
+    display: flex;
+    gap: 10px;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .check {
+    flex: none;
+    margin-top: 2px;
+    color: var(--copper);
+  }
+
+  @media (max-width: 1080px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .tiers .wrap {
+      padding-top: 16px;
+    }
+
+    .actions {
+      gap: 10px;
+      margin-top: 1.5rem;
+    }
+
+    .actions .btn {
+      font-size: 0.85rem;
+      padding: 0.6rem 1.1rem;
+    }
+
+    .grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 2rem;
+    }
+
+    .card {
+      padding: 22px 20px 24px;
+    }
+
+    .badge {
+      left: 20px;
+    }
+
+    .price {
+      margin-top: 0.9rem;
+    }
+
+    .amount {
+      font-size: 2.15rem;
+    }
+
+    .blurb {
+      min-height: 0;
+      margin: 0.85rem 0 1.2rem;
+      font-size: 0.92rem;
+    }
+
+    .feat-head {
+      margin: 1.35rem 0 0.85rem;
+    }
+
+    .feats {
+      gap: 0.6rem;
+    }
+
+    .feats li {
+      font-size: 0.88rem;
+    }
+  }
+</style>

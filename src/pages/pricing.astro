@@ -1,0 +1,80 @@
+---
+import Base from '../layouts/Base.astro';
+import Navbar from '../components/Navbar.astro';
+import PricingTiers from '../components/PricingTiers.astro';
+import PricingDetails from '../components/PricingDetails.astro';
+import Footer from '../components/Footer.astro';
+
+// Pricing FAQ, surfaced as JSON-LD so the tiers can win a rich result. The
+// answers restate the pricing model's load-bearing promises (free forever,
+// no subsidised tokens, spend caps, no lock-in).
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'Is copperhead free?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. The copperhead CLI is Apache-2.0 and free forever. It runs the full agent locally on your own files with your own model key, and does every core operation without a paid plan.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'What do the paid plans add?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Hosting, collaboration, governance, and compliance: the parts that are painful to run yourself. Cloud is $49 per user per month for hosted runs on private repos. Team adds org governance and a CI bot for a flat $199 per month. Enterprise is a custom flat annual license, self-hosted.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How is model inference billed?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Either you bring your own model key and pay your own token cost, or you use managed inference metered at model cost plus 20%. copperhead never subsidises tokens, and every seat and org can set a hard monthly spend cap.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Is copperhead free for open hardware?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. copperhead Cloud, with managed inference, is free for public repositories released under CERN-OHL-S or an OSHWA-certified license, within fair-use credit limits.',
+      },
+    },
+  ],
+};
+---
+
+<Base
+  title="Pricing · copperhead"
+  description="copperhead is open core: the CLI is free forever, Cloud is $49/user/mo, Team adds org governance, and Enterprise is a flat annual self-hosted license. You never pay to use it fully."
+  path="/pricing/"
+  ogImageAlt="copperhead pricing: free CLI, Cloud, Team, and Enterprise"
+  jsonLd={faqJsonLd}
+>
+  <Navbar home={false} />
+  <main class="pricing-main">
+    <PricingTiers />
+    <PricingDetails />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  /* The global `section { padding-block: var(--pad-y) }` is 136px, which stacks
+     to ~272px of empty space between pricing sections. Tighten the rhythm to
+     this page only by shrinking --pad-y on its <main>; descendant sections
+     inherit the smaller value. */
+  .pricing-main {
+    --pad-y: 72px;
+  }
+
+  @media (max-width: 720px) {
+    .pricing-main {
+      --pad-y: 44px;
+    }
+  }
+</style>
