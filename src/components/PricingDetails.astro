@@ -1,0 +1,417 @@
+---
+import { links } from '../config';
+
+// The lower "details" half of the pricing page: the three metering modes, the
+// full feature-comparison table, and the open-core / open-hardware commitments.
+// Kept text-first and quiet so the tier cards above stay the headline act.
+
+const modes = [
+  {
+    tag: 'Mode A',
+    title: 'Bring your own key',
+    body: 'Supply your own Claude or GPT-5 key. copperhead runs the agent but never touches your token bill. You pay for the platform, not the tokens. Predictable, and open to you on every paid tier.',
+  },
+  {
+    tag: 'Mode B',
+    title: 'Managed inference',
+    body: 'Let copperhead run the model. Each seat includes a monthly allowance of design credits; overage is metered at model cost + 20%, or bought as top-up packs. Hard spend caps on every seat and org, with runaway bills refunded.',
+  },
+  {
+    tag: 'Mode C',
+    title: 'Flat annual',
+    body: 'No per-run metering. A flat annual license sized to expected volume, with inference self-hosted in your own environment or routed through a private endpoint. One predictable number for procurement.',
+  },
+];
+
+// Summary table from the pricing model, §5. Columns match the four tiers.
+const cols = ['CLI', 'Cloud', 'Team', 'Enterprise'];
+const rows: { label: string; cells: string[] }[] = [
+  { label: 'Price', cells: ['Free', '$49 / user / mo', '$49 / user / mo + $199 / mo', 'Custom, annual'] },
+  { label: 'Repos', cells: ['Your own, local', 'Private, hosted', 'Private, hosted', 'Private / VPC / self-hosted'] },
+  { label: 'Inference', cells: ['BYO key', 'BYO key or managed', 'BYO key or managed (pooled)', 'Self-hosted / private, flat'] },
+  { label: 'Managed credits', cells: ['n/a', '200 / seat / mo', '200 / seat, pooled', 'Negotiated volume'] },
+  { label: 'Overage', cells: ['n/a', 'model cost + 20%', 'model cost + 20%', 'None (flat)'] },
+  { label: 'CI bot (check)', cells: ['Manual', 'Manual', 'Required PR check', 'Required PR check'] },
+  { label: 'Shared constraint libraries', cells: ['Local', 'Per-user', 'Org-wide', 'Org-wide'] },
+  { label: 'SSO / RBAC', cells: ['n/a', 'n/a', 'SSO', 'SSO + RBAC'] },
+  { label: 'Audit trail artifact', cells: ['In repo', 'In repo', 'In repo', 'Compliance-grade'] },
+  { label: 'Support', cells: ['Community', 'Email', 'Priority', 'Dedicated + SLA'] },
+];
+
+// The open-hardware and discount offers live in the callout banner below, so
+// these three cards carry only the distinct open-core protections, with no
+// repeat of the same copy twice on one page.
+const commitments = [
+  {
+    title: 'Plain text, in your repo, at every tier',
+    body: 'Paid plans add hosting, collaboration, and governance on top of files you fully own. No proprietary format, no lock-in.',
+  },
+  {
+    title: 'Cancel any time',
+    body: 'A paid plan never strands a design. Drop the subscription and you fall straight back to the free CLI, working on the very same files.',
+  },
+  {
+    title: 'A grant-funded commons',
+    body: 'The free CLI is funded by grants, not by hosted revenue, so it stays free for good. It is never held hostage to the paid tiers.',
+  },
+];
+---
+
+<section id="metering" class="details">
+  <div class="wrap">
+    <p class="index">01 · Metering</p>
+    <h2 class="section-title">Three ways to pay for a run.</h2>
+    <p class="section-intro">
+      Every design run is an agent loop that spends model tokens. copperhead
+      never subsidizes those tokens. You either bring your own key, or run on
+      managed inference that is metered above cost.
+    </p>
+
+    <ul class="modes">
+      {
+        modes.map((m) => (
+          <li class="mode">
+            <span class="mode-tag">{m.tag}</span>
+            <h3>{m.title}</h3>
+            <p>{m.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<section id="compare" class="details">
+  <div class="wrap">
+    <p class="index">02 · Compare</p>
+    <h2 class="section-title">The whole ladder, side by side.</h2>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col"><span class="vh">Feature</span></th>
+            {cols.map((c) => <th scope="col">{c}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((r) => (
+              <tr>
+                <th scope="row">{r.label}</th>
+                {r.cells.map((c) => (
+                  <td>{c}</td>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="open-core" class="details">
+  <div class="wrap">
+    <p class="index">03 · Open core</p>
+    <h2 class="section-title">Open source, and kept that way.</h2>
+    <p class="section-intro">
+      Paid plans only ever add hosting, collaboration, and governance on top of
+      files you already own. They never wall off the work itself.
+    </p>
+
+    <div class="callout">
+      <div class="callout-copy">
+        <p class="big">
+          <strong>Building in the open?</strong> copperhead Cloud is free for public
+          repositories released under CERN-OHL-S or an OSHWA-certified license. Managed
+          inference is included within fair-use limits. The open hardware you ship
+          is the best demo we have.
+        </p>
+        <p class="lic">
+          Startups and non-profits: 50% off · accredited education: free
+        </p>
+      </div>
+      <a class="btn btn-primary apply" href={links.contact}>Apply for open tier</a>
+    </div>
+
+    <ul class="commitments">
+      {
+        commitments.map((c) => (
+          <li class="commit">
+            <h3>{c.title}</h3>
+            <p>{c.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="closer">
+      Questions on volume, credits, or self-hosting?{' '}
+      <a href={links.contact}>Talk to us</a> or{' '}
+      <a href={links.getStarted}>book a demo call</a>.
+    </p>
+  </div>
+</section>
+
+<style>
+  /* Drop the short copper rule the global .index carries after the section
+     reference number; the pricing page reads cleaner without it. */
+  .index::after {
+    display: none;
+  }
+
+  /* ── Metering modes ── */
+  .modes {
+    list-style: none;
+    margin: 3.25rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: #1c1c1c;
+    border: 2px solid #1c1c1c;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .mode {
+    background: #0a0a0a;
+    padding: 30px 28px 32px;
+  }
+
+  .mode-tag {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--copper);
+  }
+
+  .mode h3 {
+    font-size: 1.1rem;
+    margin: 0.6rem 0 0;
+  }
+
+  .mode p {
+    color: var(--text-dim);
+    font-size: 0.96rem;
+    line-height: 1.6;
+    margin: 0.7rem 0 0;
+  }
+
+  /* ── Comparison table ── */
+  .table-scroll {
+    margin-top: 3rem;
+    overflow-x: auto;
+    border: 2px solid #1c1c1c;
+    border-radius: 16px;
+  }
+
+  table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+
+  thead th {
+    background: #0a0a0a;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text);
+    padding: 16px 20px;
+    font-size: 0.95rem;
+  }
+
+  .vh {
+    /* visually hidden header for the row-label column */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  tbody th {
+    text-align: left;
+    font-weight: 500;
+    color: var(--text);
+    padding: 14px 20px;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    color: var(--text-dim);
+    padding: 14px 20px;
+    vertical-align: top;
+  }
+
+  tbody tr {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  tbody tr:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.015);
+  }
+
+  /* Emphasise the Cloud column (2nd data column) to echo the featured card. */
+  thead th:nth-child(3),
+  tbody td:nth-child(3) {
+    background: color-mix(in srgb, var(--copper) 6%, transparent);
+    color: var(--text);
+  }
+
+  /* ── Open-hardware callout ── */
+  .callout {
+    margin-top: 3rem;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 32px 36px;
+    border: 2px solid color-mix(in srgb, var(--copper) 55%, transparent);
+    background: color-mix(in srgb, var(--copper) 8%, #0a0a0a);
+    border-radius: 16px;
+  }
+
+  .callout-copy {
+    flex: 1;
+  }
+
+  .callout .big {
+    margin: 0;
+    font-size: 1.12rem;
+    line-height: 1.55;
+    color: var(--text);
+    max-width: 68ch;
+  }
+
+  .callout .big strong {
+    color: var(--copper-hi);
+    font-weight: 600;
+  }
+
+  .callout .lic {
+    margin: 0.85rem 0 0;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  .callout .apply {
+    flex: none;
+    min-width: 180px;
+  }
+
+  @media (max-width: 720px) {
+    .callout {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 24px;
+    }
+
+    .callout .apply {
+      width: 100%;
+    }
+  }
+
+  /* ── Open-core commitments ── */
+  .commitments {
+    list-style: none;
+    margin: 3.25rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: #1c1c1c;
+    border: 2px solid #1c1c1c;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .commit {
+    background: #0a0a0a;
+    padding: 30px 28px 32px;
+  }
+
+  .commit h3 {
+    font-size: 1.08rem;
+  }
+
+  .commit p {
+    color: var(--text-dim);
+    font-size: 0.96rem;
+    line-height: 1.6;
+    margin: 0.7rem 0 0;
+  }
+
+  .closer {
+    margin: 2.5rem 0 0;
+    color: var(--text-dim);
+    font-size: 1.02rem;
+  }
+
+  @media (max-width: 940px) {
+    .modes,
+    .commitments {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Tighten the details half on phones: less padding, closer rows, smaller
+     type, and a scrollable table that keeps its columns legible. */
+  @media (max-width: 620px) {
+    .modes,
+    .commitments {
+      margin-top: 1.75rem;
+    }
+
+    .mode,
+    .commit {
+      padding: 22px 20px 24px;
+    }
+
+    .mode h3,
+    .commit h3 {
+      font-size: 1.05rem;
+    }
+
+    .mode p,
+    .commit p {
+      font-size: 0.92rem;
+      margin-top: 0.55rem;
+    }
+
+    .table-scroll {
+      margin-top: 1.75rem;
+      border-radius: 12px;
+    }
+
+    table {
+      min-width: 560px;
+      font-size: 0.84rem;
+    }
+
+    thead th {
+      padding: 12px 14px;
+      font-size: 0.84rem;
+    }
+
+    tbody th,
+    tbody td {
+      padding: 11px 14px;
+    }
+
+    .callout {
+      margin-top: 1.75rem;
+    }
+
+    .callout .big {
+      font-size: 1.02rem;
+    }
+
+    .closer {
+      margin-top: 2rem;
+      font-size: 0.96rem;
+    }
+  }
+</style>

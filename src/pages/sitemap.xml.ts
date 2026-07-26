@@ -9,6 +9,7 @@ export const GET: APIRoute = async () => {
 
   const urls = [
     { loc: '/', changefreq: 'weekly', priority: '1.0' },
+    { loc: '/pricing/', changefreq: 'monthly', priority: '0.9' },
     { loc: '/blog/', changefreq: 'weekly', priority: '0.8' },
     { loc: '/blog/faq/', changefreq: 'monthly', priority: '0.7' },
     ...posts.map((p) => ({
