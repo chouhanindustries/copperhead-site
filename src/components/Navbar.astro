@@ -49,18 +49,18 @@ const nav = [
       </nav>
 
     <div class="actions">
-        <!-- A switch, not an icon button. The bare icon gave no affordance
-             that it was pressable and no read on which mode you were in — the
-             glyph showed the destination, so it was the inverse of the state
-             and had to be reasoned about. A track with a knob is unambiguous on
-             both counts: it looks like a control, and the knob's side is the
-             answer. The knob carries the current mode's icon rather than the
-             destination's, so glyph and position agree instead of cancelling.
+        {/* A switch, not an icon button. The bare icon gave no affordance
+            that it was pressable and no read on which mode you were in: the
+            glyph showed the destination, so it was the inverse of the state
+            and had to be reasoned about. A track with a knob is unambiguous on
+            both counts: it looks like a control, and the knob's side is the
+            answer. The knob carries the current mode's icon rather than the
+            destination's, so glyph and position agree instead of cancelling.
 
-             Which side it sits on is driven off <html data-theme> in CSS, not
-             by a class this button sets, so it is right on the first frame and
-             stays right when the OS preference changes under a reader who never
-             chose. -->
+            Which side it sits on is driven off <html data-theme> in CSS, not
+            by a class this button sets, so it is right on the first frame and
+            stays right when the OS preference changes under a reader who never
+            chose. */}
         <button class="theme" type="button" role="switch" aria-checked="false" aria-label="Dark theme">
           <span class="track" aria-hidden="true">
             <span class="knob">
