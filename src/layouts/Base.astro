@@ -60,6 +60,94 @@ const jsonLd = extraJsonLd ? [appJsonLd, extraJsonLd] : appJsonLd;
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
+    {/* Above the theme script, not down with the other <link>s: the script
+        rewrites these, so they have to be in the DOM by the time it runs. The
+        pair is media-scoped rather than a single tag, which gets the browser
+        chrome onto the right theme with no script at all — data-scheme is how
+        the script tells them apart once it does need to override. */}
+    <meta
+      name="theme-color"
+      data-scheme="light"
+      media="(prefers-color-scheme: light)"
+      content="#FFFFFF"
+    />
+    <meta
+      name="theme-color"
+      data-scheme="dark"
+      media="(prefers-color-scheme: dark)"
+      content="#09090B"
+    />
+
+    {/* Theme, before anything paints.
+
+        The stylesheet already themes the page off the OS preference on its own
+        (global.css declares every token as light-dark() under `color-scheme:
+        light dark`), so this runs only to honour an explicit choice the reader
+        has made at the navbar toggle — and it has to run here, in the head and
+        unbundled, because an override applied after first paint is a flash of
+        the wrong theme.
+
+        The whole model lives here rather than in the navbar so that the path
+        taken before paint and the path taken on a click are the same three
+        lines. Three states, not two: 'light', 'dark', and null for "follow the
+        OS". Null writes no attribute, which is what keeps the page tracking the
+        system preference live if the reader changes it mid-session. */}
+    <script is:inline>
+      window.__theme = {
+        stored: function () {
+          try {
+            var t = localStorage.getItem('copperhead-theme');
+            return t === 'light' || t === 'dark' ? t : null;
+          } catch (e) {
+            return null; /* private mode, or storage disabled */
+          }
+        },
+
+        /* What the page is actually painted in right now, whether that came
+           from a stored choice or from the OS. */
+        resolved: function () {
+          return (
+            this.stored() ||
+            (matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light')
+          );
+        },
+
+        apply: function (mode) {
+          var root = document.documentElement;
+          if (mode) root.dataset.theme = mode;
+          else delete root.dataset.theme;
+
+          /* The two theme-color metas are media-scoped so that with no override
+             the browser chrome follows the OS by itself. An override has to
+             beat that, so the queries are swapped for `all` on the winner and
+             `not all` on the loser; clearing back to null restores them. */
+          var metas = document.querySelectorAll('meta[name="theme-color"]');
+          for (var i = 0; i < metas.length; i++) {
+            var scheme = metas[i].dataset.scheme;
+            metas[i].media = !mode
+              ? '(prefers-color-scheme: ' + scheme + ')'
+              : mode === scheme
+                ? 'all'
+                : 'not all';
+          }
+        },
+
+        set: function (mode) {
+          try {
+            if (mode) localStorage.setItem('copperhead-theme', mode);
+            else localStorage.removeItem('copperhead-theme');
+          } catch (e) {
+            /* the choice just will not survive the session */
+          }
+          this.apply(mode);
+        },
+      };
+
+      window.__theme.apply(window.__theme.stored());
+    </script>
+
     <!-- Google tag (gtag.js) -->
     <script
       is:inline
@@ -79,19 +167,25 @@ const jsonLd = extraJsonLd ? [appJsonLd, extraJsonLd] : appJsonLd;
     <link rel="alternate icon" href="/favicon.ico?v=2" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#080808" />
 
-    {/* the two faces that render above the fold first */}
+    {/* One face renders the whole page now, so it is the only one preloaded.
+        Space Grotesk is a single variable file carrying 300-700, which is why
+        dropping Plex removed two requests rather than adding one. */}
     <link
       rel="preload"
-      href="/fonts/ibm-plex-sans-600.woff2"
+      href="/fonts/space-grotesk-var.woff2"
       as="font"
       type="font/woff2"
       crossorigin
     />
+
+    {/* The second preload earns its place by position rather than by volume:
+        DM Sans sets the fixed bar, which is above the fold on every page and on
+        screen before anything else is. Discovered from the stylesheet instead,
+        it lands a round trip late and the bar swaps under the reader. */}
     <link
       rel="preload"
-      href="/fonts/ibm-plex-sans-400.woff2"
+      href="/fonts/dm-sans-500.woff2"
       as="font"
       type="font/woff2"
       crossorigin

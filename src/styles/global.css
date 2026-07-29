@@ -1,32 +1,26 @@
 /* copperhead.sh — design system
 
-   Type: IBM Plex Sans for both display and text (IBM's engineering face;
-   brand-and-business.md §1 already names Plex Mono as an alternate) — 600 for
-   headings, 400/500 for text — and JetBrains Mono for code, the wordmark, and
-   reference numbers. One family keeps the page sober; all faces are self-hosted
-   and subset to the glyphs the page uses, which is why four faces still fit the
-   §7 budget. */
+   Type: Space Grotesk throughout — display and text both — with JetBrains Mono
+   for code, the wordmark, and reference numbers, and DM Sans in the nav bar
+   alone. IBM Plex Sans used to hold the text role and has been dropped: one
+   variable file already carries 300-700, so every step of hierarchy the second
+   family was providing is available off its own axis.
+
+   DM Sans is the exception that proves that rule rather than a walking back of
+   it. It is not a hierarchy step — it is one component matching one reference
+   exactly (see its @font-face below), it is scoped to that component by --nav,
+   and at 8.5 KB it costs less than the two Plex weights it did not replace.
+
+   All three faces are self-hosted and subset with pyftsubset to the same set —
+   all printable ASCII plus a handful of punctuation (see README) — so the
+   display face is safe to set body copy in. Glyphs outside that set fall back
+   to a system face: draw them (★, ↗) as SVG rather than typing them. */
 
 @font-face {
-  font-family: 'IBM Plex Sans';
-  src: url('/fonts/ibm-plex-sans-400.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'IBM Plex Sans';
-  src: url('/fonts/ibm-plex-sans-500.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'IBM Plex Sans';
-  src: url('/fonts/ibm-plex-sans-600.woff2') format('woff2');
-  font-weight: 600;
+  font-family: 'Space Grotesk';
+  src: url('/fonts/space-grotesk-var.woff2') format('woff2-variations');
+  /* the range, not one value: this is the variable font, not an instance */
+  font-weight: 300 700;
   font-style: normal;
   font-display: swap;
 }
@@ -39,26 +33,139 @@
   font-display: swap;
 }
 
-:root {
-  --bg:        #080808;
-  --surface:   #1A1A1A;
-  --copper:    #D08F39;
-  --copper-hi: #DEA754;
-  --gold:      #C9A84C; /* brand gold, shared with chouhan.ai (--gold there) */
-  --green:     #0E5A38;
-  --text:      #EAEAEA;
-  --text-dim:  #9A9A9A;
+/* DM Sans, for the nav bar and nothing else. It is supermemory's --font-body,
+   and the bar is the one place this site sets out to be their bar rather than
+   to be measured against it: 15px labels in the face they actually use, at the
+   500 their stylesheet declares, instead of the Space Grotesk 400 that was
+   chosen to match their ink coverage from a distance.
 
-  --display: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+   One static instance, not the variable file — 500 is the only weight the bar
+   asks for. The 9pt optical size is the one Google serves at this weight, and
+   it is the right one: these are 15px labels, not display type. Subset to the
+   same range as the other two faces, which is what keeps a whole third family
+   to 8.5 KB. Nothing else on the page may use it without widening that range. */
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/dm-sans-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Bold mono exists for exactly one word, so it is subset to exactly that word:
+   the eight glyphs of "copperhead" come to 1.1 KB, where carrying the variable
+   mono for the same effect would have cost 8 KB. Anything else set at 700 in
+   this family will fall back to synthesised bold, so do not use it elsewhere
+   without widening the subset. */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Theme, in the supermemory.ai shape: a page, near-black or near-white text,
+   and objects separated by hairline greys rather than by luminance. Three
+   surface steps only —
+
+     --bg        the page, and the cells of a framed grid (the frame contains)
+     --panel     a standalone card lifted off the page (footer, CTA, tier cards)
+     --surface   an inset block within a panel (terminal, code, brief)
+
+   Every token is a light-dark() pair rather than a value repeated in a second
+   :root block under a media query. The function resolves against the used
+   `color-scheme`, which is the one thing the toggle below sets — so the whole
+   palette is declared once, the light and dark values sit on the same line
+   where they can be compared, and a token added later cannot be added to one
+   theme and forgotten in the other.
+
+   It also means the site is correctly themed with JavaScript off: `color-scheme:
+   light dark` alone makes light-dark() follow the OS preference. The inline
+   script in Base.astro only exists to honour an explicit choice the reader has
+   made, by stamping data-theme and pinning color-scheme to one keyword.
+
+   The accent stays copper, not supermemory's blue. On white it is darkened to
+   #A75F14 — 4.90:1 — so it is legible both as link text and under a white label
+   when it is a button fill. On the dark page it goes the other way, to #D08F39
+   (7.3:1), which is too light to carry white: --on-copper is the label colour
+   for a copper fill and flips with it. --copper-hi means more emphasis, so on a
+   light ground it is darker and on a dark ground it is lighter. */
+:root {
+  /* both keywords, so light-dark() resolves off the OS preference until the
+     toggle pins it, and so UA chrome (scrollbars, form controls, the caret)
+     follows the theme it is painted on */
+  color-scheme: light dark;
+
+  --bg:        light-dark(#FFFFFF, #09090B);
+  --panel:     light-dark(#FAFAFA, #111114);
+  --panel-hi:  light-dark(#F2F2F4, #17171B); /* hover on a panel */
+  --surface:   light-dark(#F1F1F3, #131317);
+  --line:      light-dark(#E5E5E8, #26262C); /* 2px card frames, 1px gutters */
+  --line-hi:   light-dark(#D6D6DB, #3A3A43); /* the same frame, on hover */
+  --copper:    light-dark(#A75F14, #D08F39);
+  --copper-hi: light-dark(#8F5210, #E5A855);
+  --on-copper: light-dark(#FFFFFF, #17120C); /* a label sitting on --copper */
+  --gold:      #C9A84C; /* brand gold, shared with chouhan.ai (--gold there) */
+  --green:     light-dark(#0E5A38, #3FAF7A);
+  --text:      light-dark(#0A0A0A, #EDEDEF);
+  --text-dim:  light-dark(#57575E, #9B9BA5);
+
+  --display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, sans-serif;
-  --sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+  /* One face for the whole page. --display and --sans are the same family now;
+     the hierarchy is carried by size and weight off the variable axis instead
+     of by a second typeface. */
+  --sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Nav bar only. Falls back to --sans's stack, so a failed font load leaves
+     the bar in the page's own face rather than in the UA's. */
+  --nav: 'DM Sans', 'Space Grotesk', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
 
   --maxw: 1328px; /* mastra --ds-layout-content-v2 */
   --pad-y: 136px;
-  --hairline: rgba(255, 255, 255, 0.08);
+  /* Height of the fixed nav's inner box, the 1px rule excluded. Lives here
+     rather than in Navbar.astro because the bar is fixed and therefore invisible
+     to layout: the hero has to reserve the space itself, and it was doing that
+     against a hardcoded copy of this number in two places. One name, so the bar
+     cannot shrink without the space above the hero shrinking with it. */
+  --nav-h: 69px;
+  --hairline: light-dark(rgba(0, 0, 0, 0.09), rgba(255, 255, 255, 0.1));
+  /* a wash of the page's own ink, for a zebra stripe or an icon-button hover:
+     too faint to be a surface step, which is why it is not one */
+  --wash: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.07));
+  /* cast further and deeper on the dark page, where a shadow has to do its
+     lifting against a ground that is nearly the shadow's own colour */
+  --lift: light-dark(
+    0 30px 70px -40px rgba(0, 0, 0, 0.3),
+    0 34px 80px -44px rgba(0, 0, 0, 0.85)
+  );
+  /* derived, so it tracks whichever copper is in play */
   --trace: color-mix(in srgb, var(--copper) 26%, transparent);
+}
+
+/* Phones. 69 is a desktop measure: on a 375-wide fold it is 10.5% of the whole
+   first screen, spent on a bar carrying a wordmark and a burger. 56 is the usual
+   mobile app-bar height and still clears the tallest thing in the bar (the 42px
+   wordmark). Tablets keep the full 69 — they have the fold to spare. The
+   breakpoint is the one the terminal already treats as "phone". */
+@media (max-width: 560px) {
+  :root {
+    --nav-h: 56px;
+  }
+}
+
+/* The toggle's only job. Pinning color-scheme to one keyword is what makes
+   every light-dark() above resolve to that side, so one attribute on <html>
+   swings the palette, the UA chrome, and the theme-color meta together. */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 *,
@@ -68,9 +175,10 @@
 }
 
 html {
+  /* color-scheme is set in the token block above, where it is load-bearing */
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
-  scroll-padding-top: 84px;
+  scroll-padding-top: 95px;
 }
 
 body {
@@ -78,8 +186,9 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--sans);
-  /* Type scale ported from mastra.ai: 17px body on a tighter 1.5 leading (mastra
-     runs 136%; 1.5 keeps Plex's taller x-height readable across blog prose). */
+  /* Type scale ported from mastra.ai: 17px body on a tighter 1.5 leading
+     (mastra runs 136%; 1.5 suits Space Grotesk's open counters across blog
+     prose, and it is the leading the headline scale was measured against). */
   font-size: 1.0625rem; /* 17px */
   line-height: 1.5;
   font-feature-settings: 'kern' 1;
@@ -87,32 +196,40 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Measured off supermemory's own h1: Space Grotesk 500 on 1.04 leading. Their
+   headline also runs -0.058em of tracking, but that is an optical-size value
+   for 72px type — it collapses small headings, so the tight figure is applied
+   per-heading (the hero h1, .section-title) rather than to every h1/h2/h3. */
 h1,
 h2,
 h3 {
   font-family: var(--display);
-  /* Plex Sans carries display sizes at 600; 700 reads clumsy at this scale */
-  font-weight: 600;
-  line-height: 1.12;
-  letter-spacing: -0.02em;
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
   margin: 0;
 }
 
 /* Subheads sit a step lighter than the section titles so the hierarchy reads
-   without everything shouting. */
+   without everything shouting. Free to do with a variable face. */
 h3 {
-  font-weight: 500;
+  font-weight: 400;
   line-height: 1.3;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 p {
   margin: 0 0 1rem;
 }
 
+/* Prose links carry a dashed rule rather than a solid one: at 45% copper a
+   solid underline reads as a UI border under short link text, and the dashes
+   keep it legible as an annotation of the word. Buttons and the nav set
+   `text-decoration: none` themselves, so this only reaches running text. */
 a {
   color: var(--copper);
   text-decoration: underline;
+  text-decoration-style: dashed;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
   text-decoration-color: color-mix(in srgb, var(--copper) 45%, transparent);
@@ -136,10 +253,12 @@ video {
   height: auto;
 }
 
+/* Copper, not the brand gold: gold reads at 1.9:1 on white, so on the light
+   theme the ring would be all but invisible on the very surface it has to
+   mark. Copper clears 4.9:1 on white and 7.3:1 on the dark page. */
 :where(a, button, [tabindex]):focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--copper);
   outline-offset: 3px;
-  border-radius: 2px;
 }
 
 /* ---- Layout ---- */
@@ -153,6 +272,58 @@ video {
 
 section {
   padding-block: var(--pad-y);
+}
+
+/* ---- Section frame ----
+
+   supermemory runs two hairlines down the full height of the page at the edges
+   of its content column, so every section reads as a cell of one continuous
+   frame rather than as a band floating on the page. Theirs sit at x=104/1335 in
+   a 1440 viewport: a 1231px column, which is the same geometry as this site's
+   --maxw box. SectionRule.astro's inner rule spans exactly this width, so the
+   two meet at the corners.
+
+   Drawn on one wrapper rather than per section: a single pair of lines for the
+   whole column means no seams where sections meet, and no section has to know
+   it is inside a frame. The wrapper starts below the hero, because on their
+   page the frame does too — the hero is the page's cover, not a cell of the
+   grid, and ruling its flanks would fight the dot field already there. */
+.framed {
+  position: relative;
+}
+
+.framed::before,
+.framed::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+  pointer-events: none;
+}
+
+.framed::before {
+  left: max(0px, calc(50% - var(--maxw) / 2));
+}
+
+.framed::after {
+  right: max(0px, calc(50% - var(--maxw) / 2));
+}
+
+/* A section that follows a rule closes up against it: the divider is the
+   section's own header, so the full --pad-y would read as a gap between them. */
+.rule + section {
+  padding-top: 72px;
+}
+
+/* Below this the column is the viewport and the rules would hug the screen
+   edges, where they read as a browser artefact rather than as a frame. */
+@media (max-width: 900px) {
+  .framed::before,
+  .framed::after {
+    display: none;
+  }
 }
 
 /* Section index, set like a schematic reference designator: a mono number and a
@@ -177,6 +348,8 @@ section {
 .section-title {
   /* mastra headline-2xl: clamp(30px … 54px) */
   font-size: clamp(1.875rem, 3.8vw, 3.375rem);
+  /* display sizes take more of supermemory's -0.058em than body-scale ones */
+  letter-spacing: -0.045em;
   max-width: 20ch;
   text-wrap: balance;
 }
@@ -185,6 +358,8 @@ section {
   color: var(--text-dim);
   /* a step above the 17px body, toward mastra's body-lg */
   font-size: 1.25rem;
+  line-height: 1.6;
+  letter-spacing: -0.012em;
   max-width: 54ch;
   margin: 1.35rem 0 0;
 }
@@ -210,17 +385,20 @@ section {
   width: var(--via);
   height: var(--via);
   transform: translateY(-50%);
-  border-radius: 50%;
   border: 1px solid var(--copper);
   background: var(--bg);
 }
 
 /* ---- Wordmark: fiducial mark + lowercase mono ---- */
 
+/* The company reads loudest in the bar, as supermemory's does: their lockup is
+   24px tall against 15px nav links, so the wordmark is set bold and tracked
+   tight rather than sitting at the same weight as the links beside it. */
 .wordmark {
   font-family: var(--mono);
   font-size: 1rem;
-  letter-spacing: 0.01em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--text);
   display: inline-flex;
   align-items: center;
@@ -233,18 +411,20 @@ section {
 
 /* ---- Buttons ---- */
 
+/* Square, like every box on supermemory: their whole page computes to
+   border-radius 0. 44px tall on 14.5px medium with 20px of side padding, the
+   metrics measured off their primary and secondary pair. */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-family: var(--sans);
-  font-size: 0.9375rem; /* 15px, matching the navbar CTA */
+  font-size: 0.90625rem; /* 14.5px */
   font-weight: 500;
+  letter-spacing: -0.005em;
   line-height: 1;
-  padding: 0.85rem 1.4rem;
-  /* mastra pills use a 10px radius; the sharper 3px PCB corner is retired so the
-     buttons read consistently with the navbar waitlist pill. */
-  border-radius: 10px;
+  height: 44px;
+  padding: 0 20px;
   text-decoration: none;
   border: 1px solid transparent;
   transition: background-color 0.16s ease, color 0.16s ease,
@@ -253,22 +433,26 @@ section {
 
 .btn-primary {
   background: var(--copper);
-  color: #100D0A;
+  color: var(--on-copper);
 }
 
 .btn-primary:hover {
   background: var(--copper-hi);
-  color: #100D0A;
+  color: var(--on-copper);
 }
 
+/* The outlined button needs a fill of its own, or it reads as plain text with a
+   stray box round it — supermemory's "VIEW DOCS" does the same: a soft grey
+   chip beside the solid primary. */
 .btn-secondary {
-  background: transparent;
+  background: var(--panel);
   color: var(--text);
-  border-color: rgba(255, 255, 255, 0.14);
+  border-color: var(--line);
 }
 
 .btn-secondary:hover {
-  border-color: rgba(255, 255, 255, 0.32);
+  background: var(--panel-hi);
+  border-color: var(--line-hi);
   color: var(--text);
 }
 
@@ -325,8 +509,11 @@ section {
    markdown, so its rules live here in the global sheet (the .prose scoped
    styles in blog/[...slug].astro cannot reach markdown-rendered HTML the same
    way). Scoped under .prose so they only apply inside a post, and specific
-   enough to override the generic .prose img rule. Colours use the copperhead.sh
-   tokens (bg #080808, brand gold), not chouhan.ai's palette. */
+   enough to override the generic .prose img rule.
+
+   The scrim and its CTA stay dark through the light theme: they sit on top of
+   the deck image, not on the page, so they take their contrast from the
+   artwork. Brand gold is legible there in a way it never is on white. */
 
 .prose figure {
   margin: 0 0 1.4rem;
@@ -343,7 +530,6 @@ section {
   position: relative;
   display: block;
   border: 1px solid var(--hairline);
-  border-radius: 3px;
   overflow: hidden;
   transition: border-color 0.25s ease;
 }
@@ -354,7 +540,6 @@ section {
   height: auto;
   margin: 0;
   border: none;
-  border-radius: 0;
 }
 
 .prose .deck-card::after {
@@ -391,7 +576,8 @@ section {
 
 .prose .deck-card:hover .deck-cta {
   background: var(--gold);
-  color: var(--bg);
+  /* near-black, not var(--bg): the page white is now 1.9:1 against gold */
+  color: #100d0a;
 }
 
 @media (max-width: 768px) {

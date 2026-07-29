@@ -1,0 +1,119 @@
+---
+import { groups } from '../faq';
+import { links } from '../config';
+
+// A short FAQ for the homepage. The full set lives at /blog/faq and both read
+// from src/faq.ts, so an answer is only ever written once.
+//
+// Which questions: the first two from each group, flattened. Taking whole
+// groups would have given four questions about the basics and none about trust,
+// and the objections a reader has on a landing page are spread across all of
+// them rather than concentrated at the top of the list.
+const PER_GROUP = 2;
+const items = groups.flatMap((g) => g.items.slice(0, PER_GROUP));
+const remaining = groups.reduce((n, g) => n + g.items.length, 0) - items.length;
+---
+
+<section id="faq">
+  <div class="wrap">
+    <h2 class="section-title">Questions, before you ask them.</h2>
+
+    <div class="items">
+      {
+        items.map((i) => (
+          <details>
+            <summary>{i.q}</summary>
+            <div class="answer">
+              <p set:html={i.a} />
+            </div>
+          </details>
+        ))
+      }
+    </div>
+
+    <p class="more">
+      <a href={links.faq}>{remaining} more questions</a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .section-title {
+    margin-bottom: 2.5rem;
+  }
+
+  /* One column on a hairline-separated stack, the shape the full FAQ page uses,
+     so the two read as the same component at different lengths. */
+  .items {
+    max-width: 820px;
+    border-top: 1px solid var(--line);
+  }
+
+  details {
+    border-bottom: 1px solid var(--line);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 0;
+    font-family: var(--display);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  /* The default marker is a triangle that cannot be styled consistently across
+     browsers; a drawn plus that rotates into a minus is one glyph either way. */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    content: '';
+    flex: none;
+    width: 11px;
+    height: 11px;
+    background:
+      linear-gradient(var(--copper), var(--copper)) center / 100% 1px no-repeat,
+      linear-gradient(var(--copper), var(--copper)) center / 1px 100% no-repeat;
+    transition: transform 0.18s ease;
+  }
+
+  details[open] summary::after {
+    /* the vertical bar rotates onto the horizontal one, leaving a minus */
+    transform: rotate(90deg);
+  }
+
+  .answer {
+    padding: 0 0 22px;
+    max-width: 68ch;
+  }
+
+  .answer p {
+    margin: 0;
+    color: var(--text-dim);
+    font-size: 0.96rem;
+    line-height: 1.65;
+  }
+
+  .more {
+    margin: 2rem 0 0;
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 720px) {
+    .section-title {
+      margin-bottom: 1.75rem;
+    }
+
+    summary {
+      padding: 16px 0;
+      font-size: 1rem;
+    }
+  }
+</style>

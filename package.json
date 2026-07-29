@@ -9,11 +9,15 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "shots": "node scripts/shots.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.3",
     "astro": "^7.1.1"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.56.1"
   },
   "description": "Website for copperhead, the open source AI agent for PCB design. Live at copperhead.sh",
   "license": "MIT",

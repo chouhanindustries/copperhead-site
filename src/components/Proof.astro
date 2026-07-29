@@ -1,0 +1,114 @@
+---
+import { Image } from "astro:assets";
+import pcbRender from "../assets/pcb.png";
+import { links } from "../config";
+
+// The product render and its caption, which held the right-hand column of the
+// hero before it went to the centred supermemory layout. Same content, now a
+// section of its own directly under the fold: a framed render with the claim
+// and its two receipts beneath it.
+---
+
+<section id="proof" class="proof">
+  <div class="wrap">
+    <figure>
+      <div class="frame">
+        <Image
+          src={pcbRender}
+          alt="A copperhead-designed board: the Open Telegraph key, with ESP32-S3, USB-C, and the copper switch, rendered from its KiCad files."
+          width={840}
+          height={615}
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+      <figcaption class="caption">
+        <h2>Proven on real copper.</h2>
+        <p>
+          Open Telegraph: pocket-size ESP32-S3 Morse key, built end to end with
+          this workflow. Every decision, every check, every file is public.
+        </p>
+        <p class="links">
+          <a href={links.buildStory}>Read the build story</a>
+          <a href={links.telegraphRepo}>Browse the repo</a>
+        </p>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .proof .wrap {
+    text-align: center;
+  }
+
+  figure {
+    margin: 0;
+  }
+
+  /* Product render framed as a panel: a 2px hairline frame on a raised fill, so the render's own lavender backdrop reads as a contained
+     viewport rather than as a stain on the page white. */
+  .frame {
+    max-width: 640px;
+    margin-inline: auto;
+    border: 2px solid var(--line);
+    overflow: hidden;
+    background: var(--panel);
+    box-shadow: var(--lift);
+  }
+
+  .frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .caption {
+    margin-top: 2.25rem;
+  }
+
+  .caption h2 {
+    font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+  }
+
+  .caption p {
+    color: var(--text-dim);
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 52ch;
+    margin: 0.75rem auto 0;
+  }
+
+  /* Actions read as a tight, aligned pair with a trailing arrow each. */
+  .caption .links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 1.5rem;
+    margin-top: 1.35rem;
+  }
+
+  .caption .links a {
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .caption .links a::after {
+    content: " ↗";
+    white-space: nowrap;
+  }
+
+  @media (max-width: 560px) {
+    .frame {
+      max-width: 300px;
+    }
+
+    .caption {
+      margin-top: 1.6rem;
+    }
+
+    .caption p {
+      font-size: 0.95rem;
+    }
+  }
+</style>

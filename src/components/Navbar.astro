@@ -16,10 +16,10 @@ interface Props {
 const { home = true } = Astro.props;
 
 const nav = [
+  { label: 'Research', href: links.research },
   { label: 'Pricing', href: links.pricing },
   { label: 'Blog', href: links.blog },
   { label: 'Docs', href: links.docs },
-  { label: 'FAQ', href: links.faq },
   ...(links.discord ? [{ label: 'Discord', href: links.discord }] : []),
 ];
 ---
@@ -27,10 +27,15 @@ const nav = [
 <header class="bar" data-open="false">
   <div class="inner">
     <a class="brand" href={home ? '#top' : '/'}>
-      <Wordmark size="1.02rem" />
+      <Wordmark size="1.25rem" />
     </a>
 
-    <div class="menu" id="nav-menu">
+    <!-- The CTA lives in here with the links, not in .actions, so that the
+         mobile drop panel carries it. On desktop .menu is display:contents and
+         both become direct flex children of .inner, where `order` puts the CTA
+         back at the end of the row. -->
+    <div class="menu" id="nav-menu" data-open="false">
+      <div class="menu-inner">
       <nav aria-label="Primary">
         <ul>
           {
@@ -42,9 +47,34 @@ const nav = [
           }
         </ul>
       </nav>
-    </div>
 
     <div class="actions">
+        {/* A switch, not an icon button. The bare icon gave no affordance
+            that it was pressable and no read on which mode you were in: the
+            glyph showed the destination, so it was the inverse of the state
+            and had to be reasoned about. A track with a knob is unambiguous on
+            both counts: it looks like a control, and the knob's side is the
+            answer. The knob carries the current mode's icon rather than the
+            destination's, so glyph and position agree instead of cancelling.
+
+            Which side it sits on is driven off <html data-theme> in CSS, not
+            by a class this button sets, so it is right on the first frame and
+            stays right when the OS preference changes under a reader who never
+            chose. */}
+        <button class="theme" type="button" role="switch" aria-checked="false" aria-label="Dark theme">
+          <span class="track" aria-hidden="true">
+            <span class="knob">
+              <svg class="ic ic-sun" viewBox="0 0 20 20" width="12" height="12" focusable="false">
+                <circle cx="10" cy="10" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"></circle>
+                <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M10 1.6v2.2M10 16.2v2.2M18.4 10h-2.2M3.8 10H1.6M15.94 4.06l-1.56 1.56M5.62 14.38l-1.56 1.56M15.94 15.94l-1.56-1.56M5.62 5.62 4.06 4.06"></path>
+              </svg>
+              <svg class="ic ic-moon" viewBox="0 0 20 20" width="12" height="12" focusable="false">
+                <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M16.5 12.4A7 7 0 0 1 7.6 3.5a7 7 0 1 0 8.9 8.9Z"></path>
+              </svg>
+            </span>
+          </span>
+        </button>
+
         <a
           class="gh"
           href={links.repo}
@@ -60,14 +90,39 @@ const nav = [
           </svg>
           {stats.stars !== null && (
             <span class="count">
-              {compact(stats.stars)}
-              <span class="star" aria-hidden="true">★</span>
+              <span class="num">{compact(stats.stars)}</span>
+              {/* Drawn, not typed. ★ is U+2605, outside the woff2 subset every
+                  face on this page is cut to, so as a glyph it renders in a
+                  system fallback — a fourth face, in the one row that is
+                  supposed to be exactly two. */}
+              <svg class="star" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" focusable="false">
+                <path
+                  fill="currentColor"
+                  d="M8 .5l2.3 4.66 5.15.75-3.72 3.63.88 5.13L8 12.34l-4.6 2.42.88-5.13L.55 5.9l5.15-.75L8 .5z"
+                />
+              </svg>
             </span>
           )}
         </a>
-
-      <a class="waitlist" href={links.getStarted}>Let's talk</a>
     </div>
+
+      <a class="waitlist" href={links.getStarted}>
+        <span class="label">Let's talk</span>
+        <span class="tip" aria-hidden="true"
+          ><svg viewBox="0 0 16 16" width="14" height="14" focusable="false"
+            ><path
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 8h9.5M9 4.5 12.5 8 9 11.5"></path></svg
+          ></span
+        >
+      </a>
+      </div>
+    </div>
+
 
     <button
       class="burger"
@@ -76,31 +131,42 @@ const nav = [
       aria-expanded="false"
       aria-controls="nav-menu"
     >
-      <span></span>
-      <span></span>
-      <span></span>
+      <span class="slot">
+        <svg class="ic ic-menu" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+          <path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" d="M3 5h14M3 10h14M3 15h14"></path>
+        </svg>
+        <svg class="ic ic-close" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+          <path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" d="M5 5l10 10M15 5L5 15"></path>
+        </svg>
+      </span>
     </button>
   </div>
 </header>
 
 <style>
-  /* Solid antigrid bar with a 2px lower border a hair lighter than the surface,
-     matching mastra's --ds-nav-height of 60px. */
+  /* Solid white bar over a hairline rule, the supermemory nav: the border is the
+     only thing separating it from the page. 60px tall, mastra's --ds-nav-height. */
   .bar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 20;
-    background: #0d0d0d;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.06);
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
   }
 
+  /* --nav-h + the 1px rule is the 70px supermemory's bar measures to on the
+     desktop value; it steps down on phones, where the bar was taking a tenth of
+     the fold. The number lives in global.css because the hero has to reserve the
+     same space (see the note there). Relative, because the link row is centred
+     against this box rather than packed after the wordmark — see below. */
   .inner {
+    position: relative;
     max-width: var(--maxw);
     margin-inline: auto;
     padding: 0 32px;
-    height: 60px;
+    height: var(--nav-h);
     display: flex;
     align-items: center;
     gap: 24px;
@@ -111,60 +177,135 @@ const nav = [
     display: inline-flex;
     align-items: center;
     padding: 6px 0;
-    /* mastra sets the logo an mr-[32px] off the first link */
-    margin-right: 8px;
   }
 
-  /* On desktop the wrapper collapses so nav and actions become direct flex
-     children of .inner: links left next to the brand, actions pushed right. */
-  .menu {
+  /* On desktop the wrapper collapses so its children become direct flex children
+     of .inner. That flattening is what lets the CTA sit in the drop panel's DOM
+     and still render at the far right of the bar — but it also drops it in
+     source order, next to the links, so `order` restores the row:
+     brand · links · … · github · CTA. */
+  .menu,
+  .menu-inner {
     display: contents;
+  }
+
+  .brand {
+    order: 0;
+  }
+
+  nav {
+    order: 1;
+  }
+
+  .actions {
+    order: 2;
+  }
+
+  a.waitlist {
+    order: 3;
+  }
+
+  .burger {
+    order: 4;
+  }
+
+  /* Centred on the bar, not packed after the wordmark. Their own comment on the
+     block is explicit about it — "sits in the centre column of the grid, so its
+     midpoint is the bar's midpoint" — and it is a three-column grid there:
+     logo, links, buttons. Absolute centring gets the same result out of this
+     flex row without moving the CTA out of .menu, which has to stay where it is
+     so the mobile drawer can carry it.
+
+     gap-6 in their markup: 24px between labels, and the labels carry no padding
+     of their own. */
+  nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   nav ul {
     list-style: none;
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 24px;
     margin: 0;
     padding: 0;
   }
 
+  /* Full-strength ink, not the dim grey: supermemory sets every nav link in the
+     same near-black as its body copy, so the row reads as one even weight and
+     the only thing louder than it is the company.
+
+     Every value here is theirs, the face included: DM Sans 500 at 15px on
+     -0.01em and 140%. This row used to be Space Grotesk 400, picked by matching
+     ink coverage over equal-height word boxes — 0.315 against their 0.314 —
+     because carrying a third family for one component was not worth 8.5 KB.
+     That reasoning holds for a match at a distance and does not hold for a
+     match: two faces at the same coverage still differ in every skeleton, and
+     the bar is the one component that is meant to be theirs outright. Subset,
+     the third family costs less than either Plex weight this site already
+     dropped.
+
+     The rest of the bar's 15px tier — the GitHub count, the CTA label — moves
+     with it. They are one row at one size, and a face change to some of them
+     would split a tier that the whole bar is built to read as one. */
   nav a {
-    color: var(--text-dim);
+    position: relative;
+    color: var(--text);
     text-decoration: none;
+    font-family: var(--nav);
     font-size: 0.9375rem; /* 15px */
     font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 140%;
     white-space: nowrap;
-    padding: 7px 11px;
-    border-radius: 8px;
-    transition: color 0.16s ease, background-color 0.16s ease;
+    transition: color 0.18s ease;
   }
 
+  /* The label has no padding, so the pointer target is drawn rather than
+     inherited — theirs is `inset: -10px -8px; min-height: 40px`, which keeps a
+     40px target under a 21px line box without spacing the row out. */
+  nav a::after {
+    content: '';
+    position: absolute;
+    inset: -10px -8px;
+    min-height: 40px;
+  }
+
+  /* Their hover dims the label; it does not put a pill behind it. */
   nav a:hover {
-    color: var(--text);
-    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-dim);
+    background: none;
   }
 
   /* Right cluster: mastra pairs a GitHub chip with a solid CTA pill. */
+  /* The CTA is no longer inside this box, so the 16px that parts the two
+     right-hand items is now a margin on the CTA rather than a gap in here —
+     .inner's own 24px gap would otherwise set it. */
   .actions {
     margin-left: auto;
     display: inline-flex;
     align-items: center;
-    gap: 10px;
   }
 
-  /* GitHub chip: the octocat + star count, near-white so the mark reads clearly
-     (mastra's is light too), 34px tall, 6px radius, 15px medium. */
+  a.waitlist {
+    margin-left: -8px; /* 24px .inner gap − 8 = their 16px */
+  }
+
+  /* GitHub chip: the octocat + star count in the page ink so the mark reads
+     clearly against the page, 36px tall, 15px. Same face and same 500 as the
+     links it sits beside — they are one tier and must not read as two. */
   a.gh {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    height: 34px;
+    height: 36px;
     padding: 0 10px 0 7px;
-    border-radius: 6px;
+    font-family: var(--nav);
     font-size: 0.9375rem; /* 15px */
     font-weight: 500;
+    letter-spacing: -0.01em;
     white-space: nowrap;
     text-decoration: none;
     color: var(--text);
@@ -172,190 +313,492 @@ const nav = [
   }
 
   a.gh:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--wash);
   }
 
   a.gh svg {
     flex: none;
   }
 
+  /* ── Theme switch ──
+     A 46x26 track carrying an 20px knob. Sized to sit beside the GitHub chip
+     without out-shouting it: the bar already has one emphasised destination and
+     this is not it, so the track is the page's own panel fill inside a hairline
+     rather than anything accent-coloured. */
+  .theme {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+    width: 46px;
+    height: 26px;
+    margin-right: 4px;
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: var(--text);
+  }
+
+  .theme .track {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--panel);
+    transition:
+      background-color 0.18s ease,
+      border-color 0.18s ease;
+  }
+
+  .theme:hover .track {
+    border-color: var(--line-hi);
+    background: var(--panel-hi);
+  }
+
+  .theme:active .track {
+    scale: 0.97;
+  }
+
+  .theme .knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--bg);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+    transition: transform 0.22s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .theme .ic {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: scale(0.3);
+    transition:
+      opacity 0.18s cubic-bezier(0.2, 0, 0, 1),
+      transform 0.18s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  /* Knob side and glyph both read off the same two things the palette reads
+     off: the attribute when the reader has chosen, the OS preference when they
+     have not. That is why each rule appears twice — light-dark() cannot carry
+     it, since it takes colours and this needs a transform.
+
+     :global, because the state lives on <html>, outside this component's scope,
+     and would otherwise be rewritten to a scoped selector matching nothing. */
+  .theme .ic-sun {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  :global(:root[data-theme='dark']) .theme .knob {
+    transform: translateX(20px);
+  }
+
+  :global(:root[data-theme='dark']) .theme .ic-sun {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  :global(:root[data-theme='dark']) .theme .ic-moon {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme])) .theme .knob {
+      transform: translateX(20px);
+    }
+
+    :global(:root:not([data-theme])) .theme .ic-sun {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+
+    :global(:root:not([data-theme])) .theme .ic-moon {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Mark, number, star on one centre line — which `align-items: center` alone
+     does not give you here, because only one of the three is a box whose ink is
+     centred in it.
+
+     The octocat is: an 18px viewBox filled corner to corner, so its box centre
+     is its optical centre, and it defines the line the other two must meet. The
+     star is an 11px viewBox, also centred in itself — but it is centred inside
+     .count, whose 15px line box reserves descender depth nothing in it uses, so
+     the whole span rides high. The digits ride higher still: they sit on the
+     baseline inside that same box, above even its middle.
+
+     Measured at 8x on the rendered bar, ink bands rather than boxes — the mark
+     spans 140px centred on 146; untouched, the star lands on 141.5 and the
+     digits on 136.6. So they need different corrections, and the two transforms
+     compose: .count lifts the span onto the mark, and .num takes the digits the
+     rest of the way off the baseline. Both land inside a tenth of a pixel. */
   .count {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    line-height: 1;
+    transform: translateY(0.5px);
     font-variant-numeric: tabular-nums;
   }
 
-  .count .star {
-    color: var(--copper, #c67b45);
-    font-size: 0.875em;
-    line-height: 1;
+  .count .num {
+    transform: translateY(0.6px);
   }
 
-  /* Solid CTA pill: mastra's Sign Up metrics (34px, 10px radius, 15px medium),
-     copper where mastra is white — the one emphasised destination in the bar. */
+  .count .star {
+    flex: none;
+    color: var(--copper);
+  }
+
+  /* Solid CTA in supermemory's "Start Building" slot, measured off it: a 36px
+     box, the label on 20px of side padding at the same 15px medium as the nav
+     links beside it, and a 37px arrow cap parted from the label by a rule struck
+     through the fill. Square corners, saturated ground, white label — the one
+     emphasised destination in the bar. Copper here, blue there. Same lockup as
+     the hero's primary button, one size down. */
   a.waitlist {
     display: inline-flex;
-    align-items: center;
-    height: 34px;
-    padding: 0 16px;
-    border-radius: 10px;
+    align-items: stretch;
+    height: 36px;
+    overflow: hidden;
+    font-family: var(--nav);
     font-size: 0.9375rem; /* 15px */
     font-weight: 500;
+    letter-spacing: -0.005em;
     white-space: nowrap;
     text-decoration: none;
-    color: #100d0a;
+    color: var(--on-copper);
     background: var(--copper);
     transition: background-color 0.16s ease;
   }
 
   a.waitlist:hover {
     background: var(--copper-hi);
+    color: var(--on-copper);
   }
 
-  /* Hamburger: two bars that cross into an X when open. Hidden on desktop. */
+  a.waitlist .label {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 20px;
+  }
+
+  /* The rule is struck through the fill in the label's own colour, so it
+     survives the label going from white on copper to near-black on copper. */
+  a.waitlist .tip {
+    flex: none;
+    width: 37px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid color-mix(in srgb, var(--on-copper) 24%, transparent);
+  }
+
+  /* Hamburger, on supermemory's construction: two 20px icons stacked in one
+     slot, cross-fading with a scale-and-blur rather than morphing bars. Their
+     exact curve and values — the closed icon shrinks to .25 and blurs 4px as
+     the open one comes up, which reads as one icon dissolving into the other. */
   .burger {
     display: none;
     margin-left: auto;
+    align-items: center;
+    justify-content: center;
     width: 40px;
     height: 40px;
+    margin-right: -8px;
     padding: 0;
     background: none;
     border: 0;
     cursor: pointer;
-    position: relative;
     color: var(--text);
   }
 
-  .burger span {
+  .burger .slot {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+  }
+
+  .burger .ic {
     position: absolute;
-    top: 50%;
-    left: 11px;
-    width: 18px;
-    height: 1.5px;
-    margin-top: -0.75px;
-    background: currentColor;
-    border-radius: 1px;
-    transition: transform 0.2s ease, opacity 0.2s ease;
+    inset: 0;
+    transition:
+      opacity 0.22s cubic-bezier(0.2, 0, 0, 1),
+      transform 0.22s cubic-bezier(0.2, 0, 0, 1),
+      filter 0.22s cubic-bezier(0.2, 0, 0, 1);
   }
 
-  .burger span:nth-child(1) {
-    transform: translateY(-5px);
+  .burger .ic-menu {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
   }
 
-  .burger span:nth-child(3) {
-    transform: translateY(5px);
-  }
-
-  .bar[data-open='true'] .burger span:nth-child(1) {
-    transform: translateY(0) rotate(45deg);
-  }
-
-  .bar[data-open='true'] .burger span:nth-child(2) {
+  .burger .ic-close,
+  .bar[data-open='true'] .burger .ic-menu {
     opacity: 0;
+    transform: scale(0.25);
+    filter: blur(4px);
   }
 
-  .bar[data-open='true'] .burger span:nth-child(3) {
-    transform: translateY(0) rotate(-45deg);
+  .bar[data-open='true'] .burger .ic-close {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
   }
 
-  /* ── Mobile: links and CTAs move into a drop panel (mastra behaviour) ── */
-  @media (max-width: 768px) {
+  /* ── Mobile. supermemory's drawer, to their values exactly.
+     `lg:hidden` is Tailwind's lg, so the breakpoint is 1024, not 900. From
+     their markup and stylesheet:
+
+       toggle   w-10 h-10 -mr-2                 40x40, pulled 8px toward the edge
+       panel    grid-template-rows 0fr -> 1fr   .32s cubic-bezier(.22,1,.36,1)
+       inner    opacity 0 -> 1, translateY -4px .24s / .28s, 60ms behind
+       column   py-4 px-6 gap-1                 16px / 24px / 4px
+       link     text-[15px] font-medium py-2    8px of padding a side
+       CTA      mt-3, full width                12px above it
+
+     The panel animates from a 0fr grid row rather than display:none, which is
+     the trick that lets a drop-down animate to a height nobody has measured;
+     the inner wrapper clips the overflow so the links do not reflow on the way
+     down. ── */
+  @media (max-width: 1023.98px) {
     .inner {
       gap: 6px;
       padding-inline: 16px;
     }
 
-    .brand {
-      margin-right: 0;
-    }
-
     .burger {
-      display: block;
-      /* .actions carries the margin-left:auto that pushes the cluster right, so
-         the burger sits tight against it rather than floating apart. */
-      margin-left: 0;
-      /* Narrower than desktop and nudged toward the edge so the right cluster
-         reads tight; the bars stay centred (left:11px + 18px width). */
-      width: 30px;
-      margin-right: -4px;
+      display: inline-flex;
+      margin-left: auto;
     }
 
-    /* Panel drops from under the bar, full width, closed by default so its
-       links stay out of the tab order until opened. */
+    nav {
+      position: static;
+      transform: none;
+    }
+
     .menu {
-      display: none;
+      display: grid;
+      grid-template-rows: 0fr;
       position: absolute;
-      top: 100%;
+      /* +1px, not a bare 100%: `top` resolves against the containing block's
+         padding box, and .bar's rule sits outside it — at 100% this panel
+         starts on the rule and its background paints over it, leaving the
+         mobile bar with no bottom edge. */
+      top: calc(100% + 1px);
       left: 0;
       right: 0;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 6px;
-      padding: 14px 22px 20px;
-      background: #0d0d0d;
-      border-bottom: 2px solid rgba(255, 255, 255, 0.06);
+      background: var(--bg);
+      transition: grid-template-rows 0.32s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .bar[data-open='true'] .menu {
+    .menu[data-open='true'] {
+      grid-template-rows: 1fr;
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 14px 28px -18px
+        light-dark(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.8));
+    }
+
+    .menu-inner {
       display: flex;
-    }
-
-    nav ul {
       flex-direction: column;
       align-items: stretch;
-      gap: 2px;
+      gap: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition:
+        opacity 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    nav a {
-      padding: 12px 12px;
-      font-size: 1rem;
+    .menu[data-open='true'] .menu-inner {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: 60ms;
     }
 
-    /* The GitHub chip and CTA stay in the bar (not the drop panel), as a tight
-       inline cluster pushed to the right, with the burger just past it. */
+    /* Source order is links, github, CTA; the desktop `order` values would
+       reshuffle the column. */
+    nav {
+      order: 1;
+    }
+
     .actions {
-      margin-left: auto;
-      flex-direction: row;
-      align-items: center;
-      gap: 4px;
-      margin-top: 0;
-    }
-
-    a.gh {
-      height: 32px;
-      gap: 5px;
-      justify-content: center;
-      padding: 0 6px;
-      border: 0;
-      font-size: 0.875rem; /* 14px */
-    }
-
-    a.gh svg {
-      width: 16px;
-      height: 16px;
+      order: 2;
     }
 
     a.waitlist {
-      height: 32px;
-      padding: 0 12px;
-      font-size: 0.875rem; /* 14px */
+      order: 3;
+    }
+
+    /* px-6 and the 16px of top padding are theirs; the vertical rhythm inside
+       the column is not. Their py-2 gives a 37px row on a 4px gap, and that is
+       the one part of this drawer that does not survive contact with a thumb —
+       tried at their values, and it mis-taps. 14px of padding on a 21px line
+       box makes a 49px row, and 6px of gap puts 55px between the centres of
+       adjacent targets, comfortably past the 44px minimum.
+
+       The padding rides on the children rather than on .menu-inner: padding on
+       the clipped wrapper counts toward its height, so a closed panel at 0fr
+       would still show a band of it. */
+    nav ul {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+      padding: 16px 24px 0;
+    }
+
+    /* display:block is load-bearing, not tidiness: these anchors are inline in
+       the drawer, and vertical padding on an inline box does not grow the line
+       box — the 14px was being applied and changing nothing, leaving a 30px
+       pitch. As blocks the padding counts, and the row is the 49px it reads as. */
+    nav a {
+      display: block;
+      padding: 14px 0;
+      line-height: 21px;
+      font-size: 0.9375rem; /* 15px */
+    }
+
+    nav a::after {
+      display: none;
+    }
+
+    nav a:hover {
+      color: var(--text-dim);
+    }
+
+    /* GitHub is a drawer row like their "Join Discord": icon, label, py-2. The
+       theme toggle rides at the far end of that row rather than taking a row of
+       its own — it is a control, not a destination, and the drawer's rows are a
+       list of places to go. Source order puts it first, so `order` moves it. */
+    .actions {
+      display: flex;
+      align-items: center;
+      margin: 6px 0 0;
+      padding: 0 24px;
+    }
+
+    a.gh {
+      order: 1;
+      height: auto;
+      padding: 14px 0;
+      line-height: 21px;
+      gap: 10px;
+    }
+
+    a.gh:hover {
+      background: none;
+    }
+
+    .theme {
+      order: 2;
+      margin: 0 4px 0 auto;
+    }
+
+    /* mt-3, then the column's own 16px of bottom padding. Full width, so
+       opening the menu never takes the page's main action off screen — their
+       reasoning, in their own comment. */
+    a.waitlist {
+      height: 46px;
+      margin: 14px 24px 18px;
+      font-size: 0.9375rem;
+    }
+
+    a.waitlist .label {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+
+  /* Reduced motion gets the panel without the choreography — the same thing
+     their stylesheet does. */
+  @media (prefers-reduced-motion: reduce) {
+    .menu,
+    .menu-inner,
+    .burger .ic,
+    .theme .ic,
+    .theme .knob {
+      transition: none;
     }
   }
 </style>
 
 <script>
-  // Toggle the mobile drop panel. Kept tiny and dependency-free; the panel is
-  // display:none when closed so its links stay out of the tab order.
+  // Theme toggle. The model — read, apply, persist — lives in the head script
+  // in Base.astro, because the same code has to run before first paint to
+  // honour a stored choice; this only wires the button to it and keeps the
+  // switch's state in sync.
+  //
+  // Flipping back to whatever the OS asked for clears the stored value rather
+  // than writing the opposite one. That is the difference between "I want dark"
+  // and "I want whatever this machine wants": a reader who toggles twice ends
+  // up back on the OS preference and keeps tracking it, instead of being pinned
+  // to a value that happens to match it today.
+  const theme = document.querySelector<HTMLButtonElement>('.theme');
+  const store = (window as any).__theme;
+
+  if (theme && store) {
+    const os = window.matchMedia('(prefers-color-scheme: dark)');
+
+    // role="switch" means the state is the accessible name's job no longer:
+    // aria-checked carries it, and the label stays constant ("Dark theme") so a
+    // screen reader announces "Dark theme, switch, on/off" rather than a
+    // sentence that inverts every press.
+    const label = () => {
+      const dark = store.resolved() === 'dark';
+      theme.setAttribute('aria-checked', String(dark));
+      theme.title = dark ? 'Switch to light theme' : 'Switch to dark theme';
+    };
+
+    label();
+    os.addEventListener('change', label);
+
+    theme.addEventListener('click', () => {
+      const next = store.resolved() === 'dark' ? 'light' : 'dark';
+      store.set(next === (os.matches ? 'dark' : 'light') ? null : next);
+      label();
+    });
+  }
+
+  // Toggle the mobile drawer. supermemory's handler is three lines — flip
+  // data-open on the panel and the button, mirror it onto aria-expanded — and
+  // this keeps that shape, with two additions their version does not make.
+  //
+  // The panel is no longer display:none when closed (a 0fr grid row is what
+  // collapses it now), so its links stay focusable and a keyboard user would
+  // tab into an invisible menu. `inert` takes the whole subtree out of the tab
+  // order and the accessibility tree without touching the animation. The media
+  // query is read back so the attribute is only applied at the width where the
+  // drawer actually exists — on desktop the same elements are the visible bar.
   const bar = document.querySelector<HTMLElement>('.bar');
   const burger = bar?.querySelector<HTMLButtonElement>('.burger');
   const menu = bar?.querySelector<HTMLElement>('.menu');
 
   if (bar && burger && menu) {
+    const collapsed = window.matchMedia('(max-width: 1023.98px)');
+
     const setOpen = (open: boolean) => {
       bar.dataset.open = String(open);
+      menu.dataset.open = String(open);
       burger.setAttribute('aria-expanded', String(open));
+      menu.inert = collapsed.matches && !open;
     };
+
+    setOpen(false);
+    collapsed.addEventListener('change', () => setOpen(false));
 
     burger.addEventListener('click', () => setOpen(bar.dataset.open !== 'true'));
 
@@ -366,6 +809,12 @@ const nav = [
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') setOpen(false);
+    });
+
+    // A tap anywhere off the bar dismisses it, which is what a drawer that
+    // overlays the page has to do to not feel stuck open.
+    document.addEventListener('click', (e) => {
+      if (bar.dataset.open === 'true' && !bar.contains(e.target as Node)) setOpen(false);
     });
   }
 </script>

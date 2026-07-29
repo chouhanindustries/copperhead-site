@@ -1,0 +1,151 @@
+---
+import Base from '../layouts/Base.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import { links } from '../config';
+
+// Placeholder. The nav carries a Research entry, so the page has to exist and
+// has to be honest about being empty. A "coming soon" that lists work already
+// underway is a claim; this one only describes what the section is for and
+// points at the writing that does exist today.
+const planned = [
+  {
+    title: 'Benchmarks',
+    body: 'How the agent scores on real boards rather than toy ones: pass rate on ERC and DRC, how often a change lands without human repair, and what a run costs in tokens.',
+  },
+  {
+    title: 'Drift measurement',
+    body: 'Putting a number on the problem the tool exists to solve: how far a schematic and its documents diverge over the life of a design, measured across open hardware repositories.',
+  },
+  {
+    title: 'Evaluation method',
+    body: 'The harness, the fixtures, and the scoring, published so the numbers above can be reproduced and argued with.',
+  },
+];
+---
+
+<Base
+  title="Research · copperhead"
+  description="Benchmarks, drift measurement, and evaluation method for the copperhead PCB agent. Not published yet."
+  path="/research/"
+>
+  <Navbar home={false} />
+  <main id="top">
+    <article>
+      <div class="wrap">
+        <header>
+          <p class="kind">Research</p>
+          <h1>Research</h1>
+          <p class="standfirst">
+            Nothing here yet. This is where the evidence will go: the
+            benchmarks, the methodology behind them, and the raw results, so
+            that the claims made everywhere else on this site can be checked.
+          </p>
+        </header>
+
+        <ul class="planned">
+          {
+            planned.map((p) => (
+              <li>
+                <h2>{p.title}</h2>
+                <p>{p.body}</p>
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="meanwhile">
+          In the meantime the <a href={links.blog}>blog</a> carries the argument
+          and the <a href={links.repo}>repo</a> carries the code. Both are the
+          best place to push back on any of it.
+        </p>
+      </div>
+    </article>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  article {
+    padding-block: 150px 120px;
+  }
+
+  header {
+    max-width: 62ch;
+  }
+
+  .kind {
+    margin: 0 0 1.1rem;
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--copper);
+  }
+
+  h1 {
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    letter-spacing: -0.045em;
+  }
+
+  .standfirst {
+    margin: 1.5rem 0 0;
+    color: var(--text-dim);
+    font-size: 1.2rem;
+    line-height: 1.55;
+  }
+
+  /* A hairline-separated stack rather than cards: these are notes on work that
+     does not exist yet, and a card would give them more weight than that. */
+  .planned {
+    list-style: none;
+    max-width: 820px;
+    margin: 4rem 0 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .planned li {
+    padding: 26px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .planned h2 {
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.5rem;
+  }
+
+  .planned p {
+    margin: 0;
+    max-width: 66ch;
+    color: var(--text-dim);
+    font-size: 0.96rem;
+    line-height: 1.65;
+  }
+
+  .meanwhile {
+    margin: 2.5rem 0 0;
+    max-width: 60ch;
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 720px) {
+    article {
+      padding-block: 120px 80px;
+    }
+
+    .standfirst {
+      font-size: 1.05rem;
+    }
+
+    .planned {
+      margin-top: 2.5rem;
+    }
+
+    .planned li {
+      padding: 22px 0;
+    }
+  }
+</style>

@@ -1,11 +1,24 @@
 ---
-import Wordmark from "./Wordmark.astro";
 import { links } from "../config";
 
-// Three columns, in the autoloops shape: Product / Connect / a copyright line.
-// Every link is verified to resolve; nothing is invented. Discord and X are
-// omitted because no handle appears in any source doc: add them to `links` in
-// src/config.ts and they render here automatically.
+// Footer in supermemory.ai's shape, measured off their /pricing page: a
+// full-bleed dark ground, a statement headline on the left against link columns
+// on the right, a mono uppercase legal line set to the right edge, and an
+// oversized wordmark bled off both edges and clipped by the page bottom.
+//
+// Where theirs is a flat brand blue, this one is a black-soldermask board seen
+// from above: matte black mask, matte off-white silkscreen legend, and the
+// wordmark as exposed copper under it. The palette is literal —
+//   --mask       black soldermask, warm rather than pure #000 (that reads as a
+//                hole in the page; real mask has a little body to it)
+//   --silk       silkscreen ink, off-white and slightly warm, never #fff
+//   --trace      exposed copper, the CLI's brand #b87333 rather than the page's
+//                darkened #A75F14: that value exists to clear 4.5:1 on white,
+//                and on the mask it comes out at 4.98:1 unaltered
+// White silkscreen on the mask is ~18:1, so every tier here has room to spare.
+//
+// Every link is verified to resolve; nothing is invented. Entries gate on their
+// `links` key, so adding one in src/config.ts is all it takes to render it.
 const columns = [
   {
     title: "Product",
@@ -14,22 +27,20 @@ const columns = [
       { label: "Quickstart", href: "/#quickstart" },
       { label: "Pricing", href: links.pricing },
       { label: "Docs", href: links.docs },
-      { label: "Blog", href: links.blog },
-      { label: "FAQ", href: links.faq },
       { label: "Open Telegraph", href: links.telegraphRepo },
     ],
   },
   {
-    title: "Connect",
+    title: "Resources",
     items: [
-      ...(links.contact ? [{ label: "Contact Us", href: links.contact }] : []),
-      { label: "GitHub", href: links.repo },
-      ...(links.discord ? [{ label: "Discord", href: links.discord }] : []),
-      ...(links.x ? [{ label: "X (Twitter)", href: links.x }] : []),
-      ...(links.linkedin ? [{ label: "LinkedIn", href: links.linkedin }] : []),
-      { label: "Chouhan Industries", href: links.chouhan },
+      { label: "Blog", href: links.blog },
+      { label: "FAQ", href: links.faq },
+      { label: "llms.txt", href: "/llms.txt" },
     ],
   },
+  // Their third column is COMPANY. Ours splits in two: the tools this is built
+  // on are not company links, and filing KiCad under "Company" would read as a
+  // claim about who owns it.
   {
     title: "Built on",
     items: [
@@ -37,127 +48,229 @@ const columns = [
       { label: "OpenSpec", href: links.openspec },
     ],
   },
+  {
+    title: "Company",
+    items: [
+      { label: "Chouhan Industries", href: links.chouhan },
+      ...(links.contact ? [{ label: "Contact", href: links.contact }] : []),
+    ],
+  },
+];
+
+// Their CONNECT column is an icon row rather than a list of names.
+const social = [
+  {
+    label: "GitHub",
+    href: links.repo,
+    path: "M8 .2a8 8 0 0 0-2.53 15.6c.4.07.55-.17.55-.38l-.01-1.34c-2.23.48-2.7-1.07-2.7-1.07-.36-.93-.89-1.18-.89-1.18-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.87 2.34.67.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.03 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48l-.01 2.2c0 .21.14.46.55.38A8 8 0 0 0 8 .2Z",
+  },
+  ...(links.x
+    ? [
+        {
+          label: "X",
+          href: links.x,
+          path: "M12.6 1.5h2.45l-5.36 6.12L16 14.5h-4.94l-3.87-5.06-4.43 5.06H.31l5.73-6.55L0 1.5h5.06l3.5 4.62L12.6 1.5Zm-.86 11.54h1.36L4.32 2.89H2.86l8.88 10.15Z",
+        },
+      ]
+    : []),
+  ...(links.linkedin
+    ? [
+        {
+          label: "LinkedIn",
+          href: links.linkedin,
+          path: "M3.6 5.9v8.2H.9V5.9h2.7ZM2.25 1.4c.86 0 1.55.7 1.55 1.55 0 .86-.7 1.55-1.55 1.55a1.55 1.55 0 0 1 0-3.1ZM15.1 9.5v4.6h-2.7V9.8c0-1.1-.4-1.86-1.39-1.86-.76 0-1.2.51-1.4 1-.07.18-.09.43-.09.68v4.48H6.83s.04-7.27 0-8.02h2.69v1.14c.36-.55 1-1.33 2.43-1.33 1.78 0 3.11 1.16 3.11 3.66Z",
+        },
+      ]
+    : []),
+  ...(links.discord
+    ? [
+        {
+          label: "Discord",
+          href: links.discord,
+          path: "M13.55 2.95A13.2 13.2 0 0 0 10.3 2l-.4.82a12.2 12.2 0 0 0-3.8 0L5.7 2c-1.13.2-2.22.53-3.24.95C.4 6.06-.16 9.08.12 12.06A13.3 13.3 0 0 0 4.1 14.1l.86-1.2c-.47-.17-.92-.39-1.35-.64l.33-.26a9.5 9.5 0 0 0 8.11 0l.33.26c-.43.25-.88.47-1.35.65l.86 1.19a13.3 13.3 0 0 0 3.98-2.04c.33-3.45-.56-6.44-2.32-9.11ZM5.35 10.23c-.78 0-1.42-.72-1.42-1.6s.62-1.6 1.42-1.6c.8 0 1.44.72 1.42 1.6 0 .88-.63 1.6-1.42 1.6Zm5.24 0c-.78 0-1.42-.72-1.42-1.6s.63-1.6 1.42-1.6c.8 0 1.44.72 1.43 1.6 0 .88-.63 1.6-1.43 1.6Z",
+        },
+      ]
+    : []),
 ];
 ---
 
 <footer>
   <div class="wrap">
-    <div class="card">
-      <div class="top">
-        <div class="brand">
-          <Wordmark size="0.95rem" />
-          <p>
-            An open source AI agent that designs, documents, and verifies real
-            PCBs.
-          </p>
-          <a class="llms" href="/llms.txt">llms.txt</a>
-        </div>
-
-        <div class="cols">
-          {
-            columns.map((col) => (
-              <div class="col">
-                <h2>{col.title}</h2>
-                <ul>
-                  {col.items.map((i) => (
-                    <li>
-                      <a href={i.href}>{i.label}</a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          }
-        </div>
+    <div class="top">
+      <div class="brand">
+        <h2>Circuit boards,<br />designed by an agent.</h2>
+        <p>
+          Open source, verified against KiCad and built by people who still
+          solder.
+        </p>
       </div>
 
-      <div class="bottom">
-        <p>
-          <a href={links.license}>Apache-2.0</a>.{" "}
-          <span class="ohl">
-            Hardware designs referenced here are{" "}
-            <a href="https://cern-ohl.web.cern.ch/">CERN-OHL-S v2.0</a>.
-          </span>
-        </p>
-        <p>
-          <span class="name">copperhead</span> is a <a href={links.chouhan}
-            >Chouhan Industries</a
-          > project.
-        </p>
+      <div class="cols">
+        {
+          columns.map((col) => (
+            <div class="col">
+              <h3>{col.title}</h3>
+              <ul>
+                {col.items.map((i) => (
+                  <li>
+                    <a href={i.href}>{i.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+
+        <div class="col">
+          <h3>Connect</h3>
+          <ul class="social">
+            {
+              social.map((s) => (
+                <li>
+                  <a href={s.href} aria-label={s.label}>
+                    <svg
+                      viewBox="0 0 16 16"
+                      width="16"
+                      height="16"
+                      aria-hidden="true"
+                      focusable="false"
+                    >
+                      <path fill="currentColor" d={s.path} />
+                    </svg>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
       </div>
     </div>
+
+    <!-- Their line is a bare copyright. This one keeps the licence terms the
+         project actually ships under, which are not decoration. -->
+    <p class="legal">
+      © 2026 · Chouhan Industries · Software <a href={links.license}
+        >Apache-2.0</a
+      >
+      <span class="sep" aria-hidden="true"> · </span>
+      <span class="ohl">
+        Hardware <a href="https://cern-ohl.web.cern.ch/">CERN-OHL-S v2.0</a>
+      </span>
+    </p>
+  </div>
+
+  <!-- Oversized wordmark bled off both edges and cropped by the page bottom,
+       as theirs is. Decorative: the accessible name is already on the nav. -->
+  <div class="giant" aria-hidden="true">
+    copperhead<span class="stop">.</span>
   </div>
 </footer>
 
 <style>
   footer {
-    padding-block: 40px 56px;
-    color: var(--text-dim);
-    font-size: 0.88rem;
+    --mask: #0d0d10;
+    --silk: #ebebe6;
+    --silk-dim: rgba(235, 235, 230, 0.62);
+    --trace: #b87333;
+
+    position: relative;
+    overflow: hidden;
+    margin-top: 0;
+    padding-top: 64px;
+    background: var(--mask);
+    /* the mask's own edge, where the board is cut */
+    border-top: 1px solid rgba(235, 235, 230, 0.1);
+    color: var(--silk);
   }
 
-  /* mastra's footer is a large rounded card: a 2px #1c1c1c border on a slightly
-     raised #0a0a0a fill, generous padding, soft 32px corners. */
-  .card {
-    border: 2px solid #1c1c1c;
-    background: #0a0a0a;
-    border-radius: 20px;
-    padding: 64px 56px 44px;
+  /* Silkscreen tooling dots over the mask: the fine registration grid printed
+     on a bare board, at an opacity where it is texture rather than pattern.
+     Masked away through the middle so it never sits behind the columns, and
+     off at the bottom so it does not fight the copper wordmark. */
+  footer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      var(--silk) 1px,
+      transparent 0
+    );
+    background-size: 22px 22px;
+    opacity: 0.05;
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 62%);
+    mask-image: linear-gradient(180deg, #000 0%, transparent 62%);
+    pointer-events: none;
   }
 
+  /* Everything above the texture. */
+  .wrap,
+  .giant {
+    position: relative;
+  }
+
+  /* Their footer is not bound by the section frame and is not capped at all:
+     `.footer-top { padding: 64px 64px 0 }` with no max-width, so the content is
+     the viewport less 128px at any width. It is the base of the page rather
+     than another cell of the grid. The steps below are theirs too — 32px of
+     side padding at tablet, 24px on a phone. */
+  footer .wrap {
+    max-width: 1400px;
+    padding-inline: 64px;
+  }
+
+  /* Their split: the editorial column flex-grows 1.4 against the link
+     container's 2, so the statement takes ~41% of the row. */
   .top {
-    display: grid;
-    grid-template-columns: minmax(220px, 1fr) 2.2fr;
-    gap: 56px;
-  }
-
-  .brand p {
-    margin: 1rem 0 0;
-    font-size: 0.85rem;
-    max-width: 32ch;
-    line-height: 1.6;
-  }
-
-  /* Small mono file-reference link, mirroring mastra's footer llms.txt. */
-  .brand .llms {
-    display: inline-block;
-    margin-top: 1.1rem;
-    font-family: var(--mono);
-    font-size: 0.72rem;
-    color: var(--text-dim);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    text-decoration-thickness: 1px;
-    text-decoration-color: var(--hairline);
-    transition:
-      color 0.16s ease,
-      text-decoration-color 0.16s ease;
-  }
-
-  .brand .llms:hover {
-    color: var(--copper-hi);
-    text-decoration-color: var(--copper-hi);
-  }
-
-  /* Content-width columns packed to the right edge, so the slack sits between
-     the brand and the link groups instead of trailing off the end. */
-  .cols {
-    display: grid;
-    grid-template-columns: repeat(3, auto);
-    justify-content: end;
+    display: flex;
     gap: 48px;
   }
 
-  /* h2 because the page already has one h1 and these are real headings;
-     styled down to a small label (spec §8 landmark rules) */
-  .col h2 {
+  .brand {
+    flex: 1.4 1 0;
+  }
+
+  /* Their .footer-h2 exactly: 28px on a 34px line, 500, -0.025em, in Space
+     Grotesk — which is now this site's face too, so the setting transfers
+     rather than being approximated. */
+  .brand h2 {
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 34px;
+    letter-spacing: -0.025em;
+    color: var(--silk);
+    /* their .footer-editorial-stack caps the statement at 360px */
+    max-width: 360px;
+    margin: 0;
+  }
+
+  /* Their .footer-sub: 14px on a 22px line at 70% of the ground's ink. */
+  .brand p {
+    margin: 14px 0 0; /* their stack's gap */
+    max-width: 360px;
+    font-size: 14px;
+    line-height: 22px;
+    color: rgba(235, 235, 230, 0.7);
+  }
+
+  /* Five groups: the four link columns plus Connect. */
+  .cols {
+    flex: 2 1 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 48px;
+  }
+
+  /* h3 rather than h2: the statement above is this landmark's heading, and
+     these are its subsections. Styled down to a tracked mono label. */
+  .col h3 {
     font-family: var(--mono);
-    font-size: 0.7rem;
+    font-size: 0.6875rem; /* 11px */
     font-weight: 400;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--text);
-    margin: 0 0 1rem;
+    color: var(--silk-dim);
+    margin: 0 0 1.15rem;
   }
 
   .col ul {
@@ -166,115 +279,157 @@ const columns = [
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.4rem;
   }
 
+  /* The page's link treatment — dashed rule, 3px offset, 1px thick — carried
+     onto the mask. The one substitution is the colour: --copper on this ground
+     is about 3:1, so the underline and the label both take silkscreen instead,
+     and the rule sits at the same 45% of the ink that the light-theme version
+     takes of copper. */
   .col a {
-    color: var(--text-dim);
-    text-decoration: none;
-    font-size: 0.86rem;
+    color: var(--silk-dim);
+    font-size: 0.875rem;
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    text-decoration-color: rgba(235, 235, 230, 0.28);
+    transition:
+      color 0.16s ease,
+      text-decoration-color 0.16s ease;
   }
 
   .col a:hover {
-    color: var(--text);
+    color: var(--silk);
+    text-decoration-color: currentColor;
   }
 
-  .bottom {
-    margin-top: 48px;
-    padding-top: 32px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
+  /* .col ul already sets a column direction, and it out-specifies a lone
+     .social — this row has to be selected through the same two classes to win. */
+  .col ul.social {
+    flex-direction: row;
     flex-wrap: wrap;
+    gap: 14px;
   }
 
-  .bottom p {
-    margin: 0;
-    font-size: 0.78rem;
-    color: rgba(154, 154, 154, 0.7);
+  .social a {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    color: var(--silk-dim);
   }
 
-  .bottom a {
-    color: rgba(154, 154, 154, 0.85);
+  .legal {
+    margin: 72px 0 0;
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--silk-dim);
   }
 
-  .bottom a:hover {
-    color: var(--text);
+  .legal a {
+    color: inherit;
+    text-decoration-color: rgba(235, 235, 230, 0.4);
   }
 
-  .name {
-    color: var(--copper-hi);
+  .legal a:hover {
+    color: var(--silk);
   }
 
-  /* Stacked under the brand, right-aligned groups would read as detached from
-     it, so they go back to the left edge. */
-  /* Stacked under the brand, right-aligned groups would read as detached from
-     it, so they go back to the left edge. */
-  @media (max-width: 860px) {
+  /* Their .footer-wordmark, to its own numbers: font-size calc(100vw / 6.6),
+     weight 500, -0.05em of tracking, centred and nowrap. The divisor is 6.05
+     rather than their 6.6 only because "copperhead." is a character shorter than
+     "Supermemory." — the point of the rule is that the word spans the viewport,
+     and holding their divisor would have left this one short of both edges.
+     Their wrap adds 24px above it; so does this.
+
+     Two deliberate departures. Theirs is white at 18% over its blue; this is
+     copper at 30% over the mask, which is the same distance from the ground in
+     ink but keeps the pour reading as exposed copper rather than more
+     silkscreen. And line-height is 1, not their 0.95: 0.95 pulls the baseline
+     into the crop, and losing the descenders and the stop off the bottom edge
+     reads as a rendering fault rather than as scale. */
+  .giant {
+    margin-top: 40px;
+    padding: 24px 0 20px;
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: calc(100vw / 6.05);
+    line-height: 1;
+    letter-spacing: -0.05em;
+    text-align: center;
+    white-space: nowrap;
+    color: color-mix(in srgb, var(--trace) 30%, transparent);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  /* A single bright pad at the end of the pour, the way the hero's headline
+     ends on a copper full stop. */
+  .giant .stop {
+    color: var(--trace);
+  }
+
+  @media (max-width: 980px) {
+    footer .wrap {
+      padding-inline: 32px;
+    }
+
+    /* their .footer-h2 steps to 24/30 at this width */
+    .brand h2 {
+      font-size: 24px;
+      line-height: 30px;
+    }
+
     .top {
-      grid-template-columns: 1fr;
-      gap: 32px;
+      flex-direction: column;
+      gap: 48px;
     }
 
     .cols {
+      display: grid;
+      grid-template-columns: repeat(3, auto);
       justify-content: start;
+      gap: 32px 40px;
     }
   }
 
-  /* Tighter footer on phones: less card padding, closer rows, smaller gaps. */
-  @media (max-width: 560px) {
+  @media (max-width: 720px) {
     footer {
-      padding-block: 16px 28px;
+      padding-top: 48px;
     }
 
-    .card {
-      border-radius: 16px;
-      padding: 24px 18px 20px;
-    }
-
-    .top {
-      gap: 20px;
-    }
-
-    .brand p {
-      margin-top: 0.55rem;
-    }
-
-    .brand .llms {
-      margin-top: 0.7rem;
+    footer .wrap {
+      padding-inline: 24px;
     }
 
     .cols {
       grid-template-columns: 1fr 1fr;
-      gap: 18px 20px;
+      gap: 28px 32px;
     }
 
-    .col h2 {
-      margin-bottom: 0.55rem;
+    .legal {
+      margin-top: 48px;
+      text-align: left;
+      line-height: 1.8;
     }
 
-    .col ul {
-      gap: 0;
+    /* the two licences read better stacked than run together at this measure */
+    .legal .sep {
+      display: none;
     }
 
-    .col a {
-      display: inline-block;
-      padding-block: 0.18rem;
-      line-height: 1.3;
-      font-size: 0.9rem;
-    }
-
-    .bottom {
-      margin-top: 20px;
-      padding-top: 18px;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    /* the licence clause reads better on its own line here */
-    .bottom .ohl {
+    .legal .ohl {
       display: block;
+    }
+
+    .giant {
+      margin-top: 28px;
+      padding: 16px 0 14px;
     }
   }
 </style>
