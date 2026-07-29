@@ -186,12 +186,13 @@ const showStats = stats.stars !== null || stats.downloads !== null;
     display: flex;
     align-items: stretch;
     /* Written as "clear the bar, then leave a gap" rather than as one number,
-       because the bar is a fixed 69px that the hero cannot see: any padding
+       because the bar is fixed and the hero cannot see it: any padding
        expressed as a bare svh fraction shrinks toward the bar on a short
        viewport and the chip ends up crowding it. Only the gap term scales, and
        its floor is 30px — the tightest that still reads as air under the rule
-       rather than as the chip resting on it. */
-    padding-block: calc(69px + clamp(30px, 4.6svh, 58px))
+       rather than as the chip resting on it. --nav-h so the reserved space
+       tracks the bar's own height instead of a copy of it. */
+    padding-block: calc(var(--nav-h) + clamp(30px, 4.6svh, 58px))
       clamp(24px, 4svh, 56px);
     overflow: hidden;
   }
@@ -676,12 +677,14 @@ const showStats = stats.stars !== null || stats.downloads !== null;
   }
 
   @media (max-width: 560px) {
-    /* The fixed bar is 69px; 84px clears it without a second gap under it. The
+    /* Clear the bar, then 15px, which is what the old flat 84 was against the
+       69px bar. Stated against --nav-h now so the phone's shorter bar actually
+       buys the fold the height it saves rather than leaving dead space. The
        100svh floor above is left alone — a phone cannot seat this stack, so the
        section runs past the fold and scrolls, which is what a floor does and a
        fixed height would not. */
     .hero {
-      padding-block: 84px 40px;
+      padding-block: calc(var(--nav-h) + 15px) 40px;
     }
 
     h1 {

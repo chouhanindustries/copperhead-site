@@ -156,15 +156,17 @@ const nav = [
     border-bottom: 1px solid var(--line);
   }
 
-  /* 69px + the 1px rule is the 70px supermemory's bar measures to. Relative,
-     because the link row is centred against this box rather than packed after
-     the wordmark — see below. */
+  /* --nav-h + the 1px rule is the 70px supermemory's bar measures to on the
+     desktop value; it steps down on phones, where the bar was taking a tenth of
+     the fold. The number lives in global.css because the hero has to reserve the
+     same space (see the note there). Relative, because the link row is centred
+     against this box rather than packed after the wordmark — see below. */
   .inner {
     position: relative;
     max-width: var(--maxw);
     margin-inline: auto;
     padding: 0 32px;
-    height: 69px;
+    height: var(--nav-h);
     display: flex;
     align-items: center;
     gap: 24px;

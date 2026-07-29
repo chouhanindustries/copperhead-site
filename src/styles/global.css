@@ -126,6 +126,12 @@
 
   --maxw: 1328px; /* mastra --ds-layout-content-v2 */
   --pad-y: 136px;
+  /* Height of the fixed nav's inner box, the 1px rule excluded. Lives here
+     rather than in Navbar.astro because the bar is fixed and therefore invisible
+     to layout: the hero has to reserve the space itself, and it was doing that
+     against a hardcoded copy of this number in two places. One name, so the bar
+     cannot shrink without the space above the hero shrinking with it. */
+  --nav-h: 69px;
   --hairline: light-dark(rgba(0, 0, 0, 0.09), rgba(255, 255, 255, 0.1));
   /* a wash of the page's own ink, for a zebra stripe or an icon-button hover:
      too faint to be a surface step, which is why it is not one */
@@ -138,6 +144,17 @@
   );
   /* derived, so it tracks whichever copper is in play */
   --trace: color-mix(in srgb, var(--copper) 26%, transparent);
+}
+
+/* Phones. 69 is a desktop measure: on a 375-wide fold it is 10.5% of the whole
+   first screen, spent on a bar carrying a wordmark and a burger. 56 is the usual
+   mobile app-bar height and still clears the tallest thing in the bar (the 42px
+   wordmark). Tablets keep the full 69 — they have the fold to spare. The
+   breakpoint is the one the terminal already treats as "phone". */
+@media (max-width: 560px) {
+  :root {
+    --nav-h: 56px;
+  }
 }
 
 /* The toggle's only job. Pinning color-scheme to one keyword is what makes

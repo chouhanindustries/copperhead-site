@@ -713,12 +713,20 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
   @media (max-width: 560px) {
     /* Tighter still on a phone. The window's width is fixed by the viewport and
        its height is however many rows the transcript runs to, so leading is the
-       only lever left on its proportion. 9px on 1.25 is small for reading, but
+       only lever left on its proportion. 8px on 1.25 is small for reading, but
        this is a transcript to recognise rather than to study on a phone — the
        shape carries the message, and at 12/1.6 it was a tall column of text
-       rather than a terminal. */
+       rather than a terminal.
+
+       8 rather than the 9 this was: because the transcript wraps at this width,
+       the face size sets how many continuation lines each long tool line costs,
+       so it drives height far more than it drives width. Measured on an iPhone
+       SE, 9 → 8 takes the window from 331x324 to 331x259 and the proportion
+       from 1.02:1 to 1.28:1 — squarish column back to something landscape.
+       7 was tried and gives up legibility for less: 228 tall, and by then the
+       tool names stop being readable at arm's length. */
     .term {
-      font-size: 9px;
+      font-size: 8px;
       --row: 1.25em;
     }
 
