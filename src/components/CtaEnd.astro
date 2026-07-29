@@ -6,6 +6,19 @@ import { quickstart } from '../config';
 // also the page's #quickstart target, so the hero's "Quick start" link and the
 // footer both land here. W-3 lives on this block, not the hero one: it is the
 // exact quickstart from config.ts (start-from-a-prompt demo).
+
+// The brief is a const rather than inline in the <pre> so the copy button and
+// the rendered block cannot drift: one string feeds both, the same way
+// InstallBlock takes its lines as data rather than scraping them back out of
+// the DOM.
+const brief = `# Pocket Morse key
+
+A pocket-size Morse key that types over Bluetooth as a standard keyboard.
+
+- ESP32-S3, BLE HID
+- Li-Po cell, USB-C charging
+- Sleep current budget: 25 µA
+- 3.5 mm jack for an external paddle`;
 ---
 
 <section id="quickstart" class="cta">
@@ -26,15 +39,28 @@ import { quickstart } from '../config';
            Telegraph brief (usecase-copperhead.md): ESP32-S3, BLE HID, the 25 µA
            sleep budget, the 3.5 mm key jack. -->
       <figure class="brief">
-        <figcaption>brief.md</figcaption>
-        <pre><code>{`# Pocket Morse key
-
-A pocket-size Morse key that types over Bluetooth as a standard keyboard.
-
-- ESP32-S3, BLE HID
-- Li-Po cell, USB-C charging
-- Sleep current budget: 25 µA
-- 3.5 mm jack for an external paddle`}</code></pre>
+        <figcaption>
+          brief.md
+          <!-- Same control, same icons and same script as InstallBlock's: that
+               component's handler binds every `button.copy` on the page, and it
+               is always on this page because this block renders one just above.
+               Starts hidden, so if the script ever fails to run this is absent
+               rather than dead (W-1). -->
+          <button class="copy" type="button" data-clip={brief} aria-label="Copy brief.md" hidden>
+            <svg class="ic-copy" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.4"
+                d="M5.5 5.5V3a1 1 0 0 1 1-1H13a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1h-2.5m-8-5H9a1 1 0 0 1 1 1V13a1 1 0 0 1-1 1H2.5a1 1 0 0 1-1-1V6.5a1 1 0 0 1 1-1Z"
+              />
+            </svg>
+            <svg class="ic-done" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+              <path fill="none" stroke="currentColor" stroke-width="1.7" d="m2.5 8.5 3.5 3.5 7.5-8" />
+            </svg>
+          </button>
+        </figcaption>
+        <pre><code>{brief}</code></pre>
       </figure>
 
       <p class="footnote">
@@ -81,26 +107,84 @@ A pocket-size Morse key that types over Bluetooth as a standard keyboard.
     color: var(--text);
   }
 
+  /* 52rem, up from 42. The pair sits under a 22ch headline and a 52ch lede, so
+     it was the narrowest thing in a section with 1120px of inner card to spend,
+     and the brief was setting its longest line at 621px inside 624px of content
+     box — one word from wrapping. The two share a value because they share a
+     vertical edge: they read as one stacked object, and a mismatch there is the
+     first thing the eye finds. 52 still clears the card's inner width at the
+     1024 breakpoint (832 into 858), below which both are width-constrained by
+     the card anyway and the number stops mattering. */
   .install {
-    max-width: 42rem;
+    max-width: 52rem;
     margin: 2.5rem auto 0;
     text-align: left;
   }
 
   .brief {
-    max-width: 42rem;
+    max-width: 52rem;
     margin: 0.75rem auto 0;
     text-align: left;
     background: var(--surface);
     border: 1px solid var(--hairline);
   }
 
+  /* The caption is the copy control's row rather than a bare label: this block
+     has a header where InstallBlock has none, so hanging the button in the
+     corner over the text would be borrowing a solution to a problem this one
+     does not have. Same button, seated instead of floated. */
   .brief figcaption {
-    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 8px 6px 24px;
     border-bottom: 1px solid var(--hairline);
     font-family: var(--mono);
     font-size: 0.8rem;
     color: var(--text-dim);
+  }
+
+  /* Mirrors InstallBlock's copy button — same box, same states, two sizes down
+     to sit inside the caption instead of over the code. */
+  .brief .copy {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+
+  .brief .copy:hover {
+    color: var(--text);
+    background: var(--panel-hi);
+    border-color: var(--line-hi);
+  }
+
+  .brief .copy .ic-done {
+    display: none;
+  }
+
+  .brief .copy.done {
+    color: var(--copper);
+    border-color: var(--trace);
+  }
+
+  .brief .copy.done .ic-copy {
+    display: none;
+  }
+
+  .brief .copy.done .ic-done {
+    display: block;
   }
 
   .brief pre {
@@ -125,7 +209,13 @@ A pocket-size Morse key that types over Bluetooth as a standard keyboard.
     }
 
     .brief figcaption {
-      padding: 8px 16px;
+      padding: 5px 5px 5px 16px;
+    }
+
+    /* the tap target grows on touch, as it does in InstallBlock */
+    .brief .copy {
+      width: 34px;
+      height: 34px;
     }
 
     .brief pre {
