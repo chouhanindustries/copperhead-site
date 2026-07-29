@@ -33,8 +33,17 @@ jobs:
             code=$(curl -sL -o /dev/null -w "%{http_code}" --max-time 20 \
                    -A "Mozilla/5.0 (compatible; copperhead-linkcheck)" "$url")
             printf '%-64s %s\n' "$url" "$code"
-            # 999 is LinkedIn's bot-block response, not a dead link
-            case "$code" in 2*|3*|999) ;; *) fail=1 ;; esac
+            # 999 is LinkedIn's bot-block response, not a dead link. npmjs.com
+            # is the same story with a different number: it serves 403 to every
+            # non-browser client, so the hero's install-count link trips this
+            # while the package is live. Scoped to that host, because a 403
+            # anywhere else is still worth failing on. registry.npmjs.org is
+            # the machine-readable endpoint if this ever needs a real check.
+            case "$code" in
+              2*|3*|999) ;;
+              403) case "$url" in *//www.npmjs.com/*) ;; *) fail=1 ;; esac ;;
+              *) fail=1 ;;
+            esac
           done
           exit $fail
 
