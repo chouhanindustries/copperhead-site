@@ -723,11 +723,40 @@ const showStats = stats.stars !== null || stats.downloads !== null;
     }
   }
 
-  /* Below this the pair no longer fits side by side at a readable label size. */
-  @media (max-width: 400px) {
+  /* The pair stays on one row here rather than stacking. What made it not fit
+     was never the labels: it was 20px of side padding and a 44px arrow cap, both
+     desktop measures that cost more than they buy at this width. Spending those
+     instead of the type keeps "Start building" on one line — it wraps inside a
+     44px-tall button, and the button clips it — while the labels stay at the
+     14.5px they are everywhere else.
+     Measured at 360, 375, 390, 412 and 430: one line, no clipping, in both.
+     Keyed to 560, the width the rest of the site calls a phone, and not to the
+     400 the stack used to sit at: between 400 and ~425 the untightened pair does
+     not fit either, which put a 412 Pixel in the gap. */
+  @media (max-width: 560px) {
+    .actions {
+      gap: 8px;
+    }
+
+    .primary .label {
+      padding: 0 10px;
+    }
+
+    .primary .tip {
+      width: 34px;
+    }
+
+    .secondary {
+      padding: 0 10px;
+    }
+  }
+
+  /* Below 360 the labels genuinely do not fit beside each other at a size worth
+     reading, so this is where they stack. Under every phone in the audit, and
+     under the 360 Android width the step above is drawn to hold. */
+  @media (max-width: 359.98px) {
     .actions {
       grid-template-columns: 1fr;
-      gap: 8px;
     }
   }
 

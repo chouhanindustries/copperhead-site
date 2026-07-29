@@ -278,11 +278,21 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
 
     --row: 1.6em; /* one text line; the elapsed counter steps by exactly this */
 
-    /* 800 at the 12px base, not the 900 this started at: at 900 the window ran
-       nearly the full width of the fold and read as a panel of the page rather
-       than as an object sitting on it. 800 leaves visible margin either side,
-       which is what makes it read as a window. */
-    max-width: 66.667em; /* 800px */
+    /* 733 at the 12px base, down from 800 and from the 900 this started at: at
+       900 the window ran nearly the full width of the fold and read as a panel
+       of the page rather than as an object sitting on it, and each step in has
+       left more visible margin either side, which is what makes it read as a
+       window.
+
+       The exact number is the ratio. Height here is set by the transcript —
+       rows times leading — so width is the only free term, and this one puts
+       the fully expanded window at 733x458, or 1.6:1. Both dimensions are in em
+       against the scale knob above, so that ratio holds at every step of it:
+       1.6 at 12px, at 11px and at 10px alike. It only stops holding on phones,
+       where the viewport pins the width and the transcript wraps to whatever
+       height it needs. The 72-character tool lines still clear it unwrapped —
+       518px of glyphs inside 691px of content box. */
+    max-width: 61.067em; /* 733px */
     margin: 0 auto;
     /* asserted, not inherited: this drops into centred layouts (the hero) where
        a centred transcript would be nonsense */
@@ -689,18 +699,25 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
      lost height but kept its width would stop reading as a terminal and start
      reading as a letterbox.
      Both steps hold the 1.6 leading of the full-size window and stay well above
-     the 9px the phone rule falls to — these are read at desk distance on a wide
+     the 8px the phone rule falls to — these are read at desk distance on a wide
      window where the transcript is meant to be legible, not just recognisable.
-     ── */
+
+     The first step is the one that matters most, because it is the one a 1080p
+     monitor actually lands on: a maximised browser there gives about 945-980px
+     of viewport, not 1080, once its own chrome is taken off. At 11px the stack
+     cleared that by roughly 14px, so a bookmarks bar was enough to push the
+     stats row out of the fold, and the window read as oversized long before it
+     overflowed. 10px gives the fold 38px back. Scaling the knob is what keeps
+     this a size change rather than a shape change: 1.6:1 at every step.
+
+     One step now, where there were two. The second took 720-tall laptops down a
+     further notch, which was worth it when this step was 11px; against 10px it
+     measured out at 550x344 and still did not seat the stack, so it was paying
+     legibility for a fold it was never going to win. Those viewports scroll
+     instead, which they already did. ── */
   @media (min-width: 901px) and (max-height: 1000px) {
     .term {
-      font-size: 11px; /* 800 → 733 wide, 458 → 420 tall */
-    }
-  }
-
-  @media (min-width: 901px) and (max-height: 760px) {
-    .term {
-      font-size: 10px; /* 800 → 667 wide, 458 → 382 tall */
+      font-size: 10px; /* 733 → 611 wide, 458 → 382 tall */
     }
   }
 
