@@ -71,7 +71,7 @@ const jsonLd = {
 
 <style>
   article {
-    padding-block: 168px var(--pad-y);
+    padding-block: 179px var(--pad-y);
   }
 
   /* Measure is set on the column, not on each element, so code blocks and the
@@ -150,9 +150,8 @@ const jsonLd = {
 
   /* Terminal block, matching the quickstart section on the home page. */
   .prose :global(pre) {
-    background: #0c0c0c;
-    border: 1px solid var(--hairline);
-    border-radius: 3px;
+    background: var(--surface);
+    border: 1px solid var(--line);
     padding: 1.25rem 1.35rem;
     margin: 0 0 1.4rem;
     overflow-x: auto;
@@ -162,7 +161,6 @@ const jsonLd = {
   .prose :global(:not(pre) > code) {
     background: var(--surface);
     border: 1px solid var(--hairline);
-    border-radius: 3px;
     padding: 0.1em 0.4em;
     font-size: 0.85em;
   }
@@ -172,7 +170,6 @@ const jsonLd = {
     width: 100%;
     height: auto;
     border: 1px solid var(--hairline);
-    border-radius: 3px;
     margin: 0 0 1.4rem;
   }
 
@@ -241,13 +238,9 @@ const jsonLd = {
     font-size: 0.8rem;
   }
 
-  .end a {
-    text-decoration: none;
-  }
-
   @media (max-width: 720px) {
     article {
-      padding-block: 128px var(--pad-y);
+      padding-block: 139px var(--pad-y);
     }
 
     .prose {

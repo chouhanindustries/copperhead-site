@@ -20,6 +20,10 @@ export const links = {
   demoVideo: '/copperhead-demo.mp4',
   telegraphRepo: 'https://github.com/animesh-chouhan/open-telegraph',
   buildStory: 'https://chouhan.ai/building-with-claude',
+  // Placeholder page on this site; chouhan.ai/research is a different thing.
+  research: '/research/',
+  // The Antler write-up, on chouhan.ai rather than this site's own /blog copy.
+  antler: 'https://chouhan.ai/antler-crackathon',
   // TODO(launch): confirm the real inbox before launch; copperhead.sh has no MX
   // record yet, so this address may bounce.
   contact: 'mailto:hello@copperhead.sh',

@@ -1,20 +1,44 @@
 ---
-import Base from '../layouts/Base.astro';
-import Navbar from '../components/Navbar.astro';
-import Hero from '../components/Hero.astro';
-import Demo from '../components/Demo.astro';
-import Features from '../components/Features.astro';
-import CtaEnd from '../components/CtaEnd.astro';
-import Footer from '../components/Footer.astro';
+import Base from "../layouts/Base.astro";
+import Navbar from "../components/Navbar.astro";
+import Hero from "../components/Hero.astro";
+import Proof from "../components/Proof.astro";
+import Demo from "../components/Demo.astro";
+import Features from "../components/Features.astro";
+import CtaEnd from "../components/CtaEnd.astro";
+import Footer from "../components/Footer.astro";
+import SectionRule from "../components/SectionRule.astro";
+import PricingTiers from "../components/PricingTiers.astro";
+import Faq from "../components/Faq.astro";
+
+import { has } from "../assets";
+
+// The hero is the page's own header and takes no divider. Demo only renders
+// once public/copperhead-demo.mp4 exists — the hero already carries the
+// animated terminal — so its divider is withheld with it, leaving no rule
+// standing over an empty section.
 ---
 
 <Base>
   <Navbar />
   <main>
     <Hero />
-    <Demo />
-    <Features />
-    <CtaEnd />
+    <!-- The frame's vertical rules are drawn on this wrapper, so they run the
+         height of the sections without ruling the hero above them. -->
+    <div class="framed">
+      <SectionRule label="Proven on copper" />
+      <Proof />
+      {has.video && <SectionRule label="See it run" />}
+      <Demo />
+      <SectionRule label="How it works" />
+      <Features />
+      <SectionRule label="Pricing" />
+      <PricingTiers id="pricing" />
+      <SectionRule label="FAQ" />
+      <Faq />
+      <SectionRule label="Start building" />
+      <CtaEnd />
+    </div>
   </main>
   <Footer />
 </Base>

@@ -169,14 +169,13 @@ const commitments = [
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1px;
-    background: #1c1c1c;
-    border: 2px solid #1c1c1c;
-    border-radius: 16px;
+    background: var(--line);
+    border: 2px solid var(--line);
     overflow: hidden;
   }
 
   .mode {
-    background: #0a0a0a;
+    background: var(--bg);
     padding: 30px 28px 32px;
   }
 
@@ -202,8 +201,7 @@ const commitments = [
   .table-scroll {
     margin-top: 3rem;
     overflow-x: auto;
-    border: 2px solid #1c1c1c;
-    border-radius: 16px;
+    border: 2px solid var(--line);
   }
 
   table {
@@ -214,7 +212,7 @@ const commitments = [
   }
 
   thead th {
-    background: #0a0a0a;
+    background: var(--panel);
     text-align: left;
     font-weight: 600;
     color: var(--text);
@@ -246,11 +244,13 @@ const commitments = [
   }
 
   tbody tr {
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid var(--hairline);
   }
 
+  /* A third of --wash: a zebra stripe has to be the faintest mark on the page,
+     or it competes with the row rules that are doing the actual separating. */
   tbody tr:nth-child(odd) {
-    background: rgba(255, 255, 255, 0.015);
+    background: color-mix(in srgb, var(--wash) 35%, transparent);
   }
 
   /* Emphasise the Cloud column (2nd data column) to echo the featured card. */
@@ -267,9 +267,8 @@ const commitments = [
     align-items: center;
     gap: 32px;
     padding: 32px 36px;
-    border: 2px solid color-mix(in srgb, var(--copper) 55%, transparent);
-    background: color-mix(in srgb, var(--copper) 8%, #0a0a0a);
-    border-radius: 16px;
+    border: 2px solid color-mix(in srgb, var(--copper) 45%, transparent);
+    background: color-mix(in srgb, var(--copper) 7%, var(--bg));
   }
 
   .callout-copy {
@@ -322,14 +321,13 @@ const commitments = [
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1px;
-    background: #1c1c1c;
-    border: 2px solid #1c1c1c;
-    border-radius: 16px;
+    background: var(--line);
+    border: 2px solid var(--line);
     overflow: hidden;
   }
 
   .commit {
-    background: #0a0a0a;
+    background: var(--bg);
     padding: 30px 28px 32px;
   }
 
@@ -383,7 +381,6 @@ const commitments = [
 
     .table-scroll {
       margin-top: 1.75rem;
-      border-radius: 12px;
     }
 
     table {

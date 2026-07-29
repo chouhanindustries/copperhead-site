@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # vscode setting folder
 .vscode/
+
+# screenshot output (npm run shots)
+shots/

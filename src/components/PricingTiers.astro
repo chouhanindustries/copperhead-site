@@ -87,9 +87,16 @@ const tiers: Tier[] = [
     ],
   },
 ];
+
+// The pricing page anchors its own top here; the homepage cannot, because the
+// hero already owns that id and two of them on one document is invalid.
+interface Props {
+  id?: string;
+}
+const { id = 'top' } = Astro.props;
 ---
 
-<section id="top" class="tiers">
+<section id={id} class="tiers">
   <div class="wrap">
     <h1 class="section-title">Pay to not run it yourself.</h1>
     <p class="section-intro">
@@ -113,8 +120,10 @@ const tiers: Tier[] = [
               <span class="amount">{t.price}</span>
               {t.unit && <span class="unit">{t.unit}</span>}
             </div>
-            {t.addon && <p class="addon">{t.addon}</p>}
-            {t.note && <p class="tier-note">{t.note}</p>}
+            <div class="meta">
+              {t.addon && <p class="addon">{t.addon}</p>}
+              {t.note && <p class="tier-note">{t.note}</p>}
+            </div>
 
             <p class="blurb">{t.blurb}</p>
 
@@ -159,7 +168,7 @@ const tiers: Tier[] = [
 <style>
   .tiers {
     /* Clear the 60px fixed navbar, then a comfortable gap above the headline. */
-    padding-block-start: 108px;
+    padding-block-start: 119px;
   }
 
   .tiers .wrap {
@@ -189,18 +198,30 @@ const tiers: Tier[] = [
     align-items: stretch;
   }
 
+  /* Row subgrid, so name, price, meta, blurb, CTA and feature list each sit on
+     a track shared by all four cards. That is what actually aligns the CTAs:
+     the previous approach padded .blurb to a min-height and hoped, which held
+     until a tier carried a different combination of the optional addon and note
+     rows — Enterprise did, and its "Talk to sales" sat proud of the three
+     "Let's talk" buttons beside it. Every card emits the same seven in-flow
+     children — name, price, meta, blurb, CTA, feature heading, feature list —
+     with .meta present but empty where a tier carries no addon or note. The
+     badge is absolutely positioned, so it is not a grid item and does not
+     count toward the span. */
   .card {
-    display: flex;
-    flex-direction: column;
-    background: #0a0a0a;
-    border: 2px solid #1c1c1c;
-    border-radius: 16px;
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 7;
+    background: var(--panel);
+    border: 2px solid var(--line);
     padding: 28px 26px 30px;
   }
 
+  /* The wash is mixed into the page rather than into a fixed white, so on the
+     dark theme it comes out a warm near-black lift rather than a pale band. */
   .card.featured {
-    border-color: color-mix(in srgb, var(--copper) 60%, transparent);
-    background: color-mix(in srgb, var(--copper) 7%, #0a0a0a);
+    border-color: color-mix(in srgb, var(--copper) 45%, transparent);
+    background: color-mix(in srgb, var(--copper) 6%, var(--bg));
     position: relative;
   }
 
@@ -209,9 +230,8 @@ const tiers: Tier[] = [
     top: -11px;
     left: 26px;
     padding: 3px 10px;
-    border-radius: 999px;
     background: var(--copper);
-    color: #100d0a;
+    color: var(--on-copper);
     font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.02em;
@@ -262,7 +282,6 @@ const tiers: Tier[] = [
     font-size: 0.95rem;
     line-height: 1.5;
     margin: 1rem 0 1.5rem;
-    min-height: 2.85em; /* keep the CTAs roughly aligned across cards */
   }
 
   .card .btn {
@@ -308,7 +327,7 @@ const tiers: Tier[] = [
   @media (max-width: 560px) {
     .tiers {
       /* Clear the 60px fixed navbar, then a comfortable gap above the headline. */
-      padding-block-start: 92px;
+      padding-block-start: 103px;
     }
 
     .actions {

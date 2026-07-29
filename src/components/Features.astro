@@ -71,8 +71,10 @@ const features = [
 </section>
 
 <style>
-  /* mastra card system: a 2px #1c1c1c frame with #0a0a0a cells divided by
-     1px gutters of the same tone, soft 24px corners, and a quiet hover-lift. */
+  /* Card system: a 2px hairline frame with page-white cells divided by 1px
+     gutters of the same tone, square corners, and a quiet hover-tint. The cells
+     stay white rather than tinted — the frame is what contains them, so a fill
+     would only fight the page. */
   .grid {
     list-style: none;
     margin: 3.25rem 0 0;
@@ -80,20 +82,19 @@ const features = [
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1px;
-    background: #1c1c1c;
-    border: 2px solid #1c1c1c;
-    border-radius: 16px;
+    background: var(--line);
+    border: 2px solid var(--line);
     overflow: hidden;
   }
 
   .card {
-    background: #0a0a0a;
+    background: var(--bg);
     padding: 32px 30px 34px;
     transition: background-color 0.16s ease;
   }
 
   .card:hover {
-    background: #101010;
+    background: var(--panel);
   }
 
   .card h3 {

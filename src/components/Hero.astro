@@ -1,39 +1,41 @@
 ---
-import { Image } from "astro:assets";
 import InstallBlock from "./InstallBlock.astro";
-import pcbRender from "../assets/pcb.png";
-import { quickstart, links } from "../config";
+import TerminalDemo from "./TerminalDemo.astro";
+import { quickstart, links, pkg } from "../config";
 import { stats, compact } from "../stats";
 
-// Single-column hero: headline, one-sentence subhead, a Quick start link and
-// the three-line quickstart (install, key, create). The `--help` terminal that
-// used to hold the right column moved out; the CLI surface is covered by the
-// feature cards.
-// A thin live-stats line sits under the install: highest-credibility spot on
-// the page, next to the `npm i` line the numbers vindicate. Each stat renders
-// only when its build-time fetch succeeded (stats.ts), so the row disappears
-// cleanly until the repo and package are public.
+// Centred single-column hero in the supermemory.ai shape, top to bottom:
+// announcement chip, 72px headline, 16px subhead, a button pair, the install
+// command as a bar the exact width of that pair, a tertiary text link, then a
+// social-proof row. Every measurement below is taken from that layout.
+//
+// The product render and its "Proven on real copper" caption used to hold a
+// right-hand column here; this layout has no room for them above the fold, so
+// they moved to Proof.astro, the section immediately below.
+//
+// A thin live-stats line closes the fold: highest-credibility spot on the page,
+// under the `npm i` line the numbers vindicate. Each stat renders only when its
+// build-time fetch succeeded (stats.ts), so the row disappears cleanly until the
+// repo and package are public.
 const showStats = stats.stars !== null || stats.downloads !== null;
 ---
 
 <section id="top" class="hero">
+  <!-- Routed copper. See the tile's construction in the frontmatter above;
+       traces cross because on a two-layer board they are on different layers. -->
   <div class="grid-dots" aria-hidden="true"></div>
 
-  <div class="wrap hero-grid">
-    <div class="copy">
-      <h1>Cursor for circuit boards.</h1>
-
-      <p class="sub">
-        An AI agent that designs, documents and validates real PCBs from a
-        prompt.
-      </p>
-
-      <a class="quick" href="#quickstart"
-        >Quickstart<svg
-          class="arrow"
+  <div class="wrap">
+    <a class="chip" href={links.antler}>
+      <span class="chip-tag"
+        ><span class="chip-dot" aria-hidden="true"></span>New</span
+      >
+      <span class="chip-text"
+        >copperhead: Cursor for Circuit Boards<svg
+          class="chip-arrow"
           viewBox="0 0 16 16"
-          width="13"
-          height="13"
+          width="12"
+          height="12"
           aria-hidden="true"
           focusable="false"
           ><path
@@ -42,19 +44,95 @@ const showStats = stats.stars !== null || stats.downloads !== null;
             stroke-width="1.6"
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M4 12 12 4M6.5 4H12v5.5"></path></svg
-        ></a
+            d="M3 8h9.5M9 4.5 12.5 8 9 11.5"></path></svg
+        ></span
       >
+    </a>
 
-      <div class="install">
-        <InstallBlock lines={quickstart} compact />
+    <h1>Cursor for circuit boards<span class="stop">.</span></h1>
+
+    <p class="sub">
+      copperhead is an AI PCB engineer that designs, routes, validates, and
+      documents real circuit boards. Built for real hardware. Open source.
+    </p>
+
+    <div class="cta">
+      <div class="actions">
+        <a class="primary" href="#quickstart">
+          <span class="label">Start building</span>
+          <span class="tip"
+            ><svg
+              viewBox="0 0 16 16"
+              width="14"
+              height="14"
+              aria-hidden="true"
+              focusable="false"
+              ><path
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3 8h9.5M9 4.5 12.5 8 9 11.5"></path></svg
+            ></span
+          >
+        </a>
+        <!-- The ↗ came across with the label from the tertiary link this
+             replaced: docs live off-site, and the outbound arrow is the one
+             thing the button pair does not otherwise say. Drawn rather than set
+             as a glyph because ↗ is not in the font subsets and fell back to a
+             face that did not match the page. -->
+        <a class="secondary" href={links.docs}>
+          Read the docs<svg
+            class="arrow"
+            viewBox="0 0 16 16"
+            width="12"
+            height="12"
+            aria-hidden="true"
+            focusable="false"
+            ><path
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M4 12 12 4M6.5 4H12v5.5"></path></svg
+          >
+        </a>
       </div>
 
-      {
-        showStats && (
+      <div class="install">
+        <!-- the install line only; the key + create steps stay in the full
+             quickstart block this button scrolls to -->
+        <InstallBlock lines={[quickstart[0]]} bar />
+      </div>
+      <!-- The dashed tertiary link that used to close this block was also "Read
+           the docs", so promoting it into the button pair left the two stacked
+           one above the other. The link is the one that goes: the button says
+           the same thing in the place the eye reaches first, and dropping it
+           takes ~48px off the fold. "Let's talk" still has its home in the
+           navbar CTA and again at the foot of the page. -->
+    </div>
+
+    <!-- The product shot, in the slot supermemory gives its own: directly under
+         the fold copy, wide enough to break the copy column, and cropped by the
+         viewport so its top edge is the thing that invites the scroll. That is
+         also why the scroll-cue chevron that used to sit here is gone: a
+         half-visible terminal says "there is more" better than an arrow. -->
+    <div class="demo">
+      <TerminalDemo />
+    </div>
+
+    {
+      showStats && (
+        <div class="proof">
           <p class="stats" role="status">
             {stats.stars !== null && (
-              <span class="stat">
+              <a
+                class="stat"
+                href={links.repo}
+                aria-label={`${stats.stars} stars on GitHub`}
+              >
                 <svg
                   class="ico"
                   viewBox="0 0 16 16"
@@ -70,279 +148,444 @@ const showStats = stats.stars !== null || stats.downloads !== null;
                 </svg>
                 <strong class="num">{compact(stats.stars)}</strong>
                 <span class="lbl">GitHub stars</span>
-              </span>
+              </a>
             )}
             {stats.stars !== null && stats.downloads !== null && (
               <span class="sep" aria-hidden="true" />
             )}
             {stats.downloads !== null && (
-              <span class="stat">
+              <a
+                class="stat"
+                href={`https://www.npmjs.com/package/${pkg}`}
+                aria-label={`${stats.downloads} installs a month on npm`}
+              >
                 <strong class="num">{compact(stats.downloads)}</strong>
                 <span class="lbl">installs / month</span>
-              </span>
+              </a>
             )}
           </p>
-        )
-      }
-    </div>
-
-    <figure class="hero-visual">
-      <div class="frame">
-        <Image
-          src={pcbRender}
-          alt="A copperhead-designed board: the Open Telegraph key, with ESP32-S3, USB-C, and the copper switch, rendered from its KiCad files."
-          width={840}
-          height={615}
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-      <figcaption class="caption">
-        <h2>Proven on real copper.</h2>
-        <p>
-          Open Telegraph: pocket-size ESP32-S3 Morse key, built end to end with
-          this workflow. Every decision, every check, every file is public.
-        </p>
-        <p class="links">
-          <a href={links.buildStory}>Read the build story</a>
-          <a href={links.telegraphRepo}>Browse the repo</a>
-        </p>
-      </figcaption>
-    </figure>
-  </div>
-
-  <div class="scroll-cue" aria-hidden="true">
-    <svg
-      viewBox="0 0 24 24"
-      width="22"
-      height="22"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <path d="M6 9l6 6 6-6"></path>
-    </svg>
+        </div>
+      )
+    }
   </div>
 </section>
 
 <style>
-  /* Split hero: copy left-aligned on the left, the framed product render and its
-     caption on the right — filling the first viewport (svh so mobile browser
-     chrome doesn't push the fold off-screen). */
+  /* Centred hero filling the first viewport (svh so mobile browser chrome does
+     not push the fold off-screen). A fixed height, not a floor: the section *is*
+     the fold: exactly one viewport tall on any screen with the room, which from
+     1080p up is every screen. A floor rather than a fixed height, because the
+     terminal is never cropped (see .demo) — on a window too short to seat the
+     whole stack the section grows and the stats row slides below the fold
+     instead, still on the page and one scroll away.
+     `stretch` rather than flex-start because the column below needs the hero's
+     height as a definite size to centre itself against. */
   .hero {
     position: relative;
     min-height: 100svh;
     display: flex;
-    align-items: center;
-    padding-block: clamp(92px, 12svh, 136px);
+    align-items: stretch;
+    /* Written as "clear the bar, then leave a gap" rather than as one number,
+       because the bar is a fixed 69px that the hero cannot see: any padding
+       expressed as a bare svh fraction shrinks toward the bar on a short
+       viewport and the chip ends up crowding it. Only the gap term scales, and
+       its floor is 30px — the tightest that still reads as air under the rule
+       rather than as the chip resting on it. */
+    padding-block: calc(69px + clamp(30px, 4.6svh, 58px))
+      clamp(24px, 4svh, 56px);
     overflow: hidden;
   }
 
-  .hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: center;
-    gap: clamp(40px, 5vw, 88px);
+  /* A column flex container so the stack can centre itself in the fold on a
+     screen with slack — `safe center` rather than plain `center` so that when
+     the stack is instead taller than the fold it falls back to top-anchored,
+     which keeps the headline on screen rather than pushing it off the top.
+     Nothing here shrinks. Everything has a natural height it wants and gets it
+     at every viewport, including the terminal: on a window too short for the
+     lot, the column simply runs past the fold and the stats row is what ends up
+     below it. That is the intended order of sacrifice — the transcript is the
+     product and has to be legible; the stats are a caption on it and read just
+     as well one scroll down. */
+  .hero .wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+    text-align: center;
   }
 
-  /* Floating scroll cue: a generic chevron that bounces at the foot of the fold
-     to signal there is more below — reads the same on touch or pointer. */
-  .scroll-cue {
-    position: absolute;
-    left: 50%;
-    bottom: 22px;
-    transform: translateX(-50%);
-    pointer-events: none;
-    color: var(--text-dim);
+  .hero .wrap > * {
+    flex: none;
   }
 
-  .scroll-cue svg {
-    display: block;
-    animation: scroll-bounce 1.6s ease-in-out infinite;
-  }
+  /* A diamond lattice, off supermemory's field. Theirs is measured —
 
-  @keyframes scroll-bounce {
-    0%,
-    100% {
-      transform: translateY(0);
-      opacity: 0.45;
-    }
-    50% {
-      transform: translateY(6px);
-      opacity: 0.9;
-    }
-  }
+       y=396  x = 26.5, 38.5, 50.5, 62.5 …
+       y=402  x = 32.5, 56.5 …
 
+     — two square grids on a 12px pitch, the second offset by (6,6). That is a
+     quincunx, and it does put every dot's nearest neighbours on its diagonals.
+     But its cell is a square standing on its corner, and the eye does not read
+     a square on point as a diamond: at 12/12 the diagonals are equal, the
+     verticals and horizontals stay legible as rows and columns, and the field
+     reads as offset rows.
+
+     So the cell is a rhombus rather than a square: --pitch across, --rise down,
+     and the second lattice at half of each. Unequal diagonals are what make the
+     shape read — 16 wide on 11 tall is a 1.45 ratio, past the point where the
+     eye stops resolving the orthogonals and follows the diagonals instead.
+
+     The pitch is also wider than theirs, which is the other half of matching
+     the reference. Two lattices at 12px put a dot every 72px² — twice the
+     density of the field being matched, which is what made this read as texture
+     rather than as a lattice. 16x11 comes to one every 88px², near their ~121,
+     and the dot shrinks with it: 0.65px of solid ramping out to 1.15px, for a
+     2.3px mark where this used to set a 3.4px one. Fineness is most of what
+     separates a lattice from a texture — at the old diameter the diamonds fill
+     in and the field closes up into tone.
+
+     That ramp is not softness for its own sake. A hard-edged radial gradient
+     gets no antialiasing, and at this diameter the rasteriser resolves each dot
+     as a square — which on a diamond lattice is the one artefact that would
+     give the whole construction away. Their ink renders at rgb(166,222,255) on
+     white, a tint rather than a solid, which 38% copper matches for distance
+     from the page in either theme. */
   .grid-dots {
+    --pitch: 16px;
+    --rise: 11px;
+    /* the ramp's outer edge; the gradient is sized to it so the dot is not
+       clipped by its own tile */
+    --edge: 1.15px;
+
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(
-      circle at 1px 1px,
-      var(--text) 1px,
-      transparent 0
-    );
-    background-size: 28px 28px;
-    opacity: 0.022;
-    /* centred now that the copy is centred */
-    -webkit-mask-image: radial-gradient(
-      100% 75% at 50% 0%,
-      #000 0%,
-      transparent 78%
-    );
-    mask-image: radial-gradient(100% 75% at 50% 0%, #000 0%, transparent 78%);
     pointer-events: none;
+    background-image:
+      radial-gradient(
+        circle at var(--edge) var(--edge),
+        color-mix(in srgb, var(--copper) 38%, transparent) 0 0.65px,
+        transparent var(--edge)
+      ),
+      radial-gradient(
+        circle at var(--edge) var(--edge),
+        color-mix(in srgb, var(--copper) 38%, transparent) 0 0.65px,
+        transparent var(--edge)
+      );
+    background-size:
+      var(--pitch) var(--rise),
+      var(--pitch) var(--rise);
+    background-position:
+      0 0,
+      calc(var(--pitch) / 2) calc(var(--rise) / 2);
+    /* The field is a frame: dense along all four edges, thinning inward to
+       almost nothing through the middle.
+
+       Two gradients, one per axis, and they are unioned rather than
+       intersected — that is the whole thing. `intersect` multiplies, so a pixel
+       had to be near the left/right edge *and* low on the page to survive, which
+       is why every earlier version was a pair of side bands or a dome rather
+       than a border. `add` takes the stronger of the two, so a pixel is dense
+       if it is near any edge, the corners get both, and the centre keeps only
+       what the two flat middles sum to.
+
+       Those middles are 3% each, so the centre sits at 6% — enough that the
+       copy column is not a bare white hole in the field, low enough to read
+       every line of type over it.
+
+       The four edges are not equal. Left, right and bottom run to full, but the
+       top peaks at 14% and is back to the flat middle by a fifth of the way
+       down: it is the edge nearest the navbar's rule and the one the headline
+       sits closest to. At full strength it read as a second rule under the
+       first, and even at 30% over a band 350px deep it put a wash across the
+       whole headline. The corners keep their weight regardless — the
+       horizontal gradient is already at full there, and under `add` the
+       stronger of the two wins — so the frame still closes at all four corners
+       rather than fraying at the top. The transparent sliver above it keeps the
+       field off the navbar rule entirely. */
+    -webkit-mask-image:
+      linear-gradient(
+        90deg,
+        #000 0%,
+        rgba(0, 0, 0, 0.03) 30%,
+        rgba(0, 0, 0, 0.03) 70%,
+        #000 100%
+      ),
+      linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.14) 4%,
+        rgba(0, 0, 0, 0.03) 20%,
+        rgba(0, 0, 0, 0.03) 74%,
+        #000 100%
+      );
+    -webkit-mask-composite: source-over;
+    mask-image:
+      linear-gradient(
+        90deg,
+        #000 0%,
+        rgba(0, 0, 0, 0.03) 30%,
+        rgba(0, 0, 0, 0.03) 70%,
+        #000 100%
+      ),
+      linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(0, 0, 0, 0.14) 4%,
+        rgba(0, 0, 0, 0.03) 20%,
+        rgba(0, 0, 0, 0.03) 74%,
+        #000 100%
+      );
+    mask-composite: add;
   }
 
-  .copy {
-    position: relative;
-    text-align: left;
-  }
-
-  .hero-visual {
-    margin: 0;
-    max-width: 410px;
-    justify-self: center;
-  }
-
-  /* Product render framed in the mastra card language: a 2px #1c1c1c frame on a
-     raised fill with soft corners, so the render's own backdrop reads as a
-     contained viewport rather than clashing with the page black. */
-  .frame {
-    border: 2px solid #1c1c1c;
-    border-radius: 16px;
-    overflow: hidden;
-    background: #0a0a0a;
-    box-shadow: 0 40px 120px -40px rgba(0, 0, 0, 0.8);
-  }
-
-  .frame img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  /* Caption below the render — the old Proof block, now anchored to the image it
-     is evidence for. */
-  .caption {
-    margin-top: 1.4rem;
-  }
-
-  .caption h2 {
-    font-size: 1.3rem;
-    line-height: 1.15;
-  }
-
-  .caption p {
-    color: var(--text-dim);
-    font-size: 0.95rem;
-    line-height: 1.55;
-    max-width: 44ch;
-    margin: 0.55rem 0 0;
-  }
-
-  /* Actions read as a tight, aligned pair with a trailing arrow each. */
-  .caption .links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 1.5rem;
-    margin-top: 0.95rem;
-  }
-
-  .caption .links a {
-    font-size: 0.9rem;
+  /* ── Announcement chip. Measured off supermemory's: 33px tall on a panel
+     fill, a 1px accent-tinted frame, and two 6px/10px segments. There is no
+     rule between them — the tag's tinted fill ends and that edge reads as the
+     divider. ── */
+  .chip {
+    display: inline-flex;
+    /* blockified by the column flex parent, so it centres itself rather than
+       inheriting the centring from .wrap's text-align */
+    align-self: center;
+    align-items: stretch;
+    height: 33px;
+    border: 1px solid color-mix(in srgb, var(--copper) 25%, transparent);
+    background: var(--panel);
+    font-size: 0.78125rem; /* 12.5px */
     font-weight: 500;
+    letter-spacing: -0.005em;
     text-decoration: none;
+    transition: border-color 0.16s ease;
   }
 
-  .caption .links a::after {
-    content: " ↗";
-    white-space: nowrap;
+  .chip:hover {
+    border-color: color-mix(in srgb, var(--copper) 45%, transparent);
   }
 
+  .chip-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: color-mix(in srgb, var(--copper) 8%, transparent);
+    color: var(--copper);
+  }
+
+  /* A 12px outlined square with an 8px filled one inside it, drawn from one
+     element: the 1px border and 1px padding inset the content box to 8px, and
+     background-clip keeps the fill off the padding. */
+  .chip-dot {
+    width: 12px;
+    height: 12px;
+    flex: none;
+    padding: 1px;
+    border: 1px solid color-mix(in srgb, var(--copper) 40%, transparent);
+    background: var(--copper);
+    background-clip: content-box;
+  }
+
+  .chip-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    color: var(--text);
+  }
+
+  .chip-arrow {
+    flex: none;
+    opacity: 0.6;
+  }
+
+  /* ── Headline. supermemory's exactly: Space Grotesk 500 at 72px, 74.88px
+     leading (1.04), -4.176px of tracking (-0.058em) — which is what it gets on
+     any viewport 1000px or taller.
+     The `min()` adds a height term to the usual width-driven clamp: a 72px
+     headline is 75px of the fold, and on a 720px-tall window the fold cannot
+     spend that and still show a terminal. At 7svh it lands at 72px from 1030px
+     up and eases down to ~50px at 720, which is the single largest saving in the
+     stack and costs nothing on the screens that have the room. ── */
   h1 {
-    /* mastra headline-3xl: clamp(36px … 68px) */
-    font-size: clamp(2.25rem, 5.4vw, 4.25rem);
-    letter-spacing: -0.025em;
-    max-width: 15ch;
+    font-size: clamp(2.25rem, min(5.6vw, 7svh), 4.5rem);
+    font-weight: 500;
+    line-height: 1.04;
+    letter-spacing: -0.058em;
+    max-width: 18ch;
+    margin: clamp(18px, 3.4svh, 28px) auto 0;
     text-wrap: balance;
   }
 
-  .sub {
-    color: var(--text-dim);
-    /* mastra body-lg: 22px */
-    font-size: 1.375rem;
-    line-height: 1.45;
-    max-width: 46ch;
-    margin: 1.4rem 0 0;
-    text-wrap: pretty;
+  /* supermemory ends its headline on a coloured full stop; copper, not blue */
+  .stop {
+    color: var(--copper);
   }
 
-  /* Quickstart styled as mastra's .cta pill: a 44px rounded-50 pill on the
-     raised #171717 surface with a subtle frame, white label, arrow. */
-  .quick {
+  /* 15px on 24px leading in a 600px measure, their subhead's metrics. */
+  .sub {
+    color: var(--text-dim);
+    font-size: 0.9375rem; /* 15px */
+    line-height: 1.6;
+    letter-spacing: -0.012em;
+    max-width: 600px;
+    margin: clamp(12px, 2.4svh, 20px) auto 0;
+    /* balance, not pretty: pretty only rescues a single trailing word, and this
+       sentence was breaking to leave "a prompt." alone on the second line */
+    text-wrap: balance;
+  }
+
+  /* ── Action column. The button pair and the install bar share one width, which
+     is the detail that makes this block read as a single unit: 194 + 12 + 194
+     comes to the 400px the bar and the tertiary link both take. ── */
+  .cta {
+    width: min(100%, 400px);
+    margin: clamp(20px, 4svh, 32px) auto 0;
+  }
+
+  /* Grid, not flex: against `flex-basis: 0` the secondary's 20px side padding
+     and 1px border are added on top of its computed share rather than fitted
+     inside it, so the pair came out 173/215 instead of an even split. Grid
+     tracks size the border box, which is what makes both halves exactly 194. */
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  /* Primary splits into a 20px-padded label and a 44px arrow cap, parted by a
+     rule struck through the fill itself. 44px tall on 14.5px medium. */
+  .primary {
+    display: inline-flex;
+    align-items: stretch;
+    height: 44px;
+    overflow: hidden;
+    background: var(--copper);
+    color: var(--on-copper);
+    font-size: 0.90625rem; /* 14.5px */
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    text-decoration: none;
+    transition: background-color 0.16s ease;
+  }
+
+  .primary:hover {
+    background: var(--copper-hi);
+    color: var(--on-copper);
+  }
+
+  .primary .label {
+    flex: 1;
     display: inline-flex;
     align-items: center;
-    gap: 0.5em;
-    margin-top: 1.75rem;
+    justify-content: center;
+    padding: 0 20px;
+  }
+
+  /* Struck in the label's own colour, so the rule survives the label going from
+     white on copper to near-black on copper. */
+  .primary .tip {
+    flex: none;
+    width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid color-mix(in srgb, var(--on-copper) 24%, transparent);
+  }
+
+  .secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
     height: 44px;
-    padding: 0 22px;
-    font-size: 0.95rem;
-    font-weight: 500;
+    padding: 0 20px;
+    background: var(--panel);
+    border: 1px solid var(--line);
     color: var(--text);
+    font-size: 0.90625rem; /* 14.5px */
+    font-weight: 500;
+    letter-spacing: -0.005em;
     text-decoration: none;
-    background: #171717;
-    border: 2px solid #262626;
-    border-radius: 50px;
     transition:
       background-color 0.16s ease,
       border-color 0.16s ease;
   }
 
-  .quick:hover {
+  .secondary:hover {
+    background: var(--panel-hi);
+    border-color: var(--line-hi);
     color: var(--text);
-    background: #262626;
-    border-color: #333;
   }
 
-  .quick:active {
-    scale: 0.98;
-  }
-
-  /* SVG rather than the → glyph: the arrow is not in the font subsets, and the
-     fallback face it fell to did not match the page. */
-  .quick .arrow {
+  /* Dimmer than the label at rest so the button still reads as one word-shape
+     rather than as text plus an icon; it comes up to full on hover, which is
+     also when "this leaves the site" is the useful thing to say. */
+  .secondary .arrow {
     flex: none;
+    opacity: 0.55;
+    transition: opacity 0.16s ease;
+  }
+
+  .secondary:hover .arrow {
+    opacity: 1;
+  }
+
+  .primary:active,
+  .secondary:active {
+    scale: 0.99;
   }
 
   .install {
-    max-width: 34rem;
-    margin: 1.6rem 0 0;
+    margin-top: 12px;
     text-align: left;
   }
 
-  /* High-credibility readout under the install: the number carries the weight
-     (bright, tabular) and the unit sits dim beside it, the two stats parted by a
-     hairline rule rather than a floating dot. Wraps to a centred stack on very
-     narrow screens, where the rule collapses to keep the seam clean. */
+  /* ── Social proof, where supermemory runs a customer logo wall. The label
+     that used to head this row is gone; the numbers speak without it. ── */
+  /* The stats sit under the terminal, not above it: the transcript is the claim
+     and these are its receipts, so they read as a caption on it rather than as
+     a line the reader must cross to reach it. */
+  .proof {
+    margin-top: clamp(18px, 3svh, 32px);
+  }
+
+  /* The number carries the weight (dark, tabular) and the unit sits dim beside
+     it, the two stats parted by a hairline rule rather than a floating dot. */
   .stats {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     flex-wrap: wrap;
     gap: 0.5rem 1.15rem;
-    margin: 1.6rem 0 0;
+    /* the 20px here used to part the row from its label; .proof's own top
+       margin is the only gap it needs now */
+    margin: 0;
     font-family: var(--mono);
     font-size: 0.86rem;
     color: var(--text-dim);
   }
 
+  /* Each figure links to the thing it is counting — the star count to the repo,
+     the install count to the package. Undecorated at rest so the row still reads
+     as one quiet line of numbers; the page's dashed rule appears on hover. */
   .stat {
     display: inline-flex;
     align-items: baseline;
     gap: 0.45em;
     white-space: nowrap;
+    color: inherit;
+    text-decoration-color: color-mix(in srgb, var(--copper) 45%, transparent);
+    transition:
+      color 0.16s ease,
+      text-decoration-color 0.16s ease;
+  }
+
+  .stat:hover {
+    color: var(--text);
+    text-decoration-color: var(--copper);
+  }
+
+  .stat:hover .lbl {
+    color: var(--text);
   }
 
   .stat .ico {
@@ -368,105 +611,126 @@ const showStats = stats.stars !== null || stats.downloads !== null;
     background: var(--hairline);
   }
 
-  /* Stack the split: copy first (still left-aligned), then the render + caption
-     below it, full column width. */
+  /* The terminal breaks the copy column: the copy is capped near 600px and this
+     runs to 900, which is what makes it read as the product rather than as
+     another block of the page. text-align is reset because .hero .wrap centres
+     everything, and a centred transcript is not a transcript. */
+  /* 48, not the 72 this started at. The terminal is a different class of object
+     from the copy above it and earns a bigger step than the 36px that parts the
+     subhead from the buttons — but only a bit bigger. The link above it carries
+     ~12px of its own padding and underline offset, so this lands at 60px of
+     visible gap, and the 24px saved is 24px more terminal above the fold. */
+  /* The one shrinkable item in the column, and the reason the fold holds. Given
+     `0 1 auto` it never grows past the transcript's own height, but it absorbs
+     the entire shortfall when the stack does not fit — 275px of it on a
+     1280x720 window. The explicit `min-height` is load-bearing twice over: a
+     flex item defaults to `min-height: auto`, which refuses to shrink below its
+     content and would push the whole overrun back onto the stats row, and
+     stating a real floor stops a very short window from cropping the transcript
+     to a hairline. Below that floor the terminal is no longer worth showing and
+     the stack overflows instead, top-anchored, exactly as it did before. */
+  .demo {
+    margin-top: clamp(16px, 3svh, 28px);
+    text-align: left;
+  }
+
+  /* The field used to be switched off here: with two vertical bands there was
+     no width left either side of the copy for them to live in. A radial mask
+     has no such problem — it thins wherever the copy is and keeps the corners —
+     so the phone keeps its backdrop, on a tighter pitch and a step quieter. */
   @media (max-width: 900px) {
-    .hero-grid {
-      /* minmax(0, …) not the `1fr` shorthand (= minmax(auto, …)): the auto
-         minimum would let the render's intrinsic width force the column past
-         the viewport, so the copy could not wrap and the fold overflowed. */
-      grid-template-columns: minmax(0, 1fr);
-      gap: clamp(30px, 6vw, 52px);
+    .grid-dots {
+      opacity: 0.75;
+    }
+  }
+
+  /* Phones get the same layout on tighter spacing. Every step above the fold
+     closes up — the hero has to seat a headline, a subhead, two buttons, an
+     install bar, a link and a terminal in a viewport a third the height, and
+     the desktop rhythm spends most of it on air. */
+  @media (max-width: 720px) {
+    h1 {
+      font-size: clamp(2rem, 8.8vw, 2.75rem);
+      letter-spacing: -0.03em;
+      max-width: 14ch;
+      margin-top: 26px;
     }
 
-    .frame {
-      max-width: 640px;
+    .sub {
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      margin-top: 14px;
     }
 
-    .caption p {
-      max-width: 60ch;
+    .cta {
+      margin-top: 24px;
+    }
+
+    .proof {
+      margin-top: 26px;
+    }
+
+    .demo {
+      margin-top: 28px;
+    }
+  }
+
+  @media (max-width: 560px) {
+    /* The fixed bar is 69px; 84px clears it without a second gap under it. The
+       100svh floor above is left alone — a phone cannot seat this stack, so the
+       section runs past the fold and scrolls, which is what a floor does and a
+       fixed height would not. */
+    .hero {
+      padding-block: 84px 40px;
+    }
+
+    h1 {
+      margin-top: 18px;
+    }
+
+    .sub {
+      margin-top: 12px;
+    }
+
+    .cta {
+      margin-top: 20px;
+    }
+
+    .demo {
+      margin-top: 24px;
+    }
+
+    .proof {
+      margin-top: 20px;
+    }
+
+    .chip {
+      /* the message alone can exceed a 320px screen; let it set its own width
+         and wrap the tag beside it rather than overflow */
+      max-width: 100%;
+    }
+
+    .chip-text {
+      padding: 0 10px;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-flex;
+    }
+  }
+
+  /* Below this the pair no longer fits side by side at a readable label size. */
+  @media (max-width: 400px) {
+    .actions {
+      grid-template-columns: 1fr;
+      gap: 8px;
     }
   }
 
   @media (max-width: 420px) {
     .stats .sep {
       display: none;
-    }
-  }
-
-  @media (max-width: 720px) {
-    h1 {
-      font-size: clamp(2rem, 8.6vw, 2.6rem);
-      letter-spacing: -0.02em;
-      max-width: 14ch;
-    }
-
-    .sub {
-      font-size: 1.02rem;
-      line-height: 1.5;
-      margin-top: clamp(0.9rem, 2svh, 1.35rem);
-    }
-
-    .quick {
-      margin-top: 1.4rem;
-    }
-  }
-
-  /* Phone: pull the whole fold in — tighter top gap, smaller render, and shorter
-     rhythm between the copy rows so it reads as one compact unit. */
-  @media (max-width: 560px) {
-    .hero {
-      padding-block: 80px 44px;
-    }
-
-    /* The fold stacks tall on a phone, so the "more below" cue is redundant and
-       just crowds the foot of the viewport — drop it. */
-    .scroll-cue {
-      display: none;
-    }
-
-    .hero-grid {
-      gap: 30px;
-    }
-
-    .sub {
-      margin-top: 0.9rem;
-    }
-
-    .quick {
-      margin-top: 1.25rem;
-      height: 42px;
-    }
-
-    .install {
-      margin-top: 1.25rem;
-    }
-
-    .stats {
-      margin-top: 1.25rem;
-    }
-
-    /* figure/caption keep the full content width, but the render itself is
-       trimmed and centred so the whole fold fits svh */
-    .hero-visual {
-      max-width: none;
-    }
-
-    .frame {
-      max-width: 252px;
-      margin-inline: auto;
-    }
-
-    .caption {
-      margin-top: 1.4rem;
-    }
-
-    .caption h2 {
-      font-size: 1.35rem;
-    }
-
-    .caption p {
-      max-width: none;
     }
   }
 </style>

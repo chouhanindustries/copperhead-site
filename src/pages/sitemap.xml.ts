@@ -11,6 +11,9 @@ export const GET: APIRoute = async () => {
     { loc: '/', changefreq: 'weekly', priority: '1.0' },
     { loc: '/pricing/', changefreq: 'monthly', priority: '0.9' },
     { loc: '/blog/', changefreq: 'weekly', priority: '0.8' },
+    // Low priority while it is a placeholder; raise it when there is evidence
+    // on the page to find.
+    { loc: '/research/', changefreq: 'monthly', priority: '0.4' },
     { loc: '/blog/faq/', changefreq: 'monthly', priority: '0.7' },
     ...posts.map((p) => ({
       loc: postPath(p.id),

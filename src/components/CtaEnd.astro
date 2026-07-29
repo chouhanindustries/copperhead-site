@@ -47,16 +47,18 @@ A pocket-size Morse key that types over Bluetooth as a standard keyboard.
 </section>
 
 <style>
-  /* Closing CTA sits inside the mastra card, so the section itself carries no
-     divider — the 2px frame provides the separation. */
   .cta .wrap {
     text-align: center;
   }
 
+  /* No frame and no fill. The section rule above already bounds this block, so
+     the 2px border drew a second edge a few pixels inside the first; the tint
+     that replaced it was a second answer to a question the rule had already
+     settled. The block is now just its content on the page, which is what every
+     other section on the page is. */
   .card {
-    border: 2px solid #1c1c1c;
-    background: #0a0a0a;
-    border-radius: 20px;
+    border: 0;
+    background: none;
     padding: clamp(44px, 6vw, 88px) clamp(24px, 5vw, 72px);
   }
 
@@ -91,7 +93,6 @@ A pocket-size Morse key that types over Bluetooth as a standard keyboard.
     text-align: left;
     background: var(--surface);
     border: 1px solid var(--hairline);
-    border-radius: 4px;
   }
 
   .brief figcaption {

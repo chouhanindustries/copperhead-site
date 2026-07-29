@@ -1,0 +1,777 @@
+---
+// A copperhead session, rebuilt as DOM + CSS keyframes instead of a recorded
+// GIF. Text is real (selectable, searchable, crisp at any zoom) and the whole
+// thing costs ~6 KB with no runtime library.
+//
+// The run shown is adding a USB-C power input, not the net rename that
+// scripts/demo.tape records — a landing page wants the change a reader would
+// actually ask for. The *format* is still taken from the source rather than
+// from a screenshot, and the tool names are the real ones out of the agent's
+// registry (read_file, list_nets, validate_change, edit_file, run_erc,
+// check_drift, record_decision). Two of the names the mock REPL prints —
+// openspec_validate and log_decision — are not tools the agent actually has,
+// so they are gone.
+//
+// Where each piece of the layout comes from —
+//   copperhead/scripts/ui-demo.ts   the pipeline's four sections and its pacing
+//   copperhead/src/agent/tools.ts   the tool names
+//   copperhead/src/agent/render.ts  the pinned status row (spinner · turn ·
+//                                   tokens · elapsed · busy) and finish line
+//   copperhead/src/agent/theme.ts   the SGR palette, mirrored to hex below
+//   copperhead/src/commands/repl.ts banner lockup, `❯ ` prompt
+//   copperhead/src/agent/logo.ts    the fiducial mark
+//
+// Two deliberate departures from the tape:
+//   · the slash-command palette beat (`/`, arrow through, Esc) is dropped — it
+//     reads as filler on a landing page, where only the agent run earns its
+//     seconds;
+//   · timings run at ~0.6x the real session, so the whole take is ~11s rather
+//     than ~19s. The proportions between beats are unchanged.
+
+// Absolute seconds from the start of the take. The typed command occupies
+// 0–1.6s; the run starts on Enter at 1.7s. Adjust `at` to retime a beat.
+type Row =
+  | { at: number; kind: 'tool'; name: string; text: string }
+  | { at: number; kind: 'ok'; text: string };
+
+// `kind: 'tool'` reproduces toolLine() from theme.ts: a ✓ when the result reads
+// clean, else a copper ▸. Note run_erc lands on ▸ despite "clean, 0
+// violations": theme.ts disqualifies any line matching /violat/, so the word
+// "violations" vetoes its own zero. Faithful to what ships today.
+const feed: Row[] = [
+  { at: 2.6, kind: 'tool', name: 'read_file', text: 'docs/POWER.md (48 lines)' },
+  { at: 3.2, kind: 'tool', name: 'list_nets', text: '41 nets, no VBUS, no CC1/CC2' },
+  { at: 4.1, kind: 'tool', name: 'validate_change', text: 'add-usb-c-power valid, edit tools unlocked' },
+  { at: 4.4, kind: 'ok', text: '✓ propose: add-usb-c-power validated, edit tools unlocked' },
+  { at: 5.4, kind: 'tool', name: 'edit_file', text: 'hardware/open-key.kicad_sch: USB-C receptacle, 2x 5.1k CC pulldowns' },
+  { at: 6.2, kind: 'tool', name: 'edit_file', text: 'docs/POWER.md: VBUS budget, 5 V at 1.5 A' },
+  { at: 6.5, kind: 'ok', text: '✓ edit: 2 files, 5 anchored regions' },
+  { at: 7.9, kind: 'tool', name: 'run_erc', text: 'clean, 0 violations' },
+  { at: 8.6, kind: 'tool', name: 'check_drift', text: 'docs match schematic' },
+  { at: 8.9, kind: 'ok', text: '✓ verify: ERC clean, no drift' },
+  { at: 9.7, kind: 'tool', name: 'record_decision', text: 'DECISIONS.md +1 · CHANGELOG.md +1' },
+  { at: 10.1, kind: 'ok', text: '✓ remember: decision + changelog recorded' },
+];
+
+// The pinned observability row, one entry per turnStart() in ui-demo.ts. Each
+// holds the dock from `from` until the next turn takes over.
+const turns = [
+  { from: 1.7, to: 4.4, turn: 1, tin: '900', tout: '120', busy: 'drafting the power proposal' },
+  { from: 4.4, to: 6.5, turn: 2, tin: '4.2k', tout: '800', busy: 'placing the receptacle' },
+  { from: 6.5, to: 8.9, turn: 3, tin: '9.1k', tout: '1.5k', busy: 'running ERC' },
+  { from: 8.9, to: 10.4, turn: 4, tin: '11.8k', tout: '1.9k', busy: 'writing the decision log' },
+];
+
+const END_AT = 10.4; // finish() replaces the dock with the outcome line
+
+const command = 'add a USB-C power input to the key';
+
+// The fiducial mark, drawn rather than typed. logo.ts sets it in block glyphs —
+//     '   ▄▟▙▄  '  ' ███  ███'  '   ▀▜▛▀  '
+// — which only tile into one shape when the line box is exactly the em box, the
+// way a terminal cell is. At this transcript's 1.6 leading they break into three
+// disconnected bands. So the same 9x3 cells are resolved to their quadrants and
+// emitted as rects on an 18x6 grid, stretched back to terminal cell aspect with
+// preserveAspectRatio="none". Identical shape, no seams, and no dependency on
+// the fallback font carrying U+2580-259F.
+const markRects = [
+  [9, 0, 2, 1], // ▟▙ upper quadrants
+  [6, 1, 8, 1], // ▄▟▙▄ lower band
+  [2, 2, 6, 2], // ███ left
+  [12, 2, 6, 2], // ███ right
+  [6, 4, 8, 1], // ▀▜▛▀ upper band
+  [9, 5, 2, 1], // ▜▛ lower quadrants
+];
+
+// The elapsed segment counts to the 17s the canned outcome line reports, so the
+// dock and the finish line agree. 18 stops: 0s…17s.
+const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
+---
+
+<figure
+  class="term"
+  aria-label="A copperhead terminal session: renaming a net, with the agent proposing, editing, verifying and logging the change."
+>
+  <div class="bar" aria-hidden="true">
+    <span class="ring close"></span><span class="ring min"></span><span class="ring max"></span>
+    <button class="replay" type="button" hidden>
+      <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" focusable="false">
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          d="M13.5 8a5.5 5.5 0 1 1-1.9-4.16M13 1.5V5H9.5"></path>
+      </svg>
+      Replay
+    </button>
+  </div>
+
+  <div class="screen">
+    <div class="feed">
+      <div class="banner">
+        <svg class="mark" viewBox="0 0 18 6" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          {markRects.map(([x, y, w, h]) => <rect x={x} y={y} width={w} height={h} />)}
+        </svg>
+        <div class="info">
+          <div class="row">
+            <span class="bright">copperhead</span>
+            <span class="dim"> v0.8.1</span>
+          </div>
+          <div class="row dim">claude via flag · kicad-cli 9.0.4</div>
+          <div class="row dim">~/hardware/open-key</div>
+        </div>
+      </div>
+
+      <div class="row spacer">&nbsp;</div>
+
+      <div class="row cmd-row">
+        <span class="prompt" aria-hidden="true">❯ </span>
+        <span class="sr-prompt">$ </span>
+        <span class="cmd" style={`--n:${command.length}`}>{command}<i class="caret" aria-hidden="true"></i></span>
+      </div>
+
+      <div class="row spacer">&nbsp;</div>
+
+      {
+        feed.map((r) => (
+          <div class="row out" style={`--at:${r.at}`}>
+            {r.kind === 'tool' ? (
+              <>
+                <span class="glyph copper">{'  ▸ '}</span>
+                <span class="dim">{r.name}</span>
+                <span>{'  '}</span>
+                <span>{r.text}</span>
+              </>
+            ) : (
+              <span class="ok">{'  '}{r.text}</span>
+            )}
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- The pinned row. Every state occupies the same grid cell, so the dock
+         never changes height as the turn advances or the run finishes. -->
+    <div class="dock">
+      {
+        turns.map((t) => (
+          <div class="dockrow" style={`--from:${t.from};--dur:${(t.to - t.from).toFixed(2)}`}>
+            <svg class="spin" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" focusable="false">
+              <g>
+                <circle cx="8" cy="2.6" r="1.3" opacity="1" />
+                <circle cx="11.82" cy="4.18" r="1.3" opacity="0.85" />
+                <circle cx="13.4" cy="8" r="1.3" opacity="0.7" />
+                <circle cx="11.82" cy="11.82" r="1.3" opacity="0.55" />
+                <circle cx="8" cy="13.4" r="1.3" opacity="0.42" />
+                <circle cx="4.18" cy="11.82" r="1.3" opacity="0.3" />
+                <circle cx="2.6" cy="8" r="1.3" opacity="0.2" />
+                <circle cx="4.18" cy="4.18" r="1.3" opacity="0.12" />
+              </g>
+            </svg>
+            <span class="seg">turn {t.turn}/40</span>
+            <span class="seg tok">
+              <span class="dim"> · </span>
+              <span class="dim">{t.tin} in / {t.tout} out</span>
+            </span>
+            <span class="seg time">
+              <span class="dim"> · </span>
+              <span class="dim tick" aria-hidden="true">
+                <span class="ticks">
+                  {ticks.map((s) => (
+                    <b>{s}</b>
+                  ))}
+                </span>
+              </span>
+            </span>
+            <span class="seg busy">
+              <span class="dim"> · </span>
+              <span class="warn">{t.busy}</span>
+            </span>
+          </div>
+        ))
+      }
+
+      <div class="dockrow outcome" style={`--at:${END_AT}`}>
+        <span class="ok">done</span>
+        <span class="dim"> · verified erc · committed 3f2c9a1 · 17s · 12.3k tokens</span>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<script>
+  // The only JS: arm the animation, then start it when the terminal is actually
+  // on screen. Without it the CSS below renders the finished session as a static
+  // frame, so a no-JS visitor still reads the whole transcript.
+  document.querySelectorAll<HTMLElement>('.term').forEach((term) => {
+    term.dataset.anim = '';
+
+    const play = (): void => term.classList.add('play');
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (!e.isIntersecting) continue;
+          play();
+          io.disconnect();
+        }
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(term);
+
+    const btn = term.querySelector<HTMLButtonElement>('.replay');
+    if (!btn) return;
+    btn.hidden = false;
+
+    btn.addEventListener('click', () => {
+      // Toggling .play only flips animation-play-state, which pauses and
+      // resumes — and by the time this button is worth pressing the run has
+      // finished, so there is nothing left to resume and it appeared dead.
+      //
+      // A restart means removing the animations and declaring them again. Every
+      // animation in this component is gated behind [data-anim], so dropping the
+      // attribute tears all of them down at once; reading offsetWidth forces the
+      // style recalculation to commit before they are re-declared, without which
+      // the browser coalesces both mutations and nothing changes.
+      term.classList.remove('play');
+      delete term.dataset.anim;
+      void term.offsetWidth;
+      term.dataset.anim = '';
+      play();
+    });
+  });
+</script>
+
+<style>
+  /* ── Terminal palette. The CLI's SGR colors resolved to hex: dim/ruleDim are
+     the literal #999999/#888888 from theme.ts, copper is the exact brand
+     #b87333 the CLI paints (not the page's darkened #A75F14 — that value exists
+     to clear 4.5:1 on white, and this ground is not white).
+
+     The screen stays dark on the light page on purpose. Those SGR colors were
+     chosen against a dark terminal and do not survive inversion: #999999 on
+     white is 2.8:1, unreadable. A dark screen also matches what `vhs
+     scripts/demo.tape` renders, so the animated take and the recorded GIF read
+     as the same object. ── */
+  .term {
+    --t-bg: #0d0d11;
+    --t-chrome: #16161c;
+    --t-edge: #26262f;
+    --t-text: #e6e6ea;
+    --t-dim: #999999;
+    --t-copper: #b87333;
+    --t-ok: #3fb950;
+    --t-warn: #e3b341;
+
+    /* The window's one scale knob. Every dimension below is stated in em
+       against it — width, chrome, padding, radius, the lot — so changing this
+       number alone resizes the whole object at a fixed aspect ratio rather than
+       squashing it. That matters more here than in most components: the
+       transcript is `white-space: pre`, so its width in characters and its
+       height in rows are both set by the type size, and scaling the two by the
+       same factor is the only way the window keeps its proportion *and* keeps
+       the same 72-character lines unwrapped. The short-viewport steps at the
+       bottom of this file do nothing but restate it. */
+    font-size: 12px;
+
+    --row: 1.6em; /* one text line; the elapsed counter steps by exactly this */
+
+    /* 800 at the 12px base, not the 900 this started at: at 900 the window ran
+       nearly the full width of the fold and read as a panel of the page rather
+       than as an object sitting on it. 800 leaves visible margin either side,
+       which is what makes it read as a window. */
+    max-width: 66.667em; /* 800px */
+    margin: 0 auto;
+    /* asserted, not inherited: this drops into centred layouts (the hero) where
+       a centred transcript would be nonsense */
+    text-align: left;
+    background: var(--t-chrome);
+    border: 1px solid var(--t-edge);
+    border-radius: 0.833em; /* 10px — Set BorderRadius 10, demo.tape */
+    overflow: hidden;
+    box-shadow: 0 30px 70px -40px rgba(0, 0, 0, 0.55);
+  }
+
+  /* Window bar in the tape's Rings style: 40px tall at the 12px base, three
+     caps at the left. */
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 0.667em; /* 8px */
+    height: 3.333em; /* 40px */
+    padding: 0 1.167em; /* 14px */
+    background: var(--t-chrome);
+    border-bottom: 1px solid var(--t-edge);
+  }
+
+  /* Traffic lights, desaturated a step off the macOS values: at full chroma
+     three primary dots are the brightest thing on the page and pull focus off
+     the transcript, which is the part worth reading. */
+  .ring {
+    width: 0.917em; /* 11px */
+    height: 0.917em;
+    border-radius: 50%;
+  }
+
+  .ring.close {
+    background: #e05f57;
+  }
+
+  .ring.min {
+    background: #dfa42c;
+  }
+
+  .ring.max {
+    background: #3fa653;
+  }
+
+  .replay {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.545em;
+    margin-left: auto;
+    padding: 0.364em 0.909em;
+    border: 1px solid var(--t-edge);
+    border-radius: 0.545em;
+    background: transparent;
+    color: var(--t-dim);
+    font-family: inherit;
+    font-size: 0.917em; /* 11px at the 12px base */
+    cursor: pointer;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .replay:hover {
+    color: var(--t-text);
+    border-color: #3a3a46;
+  }
+
+  .screen {
+    background: var(--t-bg);
+    padding: 1.5em 1.667em 1.167em; /* 18px 20px 14px */
+    /* The transcript is fixed-width text; on a narrow viewport it scrolls the
+       way a real terminal would rather than reflowing into nonsense. */
+    overflow-x: auto;
+  }
+
+  /* 12px, not 13. The window is a fixed 900 wide and its height is however many
+     rows the transcript runs to, so type size is the only lever on its
+     proportion — a step down takes it from roughly 3:2 to nearer 2:1, which is
+     the landscape shape a terminal is usually seen in.
+
+     Not var(--mono): the page's JetBrains Mono is subset to the ~105 codepoints
+     the marketing copy uses, which excludes every glyph this transcript is made
+     of (❯ ▸ ✓). A stack of system monospace faces that actually carry the arrow
+     and check ranges renders it. */
+  .feed,
+  .dock {
+    font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, 'DejaVu Sans Mono',
+      'Cascadia Mono', Consolas, monospace;
+    font-size: 1em; /* the .term base — see the scale knob there */
+    line-height: 1.6;
+    white-space: pre;
+    color: var(--t-text);
+  }
+
+  /* Mark and meta side by side, as repl.ts locks them up. The mark is sized in
+     the transcript's own units — 9 cells wide, 3 lines tall — and squashed to
+     that box, which is what gives it terminal cell aspect. */
+  .banner {
+    display: flex;
+    align-items: center;
+    gap: 2ch;
+  }
+
+  .mark {
+    flex: none;
+    width: 9ch;
+    height: calc(var(--row) * 3);
+    fill: var(--t-copper);
+  }
+
+  .bright {
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  .dim {
+    color: var(--t-dim);
+  }
+
+  .copper {
+    color: var(--t-copper);
+  }
+
+  .ok {
+    color: var(--t-ok);
+  }
+
+  .warn {
+    color: var(--t-warn);
+  }
+
+  .prompt {
+    color: var(--t-copper);
+    user-select: none;
+  }
+
+  /* The `❯ ` prompt is decoration a screen reader should not spell out, but the
+     transcript still needs to signal "this line is the command". A `$ ` that is
+     visually clipped but present in the accessibility tree does that. */
+  .sr-prompt {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  /* Never wraps, even where the feed around it does. The typing animation gives
+     this box an explicit `width: <n>ch` and clips it, so under the phones'
+     pre-wrap the 30-character command could break inside its own box — and with
+     `vertical-align: bottom` the overflow line then rendered *above* the prompt
+     rather than after it. It is 30ch on a 366px screen; it has no need to wrap. */
+  .cmd {
+    position: relative;
+    white-space: pre;
+  }
+
+  .caret {
+    display: none;
+  }
+
+  .spacer {
+    /* an empty line's height without needing a character in it */
+    height: var(--row);
+  }
+
+  /* Pinned observability row. Grid rather than flow so every turn state stacks
+     in one cell and the dock holds a constant height across the run. */
+  .dock {
+    display: grid;
+    margin-top: var(--row);
+    min-height: var(--row);
+  }
+
+  .dockrow {
+    grid-area: 1 / 1;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .seg {
+    display: inline-flex;
+    align-items: center;
+    white-space: pre;
+  }
+
+  .spin {
+    flex: none;
+    margin-right: 0.6ch;
+    color: var(--t-copper);
+    fill: currentColor;
+  }
+
+  /* Elapsed counter: a column of second labels clipped to one line, stepped up
+     one row at a time. Cheaper and steadier than a JS interval. */
+  .tick {
+    display: inline-block;
+    height: var(--row);
+    overflow: hidden;
+    vertical-align: bottom;
+  }
+
+  /* The strip is what moves; the labels are just its rows. Transforming the
+     first <b> alone would slide one label out of the window and leave the rest
+     where they were, showing an empty slot. */
+  .ticks {
+    display: block;
+  }
+
+  .tick b {
+    display: block;
+    height: var(--row);
+    font-weight: inherit;
+  }
+
+  /* ── Static state ends here. Everything below runs only once the script has
+     set [data-anim], so the no-JS render is the finished session. ── */
+
+  .term[data-anim] {
+    animation-play-state: paused;
+  }
+
+  .term.play {
+    animation-play-state: running;
+  }
+
+  /* animation-play-state is not inherited by default; asking for it explicitly
+     lets the single class on the root gate every animation underneath. */
+  .term[data-anim] * {
+    animation-play-state: inherit;
+  }
+
+  /* Command types in: a step per character, clipped by width. */
+  .term[data-anim] .cmd {
+    display: inline-block;
+    width: 0;
+    overflow: hidden;
+    vertical-align: bottom;
+    animation: type 1.6s steps(var(--n), end) 0s both;
+  }
+
+  @keyframes type {
+    to {
+      width: calc(var(--n) * 1ch);
+    }
+  }
+
+  .term[data-anim] .caret {
+    display: inline-block;
+    width: 1ch;
+    height: 1.1em;
+    margin-left: 1px;
+    vertical-align: text-bottom;
+    background: var(--t-copper);
+    /* The later declaration wins for `opacity` once it is filling, so blink
+       runs until 1.6s and the caret then stays gone for the rest of the take. */
+    animation:
+      blink 0.9s steps(2, end) infinite,
+      caret-off 0.01s linear 1.6s forwards;
+  }
+
+  @keyframes blink {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes caret-off {
+    to {
+      opacity: 0;
+    }
+  }
+
+  /* Scrollback lines print once and stay. */
+  .term[data-anim] .out {
+    opacity: 0;
+    animation: print 0.26s ease-out calc(var(--at) * 1s) both;
+  }
+
+  @keyframes print {
+    from {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Turn states hold a window instead of persisting: fill-mode `none` means the
+     animated opacity applies only between `from` and `from + dur`, and the base
+     opacity: 0 governs on either side. One animation per state, no JS clock. */
+  .term[data-anim] .dockrow {
+    opacity: 0;
+  }
+
+  .term[data-anim] .dock .dockrow:not(.outcome) {
+    animation: hold calc(var(--dur) * 1s) linear calc(var(--from) * 1s) none;
+  }
+
+  @keyframes hold {
+    0% {
+      opacity: 0;
+    }
+    6%,
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .term[data-anim] .outcome {
+    animation: print 0.26s ease-out calc(var(--at) * 1s) both;
+  }
+
+  .term[data-anim] .spin g {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: spin 0.72s steps(8, end) infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* 18 stops over the run; steps(17) shows 0s…16s while it runs and lands on
+     17s at the end, which is the figure the outcome line quotes. */
+  .term[data-anim] .ticks {
+    animation: count 8.7s steps(17, end) 1.7s both;
+  }
+
+  /* Percentage rather than `calc(var(--row) * -17)`: a percentage translate
+     resolves against the strip's own height, which is exactly the 18 rows it
+     contains, so the stop lands on a row boundary at every font size and the
+     step never has to agree with a separately-declared line height. */
+  @keyframes count {
+    to {
+      transform: translateY(-94.4444%); /* 17 of 18 rows */
+    }
+  }
+
+  /* Reduced motion gets the same information with none of the timing: the
+     finished transcript, which is exactly the no-JS state. */
+  @media (prefers-reduced-motion: reduce) {
+    .term[data-anim] *,
+    .term[data-anim] *::before,
+    .term[data-anim] *::after {
+      animation: none !important;
+    }
+
+    .term[data-anim] .out,
+    .term[data-anim] .outcome {
+      opacity: 1;
+    }
+
+    .term[data-anim] .dock .dockrow:not(.outcome) {
+      display: none;
+    }
+
+    .term[data-anim] .cmd {
+      width: auto;
+    }
+
+    .term[data-anim] .caret {
+      display: none;
+    }
+
+    .replay {
+      display: none;
+    }
+  }
+
+  /* A narrow viewport tightens the leading as well as the scale: the window is
+     no longer free to keep its proportion here because its width is pinned to
+     the column, so the rows have to close up for it to stay landscape.
+     --row moves with the leading because it is what sizes the blank rows, the
+     banner mark and the elapsed counter's strip; changing line-height alone
+     would desynchronise the three from the text. */
+  @media (max-width: 900px) {
+    .term {
+      font-size: 11px;
+      --row: 1.45em;
+    }
+
+    .feed,
+    .dock {
+      line-height: 1.45;
+    }
+
+    .screen {
+      padding: 1.273em 1.273em 1.091em; /* 14px 14px 12px */
+    }
+  }
+
+  /* ── Short desktops. The step above keys off width, which is the wrong axis
+     for a 1280x720 or 1512x945 laptop: wide enough for the full 12px transcript,
+     nowhere near tall enough to seat it under a headline and a button pair.
+     Here the window is not width-constrained, so it can do the honest thing and
+     scale — one number, everything in proportion, the same transcript at 92% and
+     83%. Width goes with it (800 → 733 → 667), which is the point: a window that
+     lost height but kept its width would stop reading as a terminal and start
+     reading as a letterbox.
+     Both steps hold the 1.6 leading of the full-size window and stay well above
+     the 9px the phone rule falls to — these are read at desk distance on a wide
+     window where the transcript is meant to be legible, not just recognisable.
+     ── */
+  @media (min-width: 901px) and (max-height: 1000px) {
+    .term {
+      font-size: 11px; /* 800 → 733 wide, 458 → 420 tall */
+    }
+  }
+
+  @media (min-width: 901px) and (max-height: 760px) {
+    .term {
+      font-size: 10px; /* 800 → 667 wide, 458 → 382 tall */
+    }
+  }
+
+  /* ── Phones. Shrinking type is not a solution here: the longest tool line is
+     72 characters, and fitting that across a 390px screen needs a 7px face. So
+     the transcript wraps instead, with a hanging indent that keeps continuation
+     lines clear of the glyph and tool name — the same treatment InstallBlock
+     gives long commands. Wrapping also means nothing is hidden off the right
+     edge, which a scrolling terminal does silently. ── */
+  @media (max-width: 560px) {
+    /* Tighter still on a phone. The window's width is fixed by the viewport and
+       its height is however many rows the transcript runs to, so leading is the
+       only lever left on its proportion. 9px on 1.25 is small for reading, but
+       this is a transcript to recognise rather than to study on a phone — the
+       shape carries the message, and at 12/1.6 it was a tall column of text
+       rather than a terminal. */
+    .term {
+      font-size: 9px;
+      --row: 1.25em;
+    }
+
+    .screen {
+      overflow-x: hidden;
+      padding: 1.333em 1.333em 1.111em; /* 12px 12px 10px */
+    }
+
+    .feed,
+    .dock {
+      line-height: 1.25;
+    }
+
+    .feed {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .row.out {
+      padding-left: 4ch;
+      text-indent: -4ch;
+    }
+
+    /* The dock cannot wrap — every turn state shares one grid cell, so a row
+       that ran to two lines would resize the whole dock mid-run. Drop the token
+       counts instead: of the four segments they are the one a phone reader is
+       least likely to be reading, and turn/elapsed/activity still carry it. */
+    .seg.tok {
+      display: none;
+    }
+
+    /* The outcome is one long sentence rather than a row of segments, and it
+       runs past a phone's width. It is allowed to wrap where the turn states
+       are not: it is the last thing the dock ever shows, so the extra row it
+       reserves costs nothing but a little height during the run. */
+    .outcome {
+      display: block;
+      white-space: pre-wrap;
+    }
+
+    /* The chrome opts out of the scale here, and only here. At a 9px base the
+       em values would put the caps at 8px and the replay label at 8px too —
+       proportionally correct and useless to a thumb. The bar is the one part of
+       the window a phone reader interacts with, so it holds near its desktop
+       size while the transcript shrinks past it. */
+    .ring {
+      width: 9px;
+      height: 9px;
+    }
+
+    .replay {
+      padding: 3px 8px;
+      font-size: 0.625rem; /* 10px */
+    }
+  }
+</style>
