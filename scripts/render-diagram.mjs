@@ -1,16 +1,27 @@
-// Render a fixed-size 1600x900 diagram page to PNG in both themes at 2x.
+// Render a diagram page to PNG in both themes at 2x.
 //
 //   node scripts/render-diagram.mjs                          diagrams/social-flow
 //   node scripts/render-diagram.mjs <page.html> <out-prefix>
 //
-// Writes <out-prefix>-light.png and <out-prefix>-dark.png. The page declares
-// its palette with light-dark(), so the theme is picked per pass with
-// emulated prefers-color-scheme rather than a second stylesheet.
+// Writes <out-prefix>-light.png and <out-prefix>-dark.png at 1600x900. The
+// page declares its palette with light-dark(), so the theme is picked per
+// pass with emulated prefers-color-scheme rather than a second stylesheet.
+//
+// social-flow.html carries three layouts selected by body class, and for that
+// page this script renders all of them:
+//   social (default) 1600x900  -> <out-prefix>-{theme}.png, the share render
+//   post              800x1550 -> public/blog/create-pipeline-{theme}.png,
+//                                 portrait so it stays legible in the post's
+//                                 prose column (StageFlow.astro)
+//   og               1200x630  -> public/blog/from-brief-to-gerbers-og.png,
+//                                 the link preview card, designed at native
+//                                 size instead of the whole diagram scaled
+//                                 down past legibility
 //
 // Needs a Chromium, found the same way as shots.mjs.
 
 import { chromium } from 'playwright-core';
-import { copyFileSync, existsSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -37,55 +48,49 @@ if (!existsSync(html)) throw new Error(`No such page: ${html}`);
 const isSocialFlow = out === resolve('diagrams/social-flow');
 
 const browser = await chromium.launch({ executablePath: findChromium() });
+
+// One screenshot: the page at `width`x`height` in `theme`, with the body
+// class swapped to `variant` when one is named (generic diagram pages keep
+// whatever class they load with).
+async function shoot({ variant, width, height, theme, path }) {
+  const ctx = await browser.newContext({
+    viewport: { width, height },
+    deviceScaleFactor: 2,
+    colorScheme: theme,
+  });
+  try {
+    const page = await ctx.newPage();
+    await page.goto(pathToFileURL(html).href);
+    if (variant) await page.evaluate((v) => { document.body.className = v; }, variant);
+    await page.evaluate(() => document.fonts.ready);
+    await page.screenshot({ path });
+  } finally {
+    await ctx.close();
+  }
+  console.log(path);
+}
+
 try {
   for (const theme of ['light', 'dark']) {
-    const ctx = await browser.newContext({
-      viewport: { width: 1600, height: 900 },
-      deviceScaleFactor: 2,
-      colorScheme: theme,
-    });
-    try {
-      const page = await ctx.newPage();
-      await page.goto(pathToFileURL(html).href);
-      await page.evaluate(() => document.fonts.ready);
-      await page.screenshot({ path: `${out}-${theme}.png` });
-    } finally {
-      await ctx.close();
-    }
-    console.log(`${out}-${theme}.png`);
+    await shoot({ width: 1600, height: 900, theme, path: `${out}-${theme}.png` });
 
-    // The blog embeds this diagram (StageFlow.astro), so the copies under
-    // public/ have to track the render or the post quietly goes stale.
+    // The blog embeds the portrait layout (StageFlow.astro), so the copies
+    // under public/ have to track the source or the post quietly goes stale.
     if (isSocialFlow) {
-      const site = resolve(`public/blog/create-pipeline-${theme}.png`);
-      copyFileSync(`${out}-${theme}.png`, site);
-      console.log(site);
+      await shoot({
+        variant: 'post', width: 800, height: 1550, theme,
+        path: resolve(`public/blog/create-pipeline-${theme}.png`),
+      });
     }
   }
 
-  // The post's share card (ogImage in its frontmatter): the light render scaled
-  // into the 1200x630 OG frame, letterboxed 40px a side to bridge 16:9 to 1.91:1.
+  // The post's share card (ogImage in its frontmatter). Light only: link
+  // previews do not follow the reader's theme.
   if (isSocialFlow) {
-    const ctx = await browser.newContext({
-      viewport: { width: 1200, height: 630 },
-      deviceScaleFactor: 2,
-      colorScheme: 'light',
+    await shoot({
+      variant: 'og', width: 1200, height: 630, theme: 'light',
+      path: resolve('public/blog/from-brief-to-gerbers-og.png'),
     });
-    const og = resolve('public/blog/from-brief-to-gerbers-og.png');
-    try {
-      const page = await ctx.newPage();
-      await page.goto(pathToFileURL(html).href);
-      await page.evaluate(() => document.fonts.ready);
-      await page.evaluate(() => {
-        const c = document.querySelector('.canvas');
-        c.style.transformOrigin = 'top left';
-        c.style.transform = 'translateX(40px) scale(0.7)';
-      });
-      await page.screenshot({ path: og });
-    } finally {
-      await ctx.close();
-    }
-    console.log(og);
   }
 } finally {
   await browser.close();

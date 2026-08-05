@@ -58,6 +58,15 @@
       background: var(--bg);
     }
 
+    /* Three layouts share this page, selected by the body class, which
+       scripts/render-diagram.mjs sets before each screenshot:
+         social (default)  1600x900   the render shared on socials
+         post               800x1550  portrait for the blog's 760px prose column
+         og                1200x630   the share card; big type, cards reduced
+                                      to labelled vias so the preview survives
+                                      being 500px wide in a feed
+       Positions are per-variant at the end of this sheet; everything above
+       them is shared. */
     .canvas {
       position: relative;
       width: 1600px;
@@ -133,6 +142,13 @@
     svg.trace {
       position: absolute;
       inset: 0;
+      display: none;
+    }
+
+    .social .t-social,
+    .post .t-post,
+    .og .t-og {
+      display: block;
     }
 
     svg.trace .wire {
@@ -154,6 +170,13 @@
     svg.trace .head {
       fill: var(--copper);
       stroke: none;
+    }
+
+    svg.trace text {
+      font-family: var(--mono);
+      font-size: 15px;
+      fill: var(--text);
+      text-anchor: middle;
     }
 
     /* ---------- cards ---------- */
@@ -314,10 +337,64 @@
       font-size: 14.5px;
       color: var(--text-dim);
     }
+
+    /* ---------- social: the original 16:9 card ---------- */
+    .social .c1 { left: 364px; top: 210px; }
+    .social .c2 { left: 664px; top: 210px; }
+    .social .c3 { left: 964px; top: 210px; }
+    .social .c4 { left: 1264px; top: 210px; }
+    .social .c5 { left: 64px; top: 480px; }
+    .social .c6 { left: 364px; top: 480px; }
+    .social .c7 { left: 664px; top: 480px; }
+    .social .c8 { left: 964px; top: 480px; }
+    .social .pad.in { left: 64px; top: 245px; }
+    .social .pad.out { left: 1264px; top: 515px; }
+
+    /* ---------- post: portrait, cards snaking down two columns ----------
+       800 wide against the blog's 760px prose column, so the type lands on
+       the page at nearly its designed size instead of the 0.48 scale the
+       social card came down to. Legend and footer stay off: the prose above
+       the figure is the legend, and the site does not need to cite itself. */
+    .post .canvas { width: 800px; height: 1550px; }
+    .post .brand { left: 56px; top: 44px; }
+    .post .cmd { right: 56px; top: 40px; }
+    .post .title { left: 56px; top: 98px; font-size: 32px; }
+    .post .subtitle { left: 56px; right: 56px; top: 148px; font-size: 16.5px; line-height: 1.5; }
+    .post .card { width: 300px; }
+    .post .pad { width: 300px; }
+    .post .c1 { left: 56px; top: 390px; }
+    .post .c2 { left: 444px; top: 390px; }
+    .post .c3 { left: 444px; top: 636px; }
+    .post .c4 { left: 56px; top: 636px; }
+    .post .c5 { left: 56px; top: 882px; }
+    .post .c6 { left: 444px; top: 882px; }
+    .post .c7 { left: 444px; top: 1128px; }
+    .post .c8 { left: 56px; top: 1128px; }
+    .post .pad.in { left: 56px; top: 230px; }
+    .post .pad.out { left: 56px; top: 1374px; }
+    .post .legend,
+    .post .footer { display: none; }
+
+    /* ---------- og: the link-preview card ----------
+       Feeds show this around 500px wide, so the eight cards collapse to
+       labelled vias on one trace and the title carries the card. Everything
+       here has to read at 0.4 scale. */
+    .og .canvas { width: 1200px; height: 630px; }
+    .og .brand { left: 48px; top: 44px; }
+    .og .cmd { right: 48px; top: 44px; }
+    .og .title { left: 48px; top: 122px; font-size: 54px; letter-spacing: -1px; }
+    .og .subtitle { left: 48px; right: 48px; top: 202px; font-size: 23px; line-height: 1.5; }
+    .og .card,
+    .og .legend { display: none; }
+    .og .pad.in { left: 48px; top: 360px; width: 240px; }
+    .og .pad.out { left: 892px; top: 360px; width: 260px; }
+    .og .padname { font-size: 20px; }
+    .og .padname.strong { font-size: 22px; }
+    .og .footer { left: 48px; right: 48px; top: 548px; }
   </style>
 </head>
 
-<body>
+<body class="social">
   <div class="canvas">
 
     <!-- header -->
@@ -334,8 +411,8 @@
     <div class="subtitle">Eight gated stages, eight commits, one command. Each stage is its own agent run
       and it commits <b>only when its gate finds real work on disk</b>.</div>
 
-    <!-- copper trace, drawn behind the cards -->
-    <svg class="trace" width="1600" height="900" viewBox="0 0 1600 900">
+    <!-- copper trace, drawn behind the cards: two rows with a return trace -->
+    <svg class="trace t-social" width="1600" height="900" viewBox="0 0 1600 900">
       <!-- row 1, left to right along y=305 -->
       <path class="wire" d="M336 305 H364" />
       <path class="wire" d="M636 305 H664" />
@@ -372,59 +449,134 @@
       <path class="head" d="M1264 575 l-11 -6 v12 z" />
     </svg>
 
+    <!-- post trace: the same run snaking down the two columns. Left column
+         centre x=206, right x=594; row middles y=485/731/977/1223. A via on
+         each of the seven hops between cards. -->
+    <svg class="trace t-post" width="800" height="1550" viewBox="0 0 800 1550">
+      <path class="wire" d="M206 350 V390" />
+      <path class="wire" d="M356 485 H444" />
+      <path class="wire" d="M594 580 V636" />
+      <path class="wire" d="M444 731 H356" />
+      <path class="wire" d="M206 826 V882" />
+      <path class="wire" d="M356 977 H444" />
+      <path class="wire" d="M594 1072 V1128" />
+      <path class="wire" d="M444 1223 H356" />
+      <path class="wire" d="M206 1318 V1374" />
+
+      <g>
+        <circle class="via-ring" cx="400" cy="485" r="6" />
+        <circle class="via-hole" cx="400" cy="485" r="2" />
+        <circle class="via-ring" cx="594" cy="608" r="6" />
+        <circle class="via-hole" cx="594" cy="608" r="2" />
+        <circle class="via-ring" cx="400" cy="731" r="6" />
+        <circle class="via-hole" cx="400" cy="731" r="2" />
+        <circle class="via-ring" cx="206" cy="854" r="6" />
+        <circle class="via-hole" cx="206" cy="854" r="2" />
+        <circle class="via-ring" cx="400" cy="977" r="6" />
+        <circle class="via-hole" cx="400" cy="977" r="2" />
+        <circle class="via-ring" cx="594" cy="1100" r="6" />
+        <circle class="via-hole" cx="594" cy="1100" r="2" />
+        <circle class="via-ring" cx="400" cy="1223" r="6" />
+        <circle class="via-hole" cx="400" cy="1223" r="2" />
+      </g>
+
+      <path class="head" d="M206 390 l-6 -11 h12 z" />
+      <path class="head" d="M444 485 l-11 -6 v12 z" />
+      <path class="head" d="M594 636 l-6 -11 h12 z" />
+      <path class="head" d="M356 731 l11 -6 v12 z" />
+      <path class="head" d="M206 882 l-6 -11 h12 z" />
+      <path class="head" d="M444 977 l-11 -6 v12 z" />
+      <path class="head" d="M594 1128 l-6 -11 h12 z" />
+      <path class="head" d="M356 1223 l11 -6 v12 z" />
+      <path class="head" d="M206 1374 l-6 -11 h12 z" />
+    </svg>
+
+    <!-- og trace: one run from pad to pad, the eight stages as labelled vias
+         alternating above and below the wire -->
+    <svg class="trace t-og" width="1200" height="630" viewBox="0 0 1200 630">
+      <path class="wire" d="M288 420 H892" />
+      <path class="head" d="M892 420 l-11 -6 v12 z" />
+
+      <g>
+        <circle class="via-ring" cx="340" cy="420" r="7" />
+        <circle class="via-hole" cx="340" cy="420" r="2.5" />
+        <circle class="via-ring" cx="410" cy="420" r="7" />
+        <circle class="via-hole" cx="410" cy="420" r="2.5" />
+        <circle class="via-ring" cx="480" cy="420" r="7" />
+        <circle class="via-hole" cx="480" cy="420" r="2.5" />
+        <circle class="via-ring" cx="550" cy="420" r="7" />
+        <circle class="via-hole" cx="550" cy="420" r="2.5" />
+        <circle class="via-ring" cx="620" cy="420" r="7" />
+        <circle class="via-hole" cx="620" cy="420" r="2.5" />
+        <circle class="via-ring" cx="690" cy="420" r="7" />
+        <circle class="via-hole" cx="690" cy="420" r="2.5" />
+        <circle class="via-ring" cx="760" cy="420" r="7" />
+        <circle class="via-hole" cx="760" cy="420" r="2.5" />
+        <circle class="via-ring" cx="830" cy="420" r="7" />
+        <circle class="via-hole" cx="830" cy="420" r="2.5" />
+      </g>
+
+      <text x="340" y="388">spec</text>
+      <text x="410" y="466">architecture</text>
+      <text x="480" y="388">parts</text>
+      <text x="550" y="466">schematic</text>
+      <text x="620" y="388">layout</text>
+      <text x="690" y="466">outputs</text>
+      <text x="760" y="388">firmware</text>
+      <text x="830" y="466">dev plan</text>
+    </svg>
+
     <!-- input pad -->
-    <div class="pad" style="left:64px; top:245px;">
+    <div class="pad in">
       <div class="tag">in</div>
       <div class="padname">brief.md</div>
       <div class="padsub">what you want, written in your own words</div>
     </div>
 
-    <!-- row 1 -->
-    <div class="card" style="left:364px; top:210px;">
+    <!-- the eight stages, positioned per variant -->
+    <div class="card c1">
       <div class="num">01</div>
       <div class="name">spec</div>
       <span class="artifact">docs/SPEC.md</span>
       <div class="gate"><span class="g">gate</span>a budgets section, actually filled in</div>
     </div>
-    <div class="card" style="left:664px; top:210px;">
+    <div class="card c2">
       <div class="num">02</div>
       <div class="name">architecture</div>
       <span class="artifact">docs/SUBSYSTEMS.md</span>
       <div class="gate"><span class="g">gate</span>real reasoning under every subsystem</div>
     </div>
-    <div class="card" style="left:964px; top:210px;">
+    <div class="card c3">
       <div class="num">03</div>
       <div class="name">parts</div>
       <span class="artifact">docs/BOM.md</span>
       <div class="gate"><span class="g">gate</span>part numbers chosen against datasheets</div>
     </div>
-    <div class="card hot" style="left:1264px; top:210px;">
+    <div class="card hot c4">
       <div class="num">04</div>
       <div class="name">schematic</div>
       <span class="artifact">design.kicad_sch</span>
       <div class="gate"><span class="g">gate</span>symbols placed, docs agree, ERC clean</div>
     </div>
-
-    <!-- row 2, left to right -->
-    <div class="card hot" style="left:64px; top:480px;">
+    <div class="card hot c5">
       <div class="num">05</div>
       <div class="name">layout</div>
       <span class="artifact">design.kicad_pcb</span>
       <div class="gate"><span class="g">gate</span>footprints on the board, DRC clean</div>
     </div>
-    <div class="card" style="left:364px; top:480px;">
+    <div class="card c6">
       <div class="num">06</div>
       <div class="name">outputs</div>
       <span class="artifact">gerbers · drill · STEP</span>
       <div class="gate"><span class="g">gate</span>gerbers actually on disk</div>
     </div>
-    <div class="card" style="left:664px; top:480px;">
+    <div class="card c7">
       <div class="num">07</div>
       <div class="name">firmware</div>
       <span class="artifact">firmware/ · pins.h</span>
       <div class="gate"><span class="g">gate</span>sources on disk, pins from the pinout</div>
     </div>
-    <div class="card" style="left:964px; top:480px;">
+    <div class="card c8">
       <div class="num">08</div>
       <div class="name">dev plan</div>
       <span class="artifact">docs/DEVPLAN.md</span>
@@ -432,7 +584,7 @@
     </div>
 
     <!-- output pad -->
-    <div class="pad" style="left:1264px; top:515px;">
+    <div class="pad out">
       <div class="tag">out</div>
       <div class="padname strong">a design package</div>
       <div class="padsub">gerbers, firmware, docs · one commit per stage</div>
