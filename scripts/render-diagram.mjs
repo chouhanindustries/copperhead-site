@@ -84,11 +84,11 @@ try {
     }
   }
 
-  // The post's share card (ogImage in its frontmatter). Light only: link
-  // previews do not follow the reader's theme.
+  // The post's share card (ogImage in its frontmatter). One theme only, since
+  // link previews do not follow the reader's: dark, the brand's home ground.
   if (isSocialFlow) {
     await shoot({
-      variant: 'og', width: 1200, height: 630, theme: 'light',
+      variant: 'og', width: 1200, height: 630, theme: 'dark',
       path: resolve('public/blog/from-brief-to-gerbers-og.png'),
     });
   }
