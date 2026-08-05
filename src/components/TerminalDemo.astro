@@ -49,7 +49,11 @@ export type Row =
   | { at: number; kind: 'stage'; name: string; text: string }
   // outcomeLine() from loop.ts, styled by styleOutcome(): a green head then the
   // rest of the ` · `-joined line in dim. `text` is everything after the head.
-  | { at: number; kind: 'done'; head?: string; text: string };
+  // `name` prefixes the row with a dim `stage <name>: ` label, which lets a
+  // pipeline transcript state a stage's outcome in one row instead of a
+  // stage-running row followed by a done row — half the rows, and on a phone,
+  // where the window's height is the only free dimension, half the height.
+  | { at: number; kind: 'done'; name?: string; head?: string; text: string };
 
 export interface TurnState {
   from: number;
@@ -145,7 +149,7 @@ const defaultTicks = Array.from({ length: 18 }, (_, i) => `${i}s`);
 const {
   command = 'add a USB-C power input to the key',
   feed = defaultFeed,
-  turns = defaultTurns,
+  turns: turnsProp,
   maxTurns = 40,
   runStart = 1.7,
   endAt = 10.4,
@@ -156,6 +160,13 @@ const {
   label = 'A copperhead terminal session: adding a USB-C power input, with the agent proposing, editing, verifying and logging the change.',
   fitViewport = true,
 } = Astro.props;
+
+// The default transcript's last turn holds the dock until finish(), so its end
+// follows endAt rather than repeating the hero's 10.4. Supplied turns are the
+// caller's own timeline and pass through untouched.
+const turns =
+  turnsProp ??
+  defaultTurns.map((t, i) => (i === defaultTurns.length - 1 ? { ...t, to: endAt } : t));
 
 // The elapsed counter is a strip of labels stepped one row at a time, so its
 // three numbers are all functions of how many labels there are: one step fewer
@@ -234,6 +245,7 @@ const vars = [
             )}
             {r.kind === 'done' && (
               <>
+                {r.name && <span class="dim">{`stage ${r.name}: `}</span>}
                 <span class="ok">{r.head ?? 'done'}</span>
                 <span class="dim">{r.text}</span>
               </>

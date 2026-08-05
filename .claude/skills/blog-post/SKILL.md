@@ -120,7 +120,7 @@ That section is what makes the rest credible. Do not drop it.
 ## Check before finishing
 
 ```bash
-f=src/content/blog/<slug>.md
+f=<path to the post>   # .md or .mdx, under src/content/blog/ or src/content/research/
 grep -n '—\|–' "$f"                                   # must be empty
 grep -nEi 'delve|leverage|seamless|robust|cutting-edge|game-chang|plethora|myriad|in conclusion|dive in|not just|thrilled|it.s worth noting' "$f"
 awk 'length > 88 {print FILENAME":"FNR": "length}' "$f"   # prose wrap, ignore tables/props

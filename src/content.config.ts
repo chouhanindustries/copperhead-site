@@ -29,7 +29,9 @@ const blog = defineCollection({
  * which of its numbers have been measured and which have not.
  */
 const research = defineCollection({
-  loader: glob({ base: './src/content/research', pattern: '**/*.{md,mdx}' }),
+  // Same underscore convention as the blog: a draft or body partial named _*.md
+  // must not become an article, a route, or a sitemap entry.
+  loader: glob({ base: './src/content/research', pattern: ['**/*.{md,mdx}', '!**/_*'] }),
   schema: z.object({
     title: z.string(),
     /** Shown on the index card and used as the meta description, so keep it a full sentence. */

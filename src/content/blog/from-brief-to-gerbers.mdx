@@ -24,9 +24,19 @@ ogImageAlt: "The copperhead create pipeline: brief.md in, eight gated stages fro
 # apart is also a compression: the run they are taken from took 47 minutes.
 ---
 
+import FileBlock from "../../components/FileBlock.astro";
 import TerminalDemo from "../../components/TerminalDemo.astro";
 import StageFlow from "../../components/StageFlow.astro";
-import { Content as Body } from "./_from-brief-to-gerbers.md";
+import { Content as Body } from "./_from-brief-to-gerbers.mdx";
+
+export const brief = `# USB-C 5V power breakout
+
+A pass-through: USB-C in, protected 5V out. No regulation, no MCU.
+
+- 5V from VBUS, rated 3A continuous. No PD negotiation.
+- Out: 2-pin 3.5mm screw terminal and a 2x2 0.1" header.
+- Power-good LED, under 1mA. Short-circuit protection.
+- 30 x 20mm, two M3 holes, hand-solderable (0603 minimum).`;
 
 <TerminalDemo
   command="copperhead create --brief brief.md"
@@ -35,7 +45,6 @@ import { Content as Body } from "./_from-brief-to-gerbers.md";
   endAt={13.1}
   label="A copperhead create pipeline run: eight stages from a brief to a design package, each one committing only after its gate passes."
   fitViewport={false}
-  leading={1.33}
   ticks={[
     "0m",
     "5m",
@@ -51,59 +60,59 @@ import { Content as Body } from "./_from-brief-to-gerbers.md";
   ]}
   outcome={{ head: "create pipeline complete; all checks green", rest: "" }}
   feed={[
-    { at: 2.2, kind: "stage", name: "spec-seed", text: "running" },
     {
       at: 3.2,
       kind: "done",
-      text: " · ERC not run · committed d3cf2a0 · 4m24s · 12.8k out",
+      name: "spec-seed",
+      text: " · committed d3cf2a0 · 4m24s · 12.8k out",
     },
-    { at: 3.6, kind: "stage", name: "architecture", text: "running" },
     {
       at: 4.4,
       kind: "done",
-      text: " · ERC not run · committed ef4cd50 · 1m01s · 3.3k out",
+      name: "architecture",
+      text: " · committed ef4cd50 · 1m01s · 3.3k out",
     },
-    { at: 4.8, kind: "stage", name: "part-selection", text: "running" },
     {
       at: 5.6,
       kind: "done",
-      text: " · ERC not run · committed a572cf6 · 1m48s · 6.4k out",
+      name: "part-selection",
+      text: " · committed a572cf6 · 1m48s · 6.4k out",
     },
     {
-      at: 6.0,
+      at: 6.4,
       kind: "stage",
       name: "schematic",
       text: "scaffolded empty KiCad project, wired into config",
     },
-    { at: 6.4, kind: "stage", name: "schematic", text: "running" },
     {
       at: 7.6,
       kind: "done",
+      name: "schematic",
       text: " · ERC clean · committed 3f05d1c · 11m40s · 28.9k out",
     },
-    { at: 8.0, kind: "stage", name: "layout-draft", text: "running" },
     {
       at: 9.0,
       kind: "done",
+      name: "layout-draft",
       text: " · ERC clean · DRC clean · committed 0152ea1 · 23m47s · 15.4k out",
     },
-    { at: 9.4, kind: "stage", name: "outputs", text: "running" },
     {
       at: 10.2,
       kind: "done",
-      text: " · ERC not run · committed 384bddf · 48s · 2.6k out",
+      name: "outputs",
+      text: " · committed 384bddf · 48s · 2.6k out",
     },
-    { at: 10.6, kind: "stage", name: "firmware", text: "running" },
     {
       at: 11.3,
       kind: "done",
-      text: " · ERC not run · committed 9a2f1c4 · 1m12s · 3.1k out",
+      name: "firmware",
+      text: " · committed 9a2f1c4 · 1m12s · 3.1k out",
     },
-    { at: 11.7, kind: "stage", name: "devplan", text: "running" },
     {
       at: 12.4,
       kind: "done",
-      text: " · ERC not run · committed b71e08d · 2m05s · 7.8k out",
+      name: "devplan",
+      text: " · committed b71e08d · 2m05s · 7.8k out",
     },
     {
       at: 12.7,
@@ -182,26 +191,17 @@ import { Content as Body } from "./_from-brief-to-gerbers.md";
 
 _Eight stages, eight commits, one command._
 
-That run's entire input, `brief.md`:
-
-```markdown
-# USB-C 5V power breakout
-
-A pass-through: USB-C in, protected 5V out. No regulation, no MCU.
-
-- 5V from VBUS, rated 3A continuous. No PD negotiation.
-- Out: 2-pin 3.5mm screw terminal and a 2x2 0.1" header.
-- Power-good LED, under 1mA. Short-circuit protection.
-- 30 x 20mm, two M3 holes, hand-solderable (0603 minimum).
-```
-
 You point copperhead at a markdown file and it hands back a design package. That is a
 large claim for one command, and the schematic capture is the smallest part of it.
 What carries it is the bookkeeping: what each stage has to prove before the next one
 is allowed to start and what happens to the work when it cannot prove it.
 
+The run's entire input prompt:
+
+<FileBlock name="brief.md" code={brief} lang="md" />
+
 <StageFlow />
 
-_The shape of the run: one file in, eight gates, a design package out._
+_The shape of the run: one file in, eight gates, a design package out_
 
 <Body />

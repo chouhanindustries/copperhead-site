@@ -60,7 +60,7 @@ These match the `--copper` and `--text` tokens in `src/styles/global.css`.
 `kicad/copperhead-mark-5mm.kicad_mod` places the mark on the front silkscreen
 at 5 mm square. It is a graphic footprint: no pads, excluded from the BOM and
 position files. Scale it in KiCad if you need another size, and keep it clear
-of real fiducials so it does not confuse a pick and place camera.
+of real fiducials so it does not confuse a pick-and-place camera.
 
 ## Provenance and license
 

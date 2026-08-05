@@ -10,21 +10,19 @@
 // Needs a Chromium, found the same way as shots.mjs.
 
 import { chromium } from 'playwright-core';
-import { copyFileSync, existsSync, readdirSync } from 'node:fs';
-import { join, resolve } from 'node:path';
-import { homedir } from 'node:os';
+import { copyFileSync, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 function findChromium() {
   if (process.env.CHROME_PATH) return process.env.CHROME_PATH;
-  const pw = join(homedir(), '.cache/ms-playwright');
-  if (existsSync(pw)) {
-    for (const dir of readdirSync(pw).filter(d => d.startsWith('chromium-')).sort().reverse()) {
-      for (const sub of ['chrome-linux64/chrome', 'chrome-linux/chrome', 'chrome-mac/Chromium.app/Contents/MacOS/Chromium']) {
-        const p = join(pw, dir, sub);
-        if (existsSync(p)) return p;
-      }
-    }
-  }
+  // Playwright's own resolution respects PLAYWRIGHT_BROWSERS_PATH, XDG_CACHE_HOME
+  // and the platform cache locations; it reports where the browser would live
+  // whether or not it is installed, hence the existsSync.
+  try {
+    const p = chromium.executablePath();
+    if (p && existsSync(p)) return p;
+  } catch {}
   for (const p of [
     '/usr/bin/google-chrome-stable', '/usr/bin/google-chrome', '/usr/bin/chromium',
     '/usr/bin/chromium-browser', '/snap/bin/chromium',
@@ -36,49 +34,59 @@ function findChromium() {
 const html = resolve(process.argv[2] ?? 'diagrams/social-flow.html');
 const out = resolve(process.argv[3] ?? html.replace(/\.html$/, ''));
 if (!existsSync(html)) throw new Error(`No such page: ${html}`);
+const isSocialFlow = out === resolve('diagrams/social-flow');
 
 const browser = await chromium.launch({ executablePath: findChromium() });
-for (const theme of ['light', 'dark']) {
-  const ctx = await browser.newContext({
-    viewport: { width: 1600, height: 900 },
-    deviceScaleFactor: 2,
-    colorScheme: theme,
-  });
-  const page = await ctx.newPage();
-  await page.goto('file://' + html);
-  await page.evaluate(() => document.fonts.ready);
-  await page.screenshot({ path: `${out}-${theme}.png` });
-  await ctx.close();
-  console.log(`${out}-${theme}.png`);
+try {
+  for (const theme of ['light', 'dark']) {
+    const ctx = await browser.newContext({
+      viewport: { width: 1600, height: 900 },
+      deviceScaleFactor: 2,
+      colorScheme: theme,
+    });
+    try {
+      const page = await ctx.newPage();
+      await page.goto(pathToFileURL(html).href);
+      await page.evaluate(() => document.fonts.ready);
+      await page.screenshot({ path: `${out}-${theme}.png` });
+    } finally {
+      await ctx.close();
+    }
+    console.log(`${out}-${theme}.png`);
 
-  // The blog embeds this diagram (StageFlow.astro), so the copies under
-  // public/ have to track the render or the post quietly goes stale.
-  if (out.endsWith('/diagrams/social-flow')) {
-    const site = resolve(`public/blog/create-pipeline-${theme}.png`);
-    copyFileSync(`${out}-${theme}.png`, site);
-    console.log(site);
+    // The blog embeds this diagram (StageFlow.astro), so the copies under
+    // public/ have to track the render or the post quietly goes stale.
+    if (isSocialFlow) {
+      const site = resolve(`public/blog/create-pipeline-${theme}.png`);
+      copyFileSync(`${out}-${theme}.png`, site);
+      console.log(site);
+    }
   }
-}
 
-// The post's share card (ogImage in its frontmatter): the light render scaled
-// into the 1200x630 OG frame, letterboxed 40px a side to bridge 16:9 to 1.91:1.
-if (out.endsWith('/diagrams/social-flow')) {
-  const ctx = await browser.newContext({
-    viewport: { width: 1200, height: 630 },
-    deviceScaleFactor: 2,
-    colorScheme: 'light',
-  });
-  const page = await ctx.newPage();
-  await page.goto('file://' + html);
-  await page.evaluate(() => document.fonts.ready);
-  await page.evaluate(() => {
-    const c = document.querySelector('.canvas');
-    c.style.transformOrigin = 'top left';
-    c.style.transform = 'translateX(40px) scale(0.7)';
-  });
-  const og = resolve('public/blog/from-brief-to-gerbers-og.png');
-  await page.screenshot({ path: og });
-  await ctx.close();
-  console.log(og);
+  // The post's share card (ogImage in its frontmatter): the light render scaled
+  // into the 1200x630 OG frame, letterboxed 40px a side to bridge 16:9 to 1.91:1.
+  if (isSocialFlow) {
+    const ctx = await browser.newContext({
+      viewport: { width: 1200, height: 630 },
+      deviceScaleFactor: 2,
+      colorScheme: 'light',
+    });
+    const og = resolve('public/blog/from-brief-to-gerbers-og.png');
+    try {
+      const page = await ctx.newPage();
+      await page.goto(pathToFileURL(html).href);
+      await page.evaluate(() => document.fonts.ready);
+      await page.evaluate(() => {
+        const c = document.querySelector('.canvas');
+        c.style.transformOrigin = 'top left';
+        c.style.transform = 'translateX(40px) scale(0.7)';
+      });
+      await page.screenshot({ path: og });
+    } finally {
+      await ctx.close();
+    }
+    console.log(og);
+  }
+} finally {
+  await browser.close();
 }
-await browser.close();

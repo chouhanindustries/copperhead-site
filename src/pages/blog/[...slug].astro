@@ -159,10 +159,27 @@ const jsonLd = {
     font-weight: 500;
   }
 
+  /* A file shown as itself (FileBlock.astro) and the quickstart terminal
+     (InstallBlock.astro) sit in the prose rhythm; each carries its own frame
+     and internal metrics. */
+  .prose :global(.filefig),
+  .prose :global(.terminal) {
+    margin: 0 0 1.4rem;
+  }
+
+  /* The terminal window (TerminalDemo.astro) asserts margin: 0 auto for its
+     hero placement; in the prose it needs the rhythm's bottom margin so a
+     caption under it gets the same gap as one under an image. */
+  .prose :global(figure.term) {
+    margin-bottom: 1.4rem;
+  }
+
   /* Terminal block, on the quickstart's exact metrics (InstallBlock.astro):
      the dashed ink border, 20px 22px padding, 1.75 leading, and the 13px
-     phone step. One code surface across the site, not two near-misses. */
-  .prose :global(pre) {
+     phone step. One code surface across the site, not two near-misses.
+     Direct child only: the pre inside FileBlock's figure carries that
+     component's own metrics and must not pick up a second frame. */
+  .prose > :global(pre) {
     background: var(--surface);
     border: 1px dashed color-mix(in srgb, var(--text) 20%, transparent);
     padding: 20px 22px;
@@ -171,12 +188,19 @@ const jsonLd = {
     line-height: 1.75;
   }
 
+  /* Shiki dual-theme tokens (defaultColor off in astro.config): each span
+     carries both palettes as custom properties, resolved here against the
+     color-scheme the theme toggle sets. Same rule as FileBlock.astro. */
+  .prose > :global(pre span) {
+    color: light-dark(var(--shiki-light), var(--shiki-dark));
+  }
+
   @media (max-width: 720px) {
-    .prose :global(pre) {
+    .prose > :global(pre) {
       padding: 18px 16px;
     }
 
-    .prose :global(pre code) {
+    .prose > :global(pre code) {
       font-size: 0.8125rem; /* 13px, the quickstart's phone size */
     }
   }

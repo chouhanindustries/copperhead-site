@@ -1,0 +1,204 @@
+---
+// A file shown as itself: filename header with a seated copy control, solid
+// hairline frame. This is the brief.md figure from the closing CTA, extracted
+// so the blog can put file contents on the same surface as the home page. The
+// split in the code language stays legible: commands to run get InstallBlock's
+// dashed frame, file contents get this one.
+//
+// One string feeds both the rendered block and the copy button, the same way
+// InstallBlock takes its lines as data rather than scraping them back out of
+// the DOM.
+//
+// Highlighting is dual-theme: Shiki's `themes` mode with defaultColor off
+// writes each token's two colours as --shiki-light/--shiki-dark custom
+// properties instead of a baked-in inline `color`, and the light-dark() rule
+// below resolves them off the page's color-scheme, the same mechanism every
+// other token on the site themes through. A single inline theme was how the
+// first version broke: unreadable github-light ink on the dark surface.
+import { Code } from 'astro:components';
+import type { BundledLanguage } from 'shiki';
+
+interface Props {
+  /** Filename (brief.md) or content type (shell, output) shown in the header row. */
+  name: string;
+  /** The file's contents. */
+  code: string;
+  /** Shiki language for highlighting. Omit for plain ink (e.g. tool output). */
+  lang?: BundledLanguage;
+}
+const { name, code, lang } = Astro.props;
+---
+
+<figure class="filefig">
+  <figcaption>
+    {name}
+    <!-- Same control, same icons, same states as InstallBlock's. Starts
+         hidden, so if the script ever fails to run this is absent rather than
+         dead (W-1). -->
+    <button class="copy" type="button" data-clip={code} aria-label={`Copy ${name}`} hidden>
+      <svg class="ic-copy" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+        <path
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.4"
+          d="M5.5 5.5V3a1 1 0 0 1 1-1H13a1 1 0 0 1 1 1v6.5a1 1 0 0 1-1 1h-2.5m-8-5H9a1 1 0 0 1 1 1V13a1 1 0 0 1-1 1H2.5a1 1 0 0 1-1-1V6.5a1 1 0 0 1 1-1Z"
+        />
+      </svg>
+      <svg class="ic-done" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+        <path fill="none" stroke="currentColor" stroke-width="1.7" d="m2.5 8.5 3.5 3.5 7.5-8" />
+      </svg>
+    </button>
+  </figcaption>
+  {
+    lang ? (
+      <Code code={code} lang={lang} themes={{ light: 'github-light', dark: 'github-dark' }} defaultColor={false} />
+    ) : (
+      <pre><code>{code}</code></pre>
+    )
+  }
+</figure>
+
+<script>
+  // Duplicate of InstallBlock's binder so this component works on pages that
+  // have no InstallBlock (the blog). Both binders skip buttons the other has
+  // claimed, so a page holding both components wires each button exactly once.
+  document.querySelectorAll<HTMLButtonElement>('button.copy:not([data-bound])').forEach((btn) => {
+    btn.dataset.bound = '';
+    btn.hidden = false;
+    const label = btn.getAttribute('aria-label') ?? 'Copy';
+    btn.addEventListener('click', async () => {
+      const text = btn.dataset.clip ?? '';
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        // Clipboard API unavailable (insecure context, denied permission)
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      btn.classList.add('done');
+      btn.setAttribute('aria-label', 'Copied');
+      setTimeout(() => {
+        btn.classList.remove('done');
+        btn.setAttribute('aria-label', label);
+      }, 2000);
+    });
+  });
+</script>
+
+<style>
+  .filefig {
+    margin: 0;
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+  }
+
+  /* The caption is the copy control's row rather than a bare label: this block
+     has a header where InstallBlock has none, so hanging the button in the
+     corner over the text would be borrowing a solution to a problem this one
+     does not have. Same button, seated instead of floated. */
+  figcaption {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 8px 6px 24px;
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+
+  /* Mirrors InstallBlock's copy button — same box, same states, two sizes down
+     to sit inside the caption instead of over the code. */
+  .copy {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+
+  .copy:hover {
+    color: var(--text);
+    background: var(--panel-hi);
+    border-color: var(--line-hi);
+  }
+
+  .copy .ic-done {
+    display: none;
+  }
+
+  .copy.done {
+    color: var(--copper);
+    border-color: var(--trace);
+  }
+
+  .copy.done .ic-copy {
+    display: none;
+  }
+
+  .copy.done .ic-done {
+    display: block;
+  }
+
+  /* :global inside .filefig, because the highlighted variant's <pre> is
+     rendered by astro:components' Code and carries no scope attribute. The
+     rules still bind to this component through the scoped .filefig root. */
+  .filefig :global(pre) {
+    margin: 0;
+    padding: 18px 24px;
+    /* the page's surface, never Shiki's: with defaultColor off the theme
+       backgrounds arrive only as unused custom properties */
+    background: none;
+    /* wraps instead of scrolling: unlike shell lines, nothing in a brief needs
+       to stay on one line, and this is what keeps the block compact on mobile */
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+
+  .filefig :global(code) {
+    display: block;
+    line-height: 1.8;
+    color: var(--text);
+  }
+
+  /* Each token span carries both palettes as custom properties; light-dark()
+     resolves against color-scheme, which is exactly what the theme toggle
+     sets, so highlighting follows the toggle like every other token. */
+  .filefig :global(pre span) {
+    color: light-dark(var(--shiki-light), var(--shiki-dark));
+  }
+
+  @media (max-width: 720px) {
+    figcaption {
+      padding: 5px 5px 5px 16px;
+    }
+
+    /* the tap target grows on touch, as it does in InstallBlock */
+    .copy {
+      width: 34px;
+      height: 34px;
+    }
+
+    .filefig :global(pre) {
+      padding: 14px 16px;
+    }
+  }
+</style>

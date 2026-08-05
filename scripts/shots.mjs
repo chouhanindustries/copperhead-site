@@ -15,9 +15,8 @@
 // Chrome, or $CHROME_PATH. Start the dev server first (astro dev --background).
 
 import { chromium } from 'playwright-core';
-import { existsSync, mkdirSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { homedir } from 'node:os';
 
 const BASE = process.env.URL ?? 'http://localhost:4321';
 const OUT = process.env.OUT ?? 'shots';
@@ -52,15 +51,13 @@ const VIEWPORTS = [
 
 function findChromium() {
   if (process.env.CHROME_PATH) return process.env.CHROME_PATH;
-  const pw = join(homedir(), '.cache/ms-playwright');
-  if (existsSync(pw)) {
-    for (const dir of readdirSync(pw).filter(d => d.startsWith('chromium-')).sort().reverse()) {
-      for (const sub of ['chrome-linux64/chrome', 'chrome-linux/chrome', 'chrome-mac/Chromium.app/Contents/MacOS/Chromium']) {
-        const p = join(pw, dir, sub);
-        if (existsSync(p)) return p;
-      }
-    }
-  }
+  // Playwright's own resolution respects PLAYWRIGHT_BROWSERS_PATH, XDG_CACHE_HOME
+  // and the platform cache locations; it reports where the browser would live
+  // whether or not it is installed, hence the existsSync.
+  try {
+    const p = chromium.executablePath();
+    if (p && existsSync(p)) return p;
+  } catch {}
   for (const p of [
     '/usr/bin/google-chrome-stable', '/usr/bin/google-chrome', '/usr/bin/chromium',
     '/usr/bin/chromium-browser', '/snap/bin/chromium',

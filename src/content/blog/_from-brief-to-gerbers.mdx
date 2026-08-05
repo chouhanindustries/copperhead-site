@@ -1,14 +1,18 @@
+import FileBlock from "../../components/FileBlock.astro";
+
 ## One file goes in
 
-```bash
-mkdir usb-c-breakout && cd usb-c-breakout
+<FileBlock
+  name="shell"
+  lang="sh"
+  code={`mkdir usb-c-breakout && cd usb-c-breakout
 
 # a sentence: copperhead writes it to brief.md for you
 copperhead create "a USB-C 5V power breakout, 3A, screw terminal and header, power LED"
 
 # or write brief.md yourself, in as much detail as you like, and point at it
-copperhead create --brief brief.md
-```
+copperhead create --brief brief.md`}
+/>
 
 Either way you end up with one real file on disk. The sentence form just writes
 `brief.md` for you before anything else happens. Two later things depend on that file
@@ -118,12 +122,13 @@ The second shows up as a hook on every edit. Touch a `.kicad_sch` and the last E
 result is discarded. Touch a `.kicad_pcb` and the last DRC result goes with it. When
 the model then tries to end the run, it gets this back:
 
-```text
-cannot finish yet:
+<FileBlock
+  name="output"
+  code={`cannot finish yet:
 - ERC has not passed since the last schematic edit (run run_erc)
 - open sync obligations:
-  - [drift] check_drift must run clean after KiCad edits
-```
+  - [drift] check_drift must run clean after KiCad edits`}
+/>
 
 That refusal arrives as an ordinary tool result, so the model reads it and goes back
 to work. It is not an error condition. It is the loop doing its job.
