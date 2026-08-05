@@ -1,39 +1,36 @@
 ---
-// The create pipeline figure: the portrait layout of the socials diagram
-// (source: diagrams/social-flow.html, `post` variant, rendered by
-// scripts/render-diagram.mjs into public/blog/). One PNG per theme; the pair
-// swaps on the OS preference and on the site's own toggle, which stamps
-// data-theme on the root. Portrait so the stage text stays near its designed
-// size inside the prose column instead of breaking out of it; each image
-// links to the full-size file.
+// The create pipeline figure: the same 4:3 diagram shared from the socials
+// (source: diagrams/social-flow.html, rendered by scripts/render-diagram.mjs
+// into public/blog/). One PNG per theme; the pair swaps on the OS preference
+// and on the site's own toggle, which stamps data-theme on the root.
+// It stays inside the prose column: the 4:3 card is designed at 1280 wide,
+// close enough to the column that the stage text survives the scale-down.
+// Each image links to the full-size file.
 ---
 
 <figure class="pipeline">
   <a class="light" href="/blog/create-pipeline-light.png" target="_blank">
     <img
       src="/blog/create-pipeline-light.png"
-      width="800"
-      height="1550"
+      width="1280"
+      height="960"
       loading="lazy"
-      alt="The copperhead create pipeline: brief.md in, eight gated stages from spec to dev plan along a snaking copper trace, a design package out."
+      alt="The copperhead create pipeline: brief.md in, eight gated stages from spec to dev plan along a copper trace, a design package out."
     />
   </a>
   <a class="dark" href="/blog/create-pipeline-dark.png" target="_blank">
     <img
       src="/blog/create-pipeline-dark.png"
-      width="800"
-      height="1550"
+      width="1280"
+      height="960"
       loading="lazy"
-      alt="The copperhead create pipeline: brief.md in, eight gated stages from spec to dev plan along a snaking copper trace, a design package out."
+      alt="The copperhead create pipeline: brief.md in, eight gated stages from spec to dev plan along a copper trace, a design package out."
     />
   </a>
 </figure>
 
 <style>
   .pipeline {
-    /* 680 against the 800px render: type lands at 0.85 of designed size,
-       comfortably legible, without the figure towering over the column */
-    max-width: 680px;
     margin: 2.4rem auto;
   }
 

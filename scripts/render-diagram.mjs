@@ -3,25 +3,25 @@
 //   node scripts/render-diagram.mjs                          diagrams/social-flow
 //   node scripts/render-diagram.mjs <page.html> <out-prefix>
 //
-// Writes <out-prefix>-light.png and <out-prefix>-dark.png at 1600x900. The
-// page declares its palette with light-dark(), so the theme is picked per
-// pass with emulated prefers-color-scheme rather than a second stylesheet.
+// Writes <out-prefix>-light.png and <out-prefix>-dark.png. The page declares
+// its palette with light-dark(), so the theme is picked per pass with
+// emulated prefers-color-scheme rather than a second stylesheet.
 //
-// social-flow.html carries three layouts selected by body class, and for that
-// page this script renders all of them:
-//   social (default) 1600x900  -> <out-prefix>-{theme}.png, the share render
-//   post              800x1550 -> public/blog/create-pipeline-{theme}.png,
-//                                 portrait so it stays legible in the post's
-//                                 prose column (StageFlow.astro)
-//   og               1200x630  -> public/blog/from-brief-to-gerbers-og.png,
-//                                 the link preview card, designed at native
-//                                 size instead of the whole diagram scaled
-//                                 down past legibility
+// Generic pages render at 1600x900. social-flow.html is a 4:3 card
+// (1280x960) and also carries an `og` layout selected by body class, so for
+// that page this script renders:
+//   social (default) 1280x960 -> <out-prefix>-{theme}.png, also copied to
+//                                public/blog/create-pipeline-{theme}.png for
+//                                the blog embed (StageFlow.astro)
+//   og               1200x630 -> public/blog/from-brief-to-gerbers-og.png,
+//                                the link preview card, designed at native
+//                                size instead of the whole diagram scaled
+//                                down past legibility
 //
 // Needs a Chromium, found the same way as shots.mjs.
 
 import { chromium } from 'playwright-core';
-import { existsSync } from 'node:fs';
+import { copyFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -72,15 +72,15 @@ async function shoot({ variant, width, height, theme, path }) {
 
 try {
   for (const theme of ['light', 'dark']) {
-    await shoot({ width: 1600, height: 900, theme, path: `${out}-${theme}.png` });
+    const size = isSocialFlow ? { width: 1280, height: 960 } : { width: 1600, height: 900 };
+    await shoot({ ...size, theme, path: `${out}-${theme}.png` });
 
-    // The blog embeds the portrait layout (StageFlow.astro), so the copies
-    // under public/ have to track the source or the post quietly goes stale.
+    // The blog embeds this diagram (StageFlow.astro), so the copies under
+    // public/ have to track the render or the post quietly goes stale.
     if (isSocialFlow) {
-      await shoot({
-        variant: 'post', width: 800, height: 1550, theme,
-        path: resolve(`public/blog/create-pipeline-${theme}.png`),
-      });
+      const site = resolve(`public/blog/create-pipeline-${theme}.png`);
+      copyFileSync(`${out}-${theme}.png`, site);
+      console.log(site);
     }
   }
 

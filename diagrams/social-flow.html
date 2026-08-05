@@ -58,19 +58,19 @@
       background: var(--bg);
     }
 
-    /* Three layouts share this page, selected by the body class, which
+    /* Two layouts share this page, selected by the body class, which
        scripts/render-diagram.mjs sets before each screenshot:
-         social (default)  1600x900   the render shared on socials
-         post               800x1550  portrait for the blog's 760px prose column
-         og                1200x630   the share card; big type, cards reduced
-                                      to labelled vias so the preview survives
-                                      being 500px wide in a feed
-       Positions are per-variant at the end of this sheet; everything above
-       them is shared. */
+         social (default) 1280x960  the card: pads and two rows of four
+                                    stages. 4:3 rather than 16:9 so it does
+                                    not arrive as a thin strip in the blog's
+                                    prose column.
+         og               1200x630  the link preview; big type, cards reduced
+                                    to labelled vias so the preview survives
+                                    being 500px wide in a feed */
     .canvas {
       position: relative;
-      width: 1600px;
-      height: 900px;
+      width: 1280px;
+      height: 960px;
       background: var(--bg);
       font-family: var(--sans);
       color: var(--text);
@@ -80,8 +80,8 @@
     /* ---------- header ---------- */
     .brand {
       position: absolute;
-      left: 64px;
-      top: 54px;
+      left: 44px;
+      top: 46px;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -101,8 +101,8 @@
 
     .cmd {
       position: absolute;
-      right: 64px;
-      top: 50px;
+      right: 44px;
+      top: 42px;
       font-family: var(--mono);
       font-size: 15px;
       color: var(--text);
@@ -117,18 +117,20 @@
 
     .title {
       position: absolute;
-      left: 64px;
-      top: 100px;
-      font-size: 39px;
+      left: 44px;
+      top: 94px;
+      font-size: 34px;
       font-weight: 600;
       letter-spacing: -0.5px;
     }
 
     .subtitle {
       position: absolute;
-      left: 64px;
-      top: 156px;
-      font-size: 17.5px;
+      left: 44px;
+      right: 44px;
+      top: 144px;
+      font-size: 16.5px;
+      line-height: 1.5;
       color: var(--text-dim);
       letter-spacing: 0.1px;
     }
@@ -146,7 +148,6 @@
     }
 
     .social .t-social,
-    .post .t-post,
     .og .t-og {
       display: block;
     }
@@ -182,12 +183,12 @@
     /* ---------- cards ---------- */
     .card {
       position: absolute;
-      width: 272px;
-      height: 190px;
+      width: 217px;
+      height: 205px;
       background: var(--panel);
       border: 1px solid var(--line-hi);
 
-      padding: 20px 20px 16px 22px;
+      padding: 20px 14px 16px 18px;
     }
 
     .card.hot {
@@ -212,19 +213,19 @@
       display: inline-block;
       margin-top: 11px;
       font-family: var(--mono);
-      font-size: 12.5px;
+      font-size: 11.5px;
       color: var(--text);
       background: var(--surface);
       border: 1px solid var(--line);
-      padding: 4px 9px;
+      padding: 4px 8px;
       white-space: nowrap;
     }
 
     .card .gate {
       position: absolute;
-      left: 22px;
-      right: 16px;
-      bottom: 15px;
+      left: 18px;
+      right: 12px;
+      bottom: 13px;
       border-top: 1px solid var(--line);
       padding-top: 10px;
       font-size: 13px;
@@ -244,11 +245,11 @@
     /* ---------- end pads ---------- */
     .pad {
       position: absolute;
-      width: 272px;
+      width: 217px;
       height: 120px;
       background: color-mix(in srgb, var(--copper) 8%, var(--bg));
       border: 1.5px solid var(--copper);
-      padding: 20px 20px 18px 22px;
+      padding: 18px 14px 16px 18px;
     }
 
     .pad .padname {
@@ -261,12 +262,12 @@
     .pad .padname.strong {
       font-family: var(--sans);
       font-weight: 700;
-      font-size: 20px;
+      font-size: 18px;
     }
 
     .pad .padsub {
       margin-top: 8px;
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 500;
       line-height: 1.4;
       color: var(--text);
@@ -289,13 +290,14 @@
     /* ---------- legend + footer ---------- */
     .legend {
       position: absolute;
-      left: 64px;
-      right: 64px;
-      top: 706px;
+      left: 44px;
+      right: 44px;
+      top: 790px;
       display: flex;
-      gap: 40px;
+      justify-content: space-between;
+      gap: 24px;
       align-items: center;
-      font-size: 14.5px;
+      font-size: 12.5px;
       color: var(--text-dim);
     }
 
@@ -317,9 +319,9 @@
 
     .footer {
       position: absolute;
-      left: 64px;
-      right: 64px;
-      top: 800px;
+      left: 44px;
+      right: 44px;
+      top: 866px;
       border-top: 1px solid var(--line);
       padding-top: 22px;
       display: flex;
@@ -338,42 +340,20 @@
       color: var(--text-dim);
     }
 
-    /* ---------- social: the original 16:9 card ---------- */
-    .social .c1 { left: 364px; top: 210px; }
-    .social .c2 { left: 664px; top: 210px; }
-    .social .c3 { left: 964px; top: 210px; }
-    .social .c4 { left: 1264px; top: 210px; }
-    .social .c5 { left: 64px; top: 480px; }
-    .social .c6 { left: 364px; top: 480px; }
-    .social .c7 { left: 664px; top: 480px; }
-    .social .c8 { left: 964px; top: 480px; }
-    .social .pad.in { left: 64px; top: 245px; }
-    .social .pad.out { left: 1264px; top: 515px; }
-
-    /* ---------- post: portrait, cards snaking down two columns ----------
-       800 wide against the blog's 760px prose column, so the type lands on
-       the page at nearly its designed size instead of the 0.48 scale the
-       social card came down to. Legend and footer stay off: the prose above
-       the figure is the legend, and the site does not need to cite itself. */
-    .post .canvas { width: 800px; height: 1550px; }
-    .post .brand { left: 56px; top: 44px; }
-    .post .cmd { right: 56px; top: 40px; }
-    .post .title { left: 56px; top: 98px; font-size: 32px; }
-    .post .subtitle { left: 56px; right: 56px; top: 148px; font-size: 16.5px; line-height: 1.5; }
-    .post .card { width: 300px; }
-    .post .pad { width: 300px; }
-    .post .c1 { left: 56px; top: 390px; }
-    .post .c2 { left: 444px; top: 390px; }
-    .post .c3 { left: 444px; top: 636px; }
-    .post .c4 { left: 56px; top: 636px; }
-    .post .c5 { left: 56px; top: 882px; }
-    .post .c6 { left: 444px; top: 882px; }
-    .post .c7 { left: 444px; top: 1128px; }
-    .post .c8 { left: 56px; top: 1128px; }
-    .post .pad.in { left: 56px; top: 230px; }
-    .post .pad.out { left: 56px; top: 1374px; }
-    .post .legend,
-    .post .footer { display: none; }
+    /* ---------- social: box positions ----------
+       Five 217px columns at x = 44 / 287 / 530 / 773 / 1016, rows at
+       y = 240 and 530, wires along each row's middle (342 / 632), pads
+       centred on the wires. */
+    .social .c1 { left: 287px; top: 240px; }
+    .social .c2 { left: 530px; top: 240px; }
+    .social .c3 { left: 773px; top: 240px; }
+    .social .c4 { left: 1016px; top: 240px; }
+    .social .c5 { left: 44px; top: 530px; }
+    .social .c6 { left: 287px; top: 530px; }
+    .social .c7 { left: 530px; top: 530px; }
+    .social .c8 { left: 773px; top: 530px; }
+    .social .pad.in { left: 44px; top: 282px; }
+    .social .pad.out { left: 1016px; top: 572px; }
 
     /* ---------- og: the link-preview card ----------
        Feeds show this around 500px wide, so the eight cards collapse to
@@ -383,13 +363,15 @@
     .og .brand { left: 48px; top: 44px; }
     .og .cmd { right: 48px; top: 44px; }
     .og .title { left: 48px; top: 122px; font-size: 54px; letter-spacing: -1px; }
-    .og .subtitle { left: 48px; right: 48px; top: 202px; font-size: 23px; line-height: 1.5; }
+    .og .subtitle { left: 48px; right: 48px; top: 202px; font-size: 23px; }
     .og .card,
     .og .legend { display: none; }
     .og .pad.in { left: 48px; top: 360px; width: 240px; }
     .og .pad.out { left: 892px; top: 360px; width: 260px; }
+    .og .pad { padding: 20px 20px 18px 22px; }
     .og .padname { font-size: 20px; }
     .og .padname.strong { font-size: 22px; }
+    .og .padsub { font-size: 14px; }
     .og .footer { left: 48px; right: 48px; top: 548px; }
   </style>
 </head>
@@ -412,83 +394,41 @@
       and it commits <b>only when its gate finds real work on disk</b>.</div>
 
     <!-- copper trace, drawn behind the cards: two rows with a return trace -->
-    <svg class="trace t-social" width="1600" height="900" viewBox="0 0 1600 900">
-      <!-- row 1, left to right along y=305 -->
-      <path class="wire" d="M336 305 H364" />
-      <path class="wire" d="M636 305 H664" />
-      <path class="wire" d="M936 305 H964" />
-      <path class="wire" d="M1236 305 H1264" />
+    <svg class="trace t-social" width="1280" height="960" viewBox="0 0 1280 960">
+      <!-- row 1, left to right along y=342 -->
+      <path class="wire" d="M261 342 H287" />
+      <path class="wire" d="M504 342 H530" />
+      <path class="wire" d="M747 342 H773" />
+      <path class="wire" d="M990 342 H1016" />
       <!-- return trace: down the right edge, back across between the rows, down the left edge -->
-      <path class="wire" d="M1536 305 H1552 L1568 321 V424 L1552 440 H48 L32 456 V559 L48 575 H64" />
-      <!-- row 2, left to right along y=575 -->
-      <path class="wire" d="M336 575 H364" />
-      <path class="wire" d="M636 575 H664" />
-      <path class="wire" d="M936 575 H964" />
-      <path class="wire" d="M1236 575 H1264" />
+      <path class="wire" d="M1233 342 H1246 L1260 356 V473 L1246 487 H40 L26 501 V618 L40 632 H44" />
+      <!-- row 2, left to right along y=632 -->
+      <path class="wire" d="M261 632 H287" />
+      <path class="wire" d="M504 632 H530" />
+      <path class="wire" d="M747 632 H773" />
+      <path class="wire" d="M990 632 H1016" />
 
       <!-- vias: one per gate crossing -->
       <g>
-        <circle class="via-ring" cx="650" cy="305" r="6" />
-        <circle class="via-hole" cx="650" cy="305" r="2" />
-        <circle class="via-ring" cx="950" cy="305" r="6" />
-        <circle class="via-hole" cx="950" cy="305" r="2" />
-        <circle class="via-ring" cx="1250" cy="305" r="6" />
-        <circle class="via-hole" cx="1250" cy="305" r="2" />
-        <circle class="via-ring" cx="350" cy="575" r="6" />
-        <circle class="via-hole" cx="350" cy="575" r="2" />
-        <circle class="via-ring" cx="650" cy="575" r="6" />
-        <circle class="via-hole" cx="650" cy="575" r="2" />
-        <circle class="via-ring" cx="950" cy="575" r="6" />
-        <circle class="via-hole" cx="950" cy="575" r="2" />
+        <circle class="via-ring" cx="517" cy="342" r="6" />
+        <circle class="via-hole" cx="517" cy="342" r="2" />
+        <circle class="via-ring" cx="760" cy="342" r="6" />
+        <circle class="via-hole" cx="760" cy="342" r="2" />
+        <circle class="via-ring" cx="1003" cy="342" r="6" />
+        <circle class="via-hole" cx="1003" cy="342" r="2" />
+        <circle class="via-ring" cx="274" cy="632" r="6" />
+        <circle class="via-hole" cx="274" cy="632" r="2" />
+        <circle class="via-ring" cx="517" cy="632" r="6" />
+        <circle class="via-hole" cx="517" cy="632" r="2" />
+        <circle class="via-ring" cx="760" cy="632" r="6" />
+        <circle class="via-hole" cx="760" cy="632" r="2" />
       </g>
 
       <!-- direction arrows: in, around the return, out -->
-      <path class="head" d="M364 305 l-11 -6 v12 z" />
-      <path class="head" d="M760 440 l11 -6 v12 z" />
-      <path class="head" d="M64 575 l-11 -6 v12 z" />
-      <path class="head" d="M1264 575 l-11 -6 v12 z" />
-    </svg>
-
-    <!-- post trace: the same run snaking down the two columns. Left column
-         centre x=206, right x=594; row middles y=485/731/977/1223. A via on
-         each of the seven hops between cards. -->
-    <svg class="trace t-post" width="800" height="1550" viewBox="0 0 800 1550">
-      <path class="wire" d="M206 350 V390" />
-      <path class="wire" d="M356 485 H444" />
-      <path class="wire" d="M594 580 V636" />
-      <path class="wire" d="M444 731 H356" />
-      <path class="wire" d="M206 826 V882" />
-      <path class="wire" d="M356 977 H444" />
-      <path class="wire" d="M594 1072 V1128" />
-      <path class="wire" d="M444 1223 H356" />
-      <path class="wire" d="M206 1318 V1374" />
-
-      <g>
-        <circle class="via-ring" cx="400" cy="485" r="6" />
-        <circle class="via-hole" cx="400" cy="485" r="2" />
-        <circle class="via-ring" cx="594" cy="608" r="6" />
-        <circle class="via-hole" cx="594" cy="608" r="2" />
-        <circle class="via-ring" cx="400" cy="731" r="6" />
-        <circle class="via-hole" cx="400" cy="731" r="2" />
-        <circle class="via-ring" cx="206" cy="854" r="6" />
-        <circle class="via-hole" cx="206" cy="854" r="2" />
-        <circle class="via-ring" cx="400" cy="977" r="6" />
-        <circle class="via-hole" cx="400" cy="977" r="2" />
-        <circle class="via-ring" cx="594" cy="1100" r="6" />
-        <circle class="via-hole" cx="594" cy="1100" r="2" />
-        <circle class="via-ring" cx="400" cy="1223" r="6" />
-        <circle class="via-hole" cx="400" cy="1223" r="2" />
-      </g>
-
-      <path class="head" d="M206 390 l-6 -11 h12 z" />
-      <path class="head" d="M444 485 l-11 -6 v12 z" />
-      <path class="head" d="M594 636 l-6 -11 h12 z" />
-      <path class="head" d="M356 731 l11 -6 v12 z" />
-      <path class="head" d="M206 882 l-6 -11 h12 z" />
-      <path class="head" d="M444 977 l-11 -6 v12 z" />
-      <path class="head" d="M594 1128 l-6 -11 h12 z" />
-      <path class="head" d="M356 1223 l11 -6 v12 z" />
-      <path class="head" d="M206 1374 l-6 -11 h12 z" />
+      <path class="head" d="M287 342 l-11 -6 v12 z" />
+      <path class="head" d="M640 487 l11 -6 v12 z" />
+      <path class="head" d="M44 632 l-11 -6 v12 z" />
+      <path class="head" d="M1016 632 l-11 -6 v12 z" />
     </svg>
 
     <!-- og trace: one run from pad to pad, the eight stages as labelled vias
@@ -533,7 +473,7 @@
       <div class="padsub">what you want, written in your own words</div>
     </div>
 
-    <!-- the eight stages, positioned per variant -->
+    <!-- row 1 -->
     <div class="card c1">
       <div class="num">01</div>
       <div class="name">spec</div>
@@ -558,6 +498,8 @@
       <span class="artifact">design.kicad_sch</span>
       <div class="gate"><span class="g">gate</span>symbols placed, docs agree, ERC clean</div>
     </div>
+
+    <!-- row 2, left to right -->
     <div class="card hot c5">
       <div class="num">05</div>
       <div class="name">layout</div>
