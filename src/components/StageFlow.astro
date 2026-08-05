@@ -1,0 +1,67 @@
+---
+// The create pipeline figure: the same 4:3 diagram shared from the socials
+// (source: diagrams/social-flow.html, rendered by scripts/render-diagram.mjs
+// into public/blog/). One PNG per theme; the pair swaps on the OS preference
+// and on the site's own toggle, which stamps data-theme on the root.
+// It stays inside the prose column: the 4:3 card is designed at 1280 wide,
+// close enough to the column that the stage text survives the scale-down.
+// Each image links to the full-size file.
+---
+
+<figure class="pipeline">
+  <a class="light" href="/blog/create-pipeline-light.png" target="_blank">
+    <img
+      src="/blog/create-pipeline-light.png"
+      width="1280"
+      height="960"
+      loading="lazy"
+      alt="The copperhead create pipeline: brief.md in, eight gated stages from spec to dev plan along a copper trace, a design package out."
+    />
+  </a>
+  <a class="dark" href="/blog/create-pipeline-dark.png" target="_blank">
+    <img
+      src="/blog/create-pipeline-dark.png"
+      width="1280"
+      height="960"
+      loading="lazy"
+      alt="The copperhead create pipeline: brief.md in, eight gated stages from spec to dev plan along a copper trace, a design package out."
+    />
+  </a>
+</figure>
+
+<style>
+  .pipeline {
+    margin: 2.4rem auto;
+  }
+
+  .pipeline img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+  }
+
+  /* theme pairing: the dark render on the dark page, in both the OS-preference
+     and explicit-toggle paths */
+  .dark {
+    display: none;
+  }
+
+  :global(:root[data-theme='dark']) .light {
+    display: none;
+  }
+
+  :global(:root[data-theme='dark']) .dark {
+    display: block;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .light {
+      display: none;
+    }
+
+    :global(:root:not([data-theme='light'])) .dark {
+      display: block;
+    }
+  }
+</style>

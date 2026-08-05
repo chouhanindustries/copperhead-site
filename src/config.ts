@@ -47,3 +47,19 @@ export const quickstart = [
   'export ANTHROPIC_API_KEY=<api-key>',
   'copperhead create --brief brief.md',
 ];
+
+/**
+ * The brief.md the quickstart points at, shown beside it (CtaEnd) and in the
+ * Antler write-up. Content grounded in the Open Telegraph brief
+ * (usecase-copperhead.md): ESP32-S3, BLE HID, the 25 µA sleep budget, the
+ * 3.5 mm key jack. One string, so the renderings and their copy buttons
+ * cannot drift.
+ */
+export const morseBrief = `# Pocket Morse key
+
+A pocket-size Morse key that types over Bluetooth as a standard keyboard.
+
+- ESP32-S3, BLE HID
+- Li-Po cell, USB-C charging
+- Sleep current budget: 25 µA
+- 3.5 mm jack for an external paddle`;

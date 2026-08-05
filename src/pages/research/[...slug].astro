@@ -4,27 +4,30 @@ import Base from '../../layouts/Base.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
 import { site, links } from '../../config';
-import { postPath, formatDate } from '../../blog';
+import { formatDate } from '../../blog';
+import { articlePath } from '../../research';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+  const articles = await getCollection('research');
+  return articles.map((a) => ({ params: { slug: a.id }, props: { article: a } }));
 }
 
 interface Props {
-  post: CollectionEntry<'blog'>;
+  article: CollectionEntry<'research'>;
 }
 
-const { post } = Astro.props;
-const { Content } = await render(post);
-const path = postPath(post.id);
+const { article } = Astro.props;
+const { Content } = await render(article);
+const path = articlePath(article.id);
 
+// TechArticle rather than BlogPosting: these are method and measurement write-ups
+// bound to a repository, and the distinction is worth stating to a crawler.
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'BlogPosting',
-  headline: post.data.title,
-  description: post.data.description,
-  datePublished: post.data.date.toISOString(),
+  '@type': 'TechArticle',
+  headline: article.data.title,
+  description: article.data.description,
+  datePublished: article.data.date.toISOString(),
   url: new URL(path, site).href,
   mainEntityOfPage: new URL(path, site).href,
   author: { '@type': 'Organization', name: 'Chouhan Industries', url: links.chouhan },
@@ -33,13 +36,11 @@ const jsonLd = {
 ---
 
 <Base
-  title={`copperhead: ${post.data.title}`}
-  description={post.data.description}
+  title={`copperhead research: ${article.data.title}`}
+  description={article.data.description}
   path={path}
   ogType="article"
-  ogImage={post.data.ogImage}
-  ogImageAlt={post.data.ogImageAlt}
-  publishedTime={post.data.date.toISOString()}
+  publishedTime={article.data.date.toISOString()}
   jsonLd={jsonLd}
 >
   <Navbar home={false} />
@@ -48,13 +49,19 @@ const jsonLd = {
       <div class="wrap">
         <header>
           <div class="meta">
-            <span class="kind">{post.data.kind}</span>
-            <time datetime={post.data.date.toISOString()}>
-              {formatDate(post.data.date)}
+            <span class="kind">{article.data.kind}</span>
+            <time datetime={article.data.date.toISOString()}>
+              {formatDate(article.data.date)}
             </time>
           </div>
-          <h1>{post.data.title}</h1>
-          <p class="standfirst">{post.data.description}</p>
+          <h1>{article.data.title}</h1>
+          <p class="standfirst">{article.data.description}</p>
+          {
+            /* The status line sits above the rule rather than in the body, so a
+               reader who never scrolls still knows whether this article reports
+               measurements or only describes how they will be taken. */
+            article.data.status && <p class="status">{article.data.status}</p>
+          }
         </header>
 
         <div class="prose">
@@ -62,7 +69,7 @@ const jsonLd = {
         </div>
 
         <footer class="end">
-          <a href="/blog/">All posts</a>
+          <a href="/research/">All research</a>
           <a href={links.repo}>View on GitHub</a>
         </footer>
       </div>
@@ -76,8 +83,8 @@ const jsonLd = {
     padding-block: 179px var(--pad-y);
   }
 
-  /* Measure is set on the column, not on each element, so code blocks and the
-     output table line up with the paragraphs instead of running wide. */
+  /* Measure is set on the column, not on each element, so code blocks and tables
+     line up with the paragraphs instead of running wide. */
   .wrap {
     max-width: 760px;
   }
@@ -109,6 +116,18 @@ const jsonLd = {
     max-width: 58ch;
   }
 
+  .status {
+    margin: 1.5rem 0 0;
+    padding: 0.7rem 0.9rem;
+    border-left: 2px solid var(--copper);
+    background: var(--surface);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--text-dim);
+    max-width: 58ch;
+  }
+
   .prose {
     margin-top: 3.5rem;
     border-top: 1px solid var(--hairline);
@@ -119,7 +138,7 @@ const jsonLd = {
     margin: 0 0 1.4rem;
   }
 
-  /* A paragraph that is one italic run is this blog's caption convention:
+  /* A paragraph that is one italic run is this site's caption convention:
      set it like a figcaption, snug under the figure it annotates. */
   .prose :global(p:has(> em:only-child)) {
     margin: 0 0 2.4rem;
@@ -165,13 +184,6 @@ const jsonLd = {
   .prose :global(.filefig),
   .prose :global(.terminal) {
     margin: 0 0 1.4rem;
-  }
-
-  /* The terminal window (TerminalDemo.astro) asserts margin: 0 auto for its
-     hero placement; in the prose it needs the rhythm's bottom margin so a
-     caption under it gets the same gap as one under an image. */
-  .prose :global(figure.term) {
-    margin-bottom: 1.4rem;
   }
 
   /* Terminal block, on the quickstart's exact metrics (InstallBlock.astro):
@@ -245,13 +257,15 @@ const jsonLd = {
     vertical-align: top;
   }
 
-  .prose :global(td:first-child) {
-    color: var(--text);
-    white-space: nowrap;
-  }
-
-  .prose :global(td:last-child) {
-    color: var(--text-dim);
+  .end {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 0.8rem;
   }
 
   /* Big screens. 760px at 17px is already around 80 characters a line, so
@@ -269,37 +283,8 @@ const jsonLd = {
     }
   }
 
-  /* Tables can still exceed the measure on a phone; let this one scroll rather
-     than forcing the page body sideways. The first column also gives up its
-     nowrap, which keeps most tables from needing to scroll at all. */
-  @media (max-width: 720px) {
-    .prose :global(table) {
-      display: block;
-      overflow-x: auto;
-      font-size: 0.9rem;
-    }
-
-    .prose :global(td:first-child) {
-      white-space: normal;
-    }
-
-    .prose :global(td) {
-      padding-right: 0.85rem;
-      min-width: 7.5rem;
-    }
-  }
-
-  .end {
-    margin-top: 4rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--hairline);
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-    font-family: var(--mono);
-    font-size: 0.8rem;
-  }
-
+  /* Tables can exceed the measure on a phone; let the table scroll rather than
+     pushing the page body sideways. */
   @media (max-width: 720px) {
     article {
       padding-block: 139px var(--pad-y);
@@ -312,6 +297,17 @@ const jsonLd = {
 
     .standfirst {
       font-size: 1.05rem;
+    }
+
+    .prose :global(table) {
+      display: block;
+      overflow-x: auto;
+      font-size: 0.9rem;
+    }
+
+    .prose :global(td) {
+      padding-right: 0.85rem;
+      min-width: 7.5rem;
     }
   }
 </style>

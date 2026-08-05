@@ -1,0 +1,207 @@
+---
+title: "From brief.md to gerbers"
+description: "One command turns a markdown brief into gerbers, firmware and docs. A walk through the eight stages and what each one has to prove before the next starts."
+date: 2026-08-05
+kind: "Engineering"
+ogImage: "/blog/from-brief-to-gerbers-og.png"
+ogImageAlt: "The copperhead create pipeline: brief.md in, eight gated stages from spec to dev plan along a copper trace, a design package out."
+# About the TerminalDemo below (kept here as YAML comments: a JSX comment in
+# the body keeps getting its asterisks escaped by the formatter, which breaks
+# the MDX compile).
+#
+# The same window the hero plays, with the create pipeline's transcript in it
+# instead of a single `do` run. Format is taken from the source rather than
+# from a screenshot: `stage <name>: <detail>` is stageLine() in agent/theme.ts,
+# the `done · ...` lines are outcomeLine() in agent/loop.ts, the stage names
+# and their order are STAGES in commands/create.ts, and the closing line is
+# what the pipeline prints once `copperhead check` comes back green.
+#
+# The numbers are the real ones from the run that built this board: the wall
+# clocks, out-token counts and commit shas of stages 1-6 are read off that
+# run's logs. It stopped during stage 7, so the firmware and dev plan lines
+# carry plausible figures rather than measured ones, which is the same
+# standing the hero's canned outcome line has. Eight `done` lines at ~0.4s
+# apart is also a compression: the run they are taken from took 47 minutes.
+---
+
+import FileBlock from "../../components/FileBlock.astro";
+import TerminalDemo from "../../components/TerminalDemo.astro";
+import StageFlow from "../../components/StageFlow.astro";
+import { Content as Body } from "./_from-brief-to-gerbers.mdx";
+
+export const brief = `# USB-C 5V power breakout
+
+A pass-through: USB-C in, protected 5V out. No regulation, no MCU.
+
+- 5V from VBUS, rated 3A continuous. No PD negotiation.
+- Out: 2-pin 3.5mm screw terminal and a 2x2 0.1" header.
+- Power-good LED, under 1mA. Short-circuit protection.
+- 30 x 20mm, two M3 holes, hand-solderable (0603 minimum).`;
+
+<TerminalDemo
+  command="copperhead create --brief brief.md"
+  cwd="~/usb-c-breakout"
+  runStart={1.7}
+  endAt={13.1}
+  label="A copperhead create pipeline run: eight stages from a brief to a design package, each one committing only after its gate passes."
+  fitViewport={false}
+  ticks={[
+    "0m",
+    "5m",
+    "10m",
+    "15m",
+    "20m",
+    "25m",
+    "30m",
+    "35m",
+    "40m",
+    "45m",
+    "46m",
+  ]}
+  outcome={{ head: "create pipeline complete; all checks green", rest: "" }}
+  feed={[
+    {
+      at: 3.2,
+      kind: "done",
+      name: "spec-seed",
+      text: " · committed d3cf2a0 · 4m24s · 12.8k out",
+    },
+    {
+      at: 4.4,
+      kind: "done",
+      name: "architecture",
+      text: " · committed ef4cd50 · 1m01s · 3.3k out",
+    },
+    {
+      at: 5.6,
+      kind: "done",
+      name: "part-selection",
+      text: " · committed a572cf6 · 1m48s · 6.4k out",
+    },
+    {
+      at: 6.4,
+      kind: "stage",
+      name: "schematic",
+      text: "scaffolded empty KiCad project, wired into config",
+    },
+    {
+      at: 7.6,
+      kind: "done",
+      name: "schematic",
+      text: " · ERC clean · committed 3f05d1c · 11m40s · 28.9k out",
+    },
+    {
+      at: 9.0,
+      kind: "done",
+      name: "layout-draft",
+      text: " · ERC clean · DRC clean · committed 0152ea1 · 23m47s · 15.4k out",
+    },
+    {
+      at: 10.2,
+      kind: "done",
+      name: "outputs",
+      text: " · committed 384bddf · 48s · 2.6k out",
+    },
+    {
+      at: 11.3,
+      kind: "done",
+      name: "firmware",
+      text: " · committed 9a2f1c4 · 1m12s · 3.1k out",
+    },
+    {
+      at: 12.4,
+      kind: "done",
+      name: "devplan",
+      text: " · committed b71e08d · 2m05s · 7.8k out",
+    },
+    {
+      at: 12.7,
+      kind: "done",
+      head: "",
+      text: "pipeline so far: 8/8 stages · 46m45s · 80.3k out tokens · 41% cache hits",
+    },
+  ]}
+  turns={[
+    {
+      from: 1.7,
+      to: 3.6,
+      turn: 12,
+      tin: "32",
+      tout: "12.8k",
+      busy: "writing docs/SPEC.md",
+    },
+    {
+      from: 3.6,
+      to: 4.8,
+      turn: 5,
+      tin: "8",
+      tout: "3.3k",
+      busy: "writing docs/SUBSYSTEMS.md",
+    },
+    {
+      from: 4.8,
+      to: 6.4,
+      turn: 9,
+      tin: "10",
+      tout: "6.4k",
+      busy: "choosing parts against the power budget",
+    },
+    {
+      from: 6.4,
+      to: 8.0,
+      turn: 31,
+      tin: "46",
+      tout: "28.9k",
+      busy: "placing symbols, one part at a time",
+    },
+    {
+      from: 8.0,
+      to: 9.4,
+      turn: 22,
+      tin: "14",
+      tout: "15.4k",
+      busy: "routing VBUS and GND",
+    },
+    {
+      from: 9.4,
+      to: 10.6,
+      turn: 7,
+      tin: "6",
+      tout: "2.6k",
+      busy: "exporting gerbers, drill, STEP",
+    },
+    {
+      from: 10.6,
+      to: 11.7,
+      turn: 6,
+      tin: "8",
+      tout: "3.1k",
+      busy: "scaffolding firmware/",
+    },
+    {
+      from: 11.7,
+      to: 13.1,
+      turn: 8,
+      tin: "11",
+      tout: "7.8k",
+      busy: "writing the bring-up plan",
+    },
+  ]}
+/>
+
+_Eight stages, eight commits, one command._
+
+You point copperhead at a markdown file and it hands back a design package. That is a
+large claim for one command, and the schematic capture is the smallest part of it.
+What carries it is the bookkeeping: what each stage has to prove before the next one
+is allowed to start and what happens to the work when it cannot prove it.
+
+The run's entire input prompt:
+
+<FileBlock name="brief.md" code={brief} lang="md" />
+
+<StageFlow />
+
+_The shape of the run: one file in, eight gates, a design package out_
+
+<Body />

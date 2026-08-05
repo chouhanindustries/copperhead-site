@@ -1,0 +1,568 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <style>
+    @font-face {
+      font-family: 'Space Grotesk';
+      src: url('../public/fonts/space-grotesk-var.woff2') format('woff2-variations');
+      font-weight: 300 700;
+    }
+
+    @font-face {
+      font-family: 'JetBrains Mono';
+      src: url('../public/fonts/jetbrains-mono-400.woff2') format('woff2');
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: 'JetBrains Mono';
+      src: url('../public/fonts/jetbrains-mono-700.woff2') format('woff2');
+      font-weight: 700;
+    }
+
+    /* the 700 file above is subset to the glyphs of "copperhead" only; this alias
+     spans the whole weight range so any other bold mono synthesizes from the 400
+     face instead of falling to a system font glyph by glyph */
+    @font-face {
+      font-family: 'JBM';
+      src: url('../public/fonts/jetbrains-mono-400.woff2') format('woff2');
+      font-weight: 400 700;
+    }
+
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#FFFFFF, #09090B);
+      --panel: light-dark(#FAFAFA, #111114);
+      --surface: light-dark(#F1F1F3, #131317);
+      --line: light-dark(#E5E5E8, #26262C);
+      --line-hi: light-dark(#D6D6DB, #3A3A43);
+      --copper: light-dark(#A75F14, #D08F39);
+      --copper-hi: light-dark(#8F5210, #E5A855);
+      --on-copper: light-dark(#FFFFFF, #17120C);
+      --text: light-dark(#0A0A0A, #EDEDEF);
+      --text-dim: light-dark(#57575E, #9B9BA5);
+      --sans: 'Space Grotesk', -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      background: var(--bg);
+    }
+
+    /* Two layouts share this page, selected by the body class, which
+       scripts/render-diagram.mjs sets before each screenshot:
+         social (default) 1280x960  the card: pads and two rows of four
+                                    stages. 4:3 rather than 16:9 so it does
+                                    not arrive as a thin strip in the blog's
+                                    prose column.
+         og               1200x630  the link preview; big type, cards reduced
+                                    to labelled vias so the preview survives
+                                    being 500px wide in a feed */
+    .canvas {
+      position: relative;
+      width: 1280px;
+      height: 960px;
+      background: var(--bg);
+      font-family: var(--sans);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* ---------- header ---------- */
+    .brand {
+      position: absolute;
+      left: 44px;
+      top: 46px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand svg {
+      display: block;
+    }
+
+    .brand .word {
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 0.5px;
+      color: var(--text);
+    }
+
+    .cmd {
+      position: absolute;
+      right: 44px;
+      top: 42px;
+      font-family: var(--mono);
+      font-size: 15px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--line-hi);
+      padding: 8px 16px;
+    }
+
+    .cmd .prompt {
+      color: var(--copper);
+    }
+
+    .title {
+      position: absolute;
+      left: 44px;
+      top: 94px;
+      font-size: 34px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      position: absolute;
+      left: 44px;
+      right: 44px;
+      top: 144px;
+      font-size: 16.5px;
+      line-height: 1.5;
+      color: var(--text-dim);
+      letter-spacing: 0.1px;
+    }
+
+    .subtitle b {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* ---------- trace layer ---------- */
+    svg.trace {
+      position: absolute;
+      inset: 0;
+      display: none;
+    }
+
+    .social .t-social,
+    .og .t-og {
+      display: block;
+    }
+
+    svg.trace .wire {
+      stroke: var(--copper);
+      stroke-width: 2.5;
+      fill: none;
+    }
+
+    svg.trace .via-ring {
+      fill: var(--bg);
+      stroke: var(--copper);
+      stroke-width: 2;
+    }
+
+    svg.trace .via-hole {
+      fill: var(--copper);
+    }
+
+    svg.trace .head {
+      fill: var(--copper);
+      stroke: none;
+    }
+
+    svg.trace text {
+      font-family: var(--mono);
+      font-size: 15px;
+      fill: var(--text);
+      text-anchor: middle;
+    }
+
+    /* ---------- cards ---------- */
+    .card {
+      position: absolute;
+      width: 217px;
+      height: 205px;
+      background: var(--panel);
+      border: 1px solid var(--line-hi);
+
+      padding: 20px 14px 16px 18px;
+    }
+
+    .card.hot {
+      border: 1.5px solid var(--copper);
+    }
+
+    .card .num {
+      font-family: var(--mono);
+      font-size: 13px;
+      letter-spacing: 2px;
+      color: var(--copper);
+    }
+
+    .card .name {
+      margin-top: 7px;
+      font-size: 22.5px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+    }
+
+    .card .artifact {
+      display: inline-block;
+      margin-top: 11px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: 4px 8px;
+      white-space: nowrap;
+    }
+
+    .card .gate {
+      position: absolute;
+      left: 18px;
+      right: 12px;
+      bottom: 13px;
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      font-size: 13px;
+      line-height: 1.35;
+      color: var(--text-dim);
+    }
+
+    .card .gate .g {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 1.5px;
+      color: var(--copper);
+      text-transform: uppercase;
+      margin-right: 6px;
+    }
+
+    /* ---------- end pads ---------- */
+    .pad {
+      position: absolute;
+      width: 217px;
+      height: 120px;
+      background: color-mix(in srgb, var(--copper) 8%, var(--bg));
+      border: 1.5px solid var(--copper);
+      padding: 18px 14px 16px 18px;
+    }
+
+    .pad .padname {
+      font-family: 'JBM', var(--mono);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .pad .padname.strong {
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .pad .padsub {
+      margin-top: 8px;
+      font-size: 13.5px;
+      font-weight: 500;
+      line-height: 1.4;
+      color: var(--text);
+    }
+
+    .pad .tag {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      font-family: 'JBM', var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--on-copper);
+      background: var(--copper);
+      padding: 3px 9px;
+    }
+
+    /* ---------- legend + footer ---------- */
+    .legend {
+      position: absolute;
+      left: 44px;
+      right: 44px;
+      top: 790px;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: center;
+      font-size: 12.5px;
+      color: var(--text-dim);
+    }
+
+    .legend .item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .legend svg {
+      display: block;
+      flex: none;
+    }
+
+    .legend b {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .footer {
+      position: absolute;
+      left: 44px;
+      right: 44px;
+      top: 866px;
+      border-top: 1px solid var(--line);
+      padding-top: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer .site {
+      font-family: var(--mono);
+      font-size: 15px;
+      color: var(--copper);
+    }
+
+    .footer .note {
+      font-size: 14.5px;
+      color: var(--text-dim);
+    }
+
+    /* ---------- social: box positions ----------
+       Five 217px columns at x = 44 / 287 / 530 / 773 / 1016, rows at
+       y = 240 and 530, wires along each row's middle (342 / 632), pads
+       centred on the wires. */
+    .social .c1 { left: 287px; top: 240px; }
+    .social .c2 { left: 530px; top: 240px; }
+    .social .c3 { left: 773px; top: 240px; }
+    .social .c4 { left: 1016px; top: 240px; }
+    .social .c5 { left: 44px; top: 530px; }
+    .social .c6 { left: 287px; top: 530px; }
+    .social .c7 { left: 530px; top: 530px; }
+    .social .c8 { left: 773px; top: 530px; }
+    .social .pad.in { left: 44px; top: 282px; }
+    .social .pad.out { left: 1016px; top: 572px; }
+
+    /* ---------- og: the link-preview card ----------
+       Feeds show this around 500px wide, so the eight cards collapse to
+       labelled vias on one trace and the title carries the card. Everything
+       here has to read at 0.4 scale. */
+    .og .canvas { width: 1200px; height: 630px; }
+    .og .brand { left: 48px; top: 44px; }
+    .og .cmd { right: 48px; top: 44px; }
+    .og .title { left: 48px; top: 122px; font-size: 54px; letter-spacing: -1px; }
+    .og .subtitle { left: 48px; right: 48px; top: 202px; font-size: 23px; }
+    .og .card,
+    .og .legend { display: none; }
+    .og .pad.in { left: 48px; top: 360px; width: 240px; }
+    .og .pad.out { left: 892px; top: 360px; width: 260px; }
+    .og .pad { padding: 20px 20px 18px 22px; }
+    .og .padname { font-size: 20px; }
+    .og .padname.strong { font-size: 22px; }
+    .og .padsub { font-size: 14px; }
+    .og .footer { left: 48px; right: 48px; top: 548px; }
+  </style>
+</head>
+
+<body class="social">
+  <div class="canvas">
+
+    <!-- header -->
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 32 32">
+        <rect width="32" height="32" fill="#15181c" />
+        <circle cx="16" cy="16" r="5.25" fill="none" stroke="#b87333" stroke-width="2.25" />
+        <path d="M16 5.75v5M16 21.25v5M5.75 16h5M21.25 16h5" stroke="#b87333" stroke-width="2.25" />
+      </svg>
+      <span class="word">copperhead</span>
+    </div>
+    <div class="cmd"><span class="prompt">$</span> copperhead create</div>
+    <div class="title">From a brief to a design package</div>
+    <div class="subtitle">Eight gated stages, eight commits, one command. Each stage is its own agent run
+      and it commits <b>only when its gate finds real work on disk</b>.</div>
+
+    <!-- copper trace, drawn behind the cards: two rows with a return trace -->
+    <svg class="trace t-social" width="1280" height="960" viewBox="0 0 1280 960">
+      <!-- row 1, left to right along y=342 -->
+      <path class="wire" d="M261 342 H287" />
+      <path class="wire" d="M504 342 H530" />
+      <path class="wire" d="M747 342 H773" />
+      <path class="wire" d="M990 342 H1016" />
+      <!-- return trace: down the right edge, back across between the rows, down the left edge -->
+      <path class="wire" d="M1233 342 H1246 L1260 356 V473 L1246 487 H40 L26 501 V618 L40 632 H44" />
+      <!-- row 2, left to right along y=632 -->
+      <path class="wire" d="M261 632 H287" />
+      <path class="wire" d="M504 632 H530" />
+      <path class="wire" d="M747 632 H773" />
+      <path class="wire" d="M990 632 H1016" />
+
+      <!-- vias: one per gate crossing -->
+      <g>
+        <circle class="via-ring" cx="517" cy="342" r="6" />
+        <circle class="via-hole" cx="517" cy="342" r="2" />
+        <circle class="via-ring" cx="760" cy="342" r="6" />
+        <circle class="via-hole" cx="760" cy="342" r="2" />
+        <circle class="via-ring" cx="1003" cy="342" r="6" />
+        <circle class="via-hole" cx="1003" cy="342" r="2" />
+        <circle class="via-ring" cx="274" cy="632" r="6" />
+        <circle class="via-hole" cx="274" cy="632" r="2" />
+        <circle class="via-ring" cx="517" cy="632" r="6" />
+        <circle class="via-hole" cx="517" cy="632" r="2" />
+        <circle class="via-ring" cx="760" cy="632" r="6" />
+        <circle class="via-hole" cx="760" cy="632" r="2" />
+      </g>
+
+      <!-- direction arrows: in, around the return, out -->
+      <path class="head" d="M287 342 l-11 -6 v12 z" />
+      <path class="head" d="M640 487 l11 -6 v12 z" />
+      <path class="head" d="M44 632 l-11 -6 v12 z" />
+      <path class="head" d="M1016 632 l-11 -6 v12 z" />
+    </svg>
+
+    <!-- og trace: one run from pad to pad, the eight stages as labelled vias
+         alternating above and below the wire -->
+    <svg class="trace t-og" width="1200" height="630" viewBox="0 0 1200 630">
+      <path class="wire" d="M288 420 H892" />
+      <path class="head" d="M892 420 l-11 -6 v12 z" />
+
+      <g>
+        <circle class="via-ring" cx="340" cy="420" r="7" />
+        <circle class="via-hole" cx="340" cy="420" r="2.5" />
+        <circle class="via-ring" cx="410" cy="420" r="7" />
+        <circle class="via-hole" cx="410" cy="420" r="2.5" />
+        <circle class="via-ring" cx="480" cy="420" r="7" />
+        <circle class="via-hole" cx="480" cy="420" r="2.5" />
+        <circle class="via-ring" cx="550" cy="420" r="7" />
+        <circle class="via-hole" cx="550" cy="420" r="2.5" />
+        <circle class="via-ring" cx="620" cy="420" r="7" />
+        <circle class="via-hole" cx="620" cy="420" r="2.5" />
+        <circle class="via-ring" cx="690" cy="420" r="7" />
+        <circle class="via-hole" cx="690" cy="420" r="2.5" />
+        <circle class="via-ring" cx="760" cy="420" r="7" />
+        <circle class="via-hole" cx="760" cy="420" r="2.5" />
+        <circle class="via-ring" cx="830" cy="420" r="7" />
+        <circle class="via-hole" cx="830" cy="420" r="2.5" />
+      </g>
+
+      <text x="340" y="388">spec</text>
+      <text x="410" y="466">architecture</text>
+      <text x="480" y="388">parts</text>
+      <text x="550" y="466">schematic</text>
+      <text x="620" y="388">layout</text>
+      <text x="690" y="466">outputs</text>
+      <text x="760" y="388">firmware</text>
+      <text x="830" y="466">dev plan</text>
+    </svg>
+
+    <!-- input pad -->
+    <div class="pad in">
+      <div class="tag">in</div>
+      <div class="padname">brief.md</div>
+      <div class="padsub">what you want, written in your own words</div>
+    </div>
+
+    <!-- row 1 -->
+    <div class="card c1">
+      <div class="num">01</div>
+      <div class="name">spec</div>
+      <span class="artifact">docs/SPEC.md</span>
+      <div class="gate"><span class="g">gate</span>a budgets section, actually filled in</div>
+    </div>
+    <div class="card c2">
+      <div class="num">02</div>
+      <div class="name">architecture</div>
+      <span class="artifact">docs/SUBSYSTEMS.md</span>
+      <div class="gate"><span class="g">gate</span>real reasoning under every subsystem</div>
+    </div>
+    <div class="card c3">
+      <div class="num">03</div>
+      <div class="name">parts</div>
+      <span class="artifact">docs/BOM.md</span>
+      <div class="gate"><span class="g">gate</span>part numbers chosen against datasheets</div>
+    </div>
+    <div class="card hot c4">
+      <div class="num">04</div>
+      <div class="name">schematic</div>
+      <span class="artifact">design.kicad_sch</span>
+      <div class="gate"><span class="g">gate</span>symbols placed, docs agree, ERC clean</div>
+    </div>
+
+    <!-- row 2, left to right -->
+    <div class="card hot c5">
+      <div class="num">05</div>
+      <div class="name">layout</div>
+      <span class="artifact">design.kicad_pcb</span>
+      <div class="gate"><span class="g">gate</span>footprints on the board, DRC clean</div>
+    </div>
+    <div class="card c6">
+      <div class="num">06</div>
+      <div class="name">outputs</div>
+      <span class="artifact">gerbers · drill · STEP</span>
+      <div class="gate"><span class="g">gate</span>gerbers actually on disk</div>
+    </div>
+    <div class="card c7">
+      <div class="num">07</div>
+      <div class="name">firmware</div>
+      <span class="artifact">firmware/ · pins.h</span>
+      <div class="gate"><span class="g">gate</span>sources on disk, pins from the pinout</div>
+    </div>
+    <div class="card c8">
+      <div class="num">08</div>
+      <div class="name">dev plan</div>
+      <span class="artifact">docs/DEVPLAN.md</span>
+      <div class="gate"><span class="g">gate</span>a written bring-up and test plan</div>
+    </div>
+
+    <!-- output pad -->
+    <div class="pad out">
+      <div class="tag">out</div>
+      <div class="padname strong">a design package</div>
+      <div class="padsub">gerbers, firmware, docs · one commit per stage</div>
+    </div>
+
+    <!-- legend -->
+    <div class="legend">
+      <div class="item">
+        <svg width="18" height="18" viewBox="0 0 18 18">
+          <circle cx="9" cy="9" r="6" fill="none" stroke="var(--copper)" stroke-width="2" />
+          <circle cx="9" cy="9" r="2" fill="var(--copper)" />
+        </svg>
+        <span>every hop is a gate: <b>no real work on disk, no commit</b></span>
+      </div>
+      <div class="item">
+        <svg width="18" height="18" viewBox="0 0 18 18">
+          <rect x="2" y="2" width="14" height="14" fill="none" stroke="var(--copper)" stroke-width="2" />
+        </svg>
+        <span>copper border: verified by KiCad itself, <b>ERC and DRC clean</b></span>
+      </div>
+      <div class="item">
+        <svg width="18" height="18" viewBox="0 0 18 18">
+          <path d="M1 13 H7 L11 9 H12" fill="none" stroke="var(--copper)" stroke-width="2" />
+          <path d="M17 9 l-6 -3.5 v7 z" fill="var(--copper)" />
+        </svg>
+        <span>resume is the same command: <b>finished stages skip themselves</b></span>
+      </div>
+    </div>
+
+    <!-- footer -->
+    <div class="footer">
+      <div class="site">copperhead.sh</div>
+      <div class="note">agentic hardware design: from brief to gerbers</div>
+    </div>
+
+  </div>
+</body>
+
+</html>

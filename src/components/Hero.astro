@@ -3,6 +3,7 @@ import InstallBlock from "./InstallBlock.astro";
 import TerminalDemo from "./TerminalDemo.astro";
 import { quickstart, links, pkg } from "../config";
 import { stats, compact } from "../stats";
+import { postPath } from "../blog";
 
 // Centred single-column hero in the supermemory.ai shape, top to bottom:
 // announcement chip, 72px headline, 16px subhead, a button pair, the install
@@ -26,12 +27,12 @@ const showStats = stats.stars !== null || stats.downloads !== null;
   <div class="grid-dots" aria-hidden="true"></div>
 
   <div class="wrap">
-    <a class="chip" href={links.antler}>
+    <a class="chip" href={postPath('from-brief-to-gerbers')}>
       <span class="chip-tag"
         ><span class="chip-dot" aria-hidden="true"></span>New</span
       >
       <span class="chip-text"
-        >copperhead: Cursor for Circuit Boards<svg
+        >From brief.md to gerbers<svg
           class="chip-arrow"
           viewBox="0 0 16 16"
           width="12"
@@ -51,9 +52,19 @@ const showStats = stats.stars !== null || stats.downloads !== null;
 
     <h1>Cursor for circuit boards<span class="stop">.</span></h1>
 
+    {
+      /* Length is set by how this wraps on a phone, and the lever is the words:
+        no type size fixes it. The original ran to four lines at 375 and three
+        at 390, and reached two only at 9.5-11.5px against 15px body, which is
+        why "Built for real hardware" went rather than the font shrinking.
+        As it stands this is three lines from 360 to 430 and two on desktop.
+        Two on phones as well needs one more cut — dropping "is an AI PCB
+        engineer" does it, at the cost of the category label for a first-time
+        reader. Measured, not guessed; re-measure before trading it away. */
+    }
     <p class="sub">
-      copperhead is an AI PCB engineer that designs, routes, validates, and
-      documents real circuit boards. Built for real hardware. Open source.
+      copperhead is an AI PCB engineer that designs, routes, validates and
+      documents real circuit boards. Open source.
     </p>
 
     <div class="cta">
@@ -707,14 +718,24 @@ const showStats = stats.stars !== null || stats.downloads !== null;
       margin-top: 20px;
     }
 
+    /* Narrower here than the type alone would make it. At 12.5px the message
+       ran the chip to within a few pixels of the column on a 375 screen, so it
+       read as a full-width banner rather than as a chip — the one element above
+       the headline, and the widest thing in the fold. Taking the type, the
+       height and the side padding down a step each leaves it sized to its own
+       content with the column visible either side of it, which is the shape
+       that says "small notice" rather than "bar".
+       The ellipsis stays as the backstop it always was, for the narrow screens
+       where even this does not fit. */
     .chip {
-      /* the message alone can exceed a 320px screen; let it set its own width
-         and wrap the tag beside it rather than overflow */
       max-width: 100%;
+      height: 28px;
+      font-size: 0.6875rem; /* 11px */
     }
 
     .chip-text {
-      padding: 0 10px;
+      padding: 0 8px;
+      gap: 6px;
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;

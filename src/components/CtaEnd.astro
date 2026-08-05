@@ -1,11 +1,13 @@
 ---
+import FileBlock from './FileBlock.astro';
 import InstallBlock from './InstallBlock.astro';
-import { quickstart } from '../config';
+import { morseBrief, quickstart } from '../config';
 
 // Closing CTA: tagline, one line of copy, and the install repeated. This is
 // also the page's #quickstart target, so the hero's "Quick start" link and the
 // footer both land here. W-3 lives on this block, not the hero one: it is the
-// exact quickstart from config.ts (start-from-a-prompt demo).
+// exact quickstart from config.ts (start-from-a-prompt demo), and the brief
+// beside it is the shared morseBrief from the same file.
 ---
 
 <section id="quickstart" class="cta">
@@ -22,20 +24,12 @@ import { quickstart } from '../config';
         <InstallBlock lines={quickstart} />
       </div>
 
-      <!-- What `--brief brief.md` points at. Content grounded in the Open
-           Telegraph brief (usecase-copperhead.md): ESP32-S3, BLE HID, the 25 µA
-           sleep budget, the 3.5 mm key jack. -->
-      <figure class="brief">
-        <figcaption>brief.md</figcaption>
-        <pre><code>{`# Pocket Morse key
-
-A pocket-size Morse key that types over Bluetooth as a standard keyboard.
-
-- ESP32-S3, BLE HID
-- Li-Po cell, USB-C charging
-- Sleep current budget: 25 µA
-- 3.5 mm jack for an external paddle`}</code></pre>
-      </figure>
+      <!-- What `--brief brief.md` points at. The figure lives in
+           FileBlock.astro and the content in config.ts, both shared with the
+           blog. -->
+      <div class="brief">
+        <FileBlock name="brief.md" code={morseBrief} lang="md" />
+      </div>
 
       <p class="footnote">
         Requires Node 20+ and kicad-cli. The agent refuses to run on a dirty git
@@ -81,55 +75,29 @@ A pocket-size Morse key that types over Bluetooth as a standard keyboard.
     color: var(--text);
   }
 
+  /* 52rem, up from 42. The pair sits under a 22ch headline and a 52ch lede, so
+     it was the narrowest thing in a section with 1120px of inner card to spend,
+     and the brief was setting its longest line at 621px inside 624px of content
+     box — one word from wrapping. The two share a value because they share a
+     vertical edge: they read as one stacked object, and a mismatch there is the
+     first thing the eye finds. 52 still clears the card's inner width at the
+     1024 breakpoint (832 into 858), below which both are width-constrained by
+     the card anyway and the number stops mattering. */
   .install {
-    max-width: 42rem;
+    max-width: 52rem;
     margin: 2.5rem auto 0;
     text-align: left;
   }
 
   .brief {
-    max-width: 42rem;
+    max-width: 52rem;
     margin: 0.75rem auto 0;
     text-align: left;
-    background: var(--surface);
-    border: 1px solid var(--hairline);
-  }
-
-  .brief figcaption {
-    padding: 10px 24px;
-    border-bottom: 1px solid var(--hairline);
-    font-family: var(--mono);
-    font-size: 0.8rem;
-    color: var(--text-dim);
-  }
-
-  .brief pre {
-    margin: 0;
-    padding: 18px 24px;
-    /* wraps instead of scrolling: unlike the shell lines above, nothing here
-       needs to stay on one line, and this is what keeps the block compact on
-       mobile */
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
-  }
-
-  .brief code {
-    display: block;
-    line-height: 1.8;
-    color: var(--text);
   }
 
   @media (max-width: 720px) {
     .lede {
       font-size: 1.02rem;
-    }
-
-    .brief figcaption {
-      padding: 8px 16px;
-    }
-
-    .brief pre {
-      padding: 14px 16px;
     }
   }
 

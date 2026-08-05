@@ -43,8 +43,13 @@ const block = lines.join('\n');
 </div>
 
 <script>
-  document.querySelectorAll<HTMLButtonElement>('button.copy').forEach((btn) => {
+  // `:not([data-bound])` pairs with FileBlock's identical binder: whichever
+  // script runs first claims every copy button on the page, the other skips
+  // them, and no button ends up with two listeners.
+  document.querySelectorAll<HTMLButtonElement>('button.copy:not([data-bound])').forEach((btn) => {
+    btn.dataset.bound = '';
     btn.hidden = false;
+    const label = btn.getAttribute('aria-label') ?? 'Copy';
     btn.addEventListener('click', async () => {
       const text = btn.dataset.clip ?? '';
       try {
@@ -65,7 +70,7 @@ const block = lines.join('\n');
       btn.setAttribute('aria-label', 'Copied');
       setTimeout(() => {
         btn.classList.remove('done');
-        btn.setAttribute('aria-label', 'Copy to clipboard');
+        btn.setAttribute('aria-label', label);
       }, 2000);
     });
   });

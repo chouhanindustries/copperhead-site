@@ -5,6 +5,8 @@ date: 2026-07-14
 kind: 'Product'
 ---
 
+import FileBlock from "../../components/FileBlock.astro";
+
 copperhead is an open source AI agent for hardware design. You give it a brief or a
 change request in plain English. It edits your real KiCad files, updates every
 document that references them, and runs KiCad's own checks until they pass.
@@ -18,9 +20,7 @@ scaffold, and a bring-up plan. All of it inside the git repository you already h
 **Iterate on a design that exists.** This is the common case. You ask for one thing
 and the agent handles the fan-out:
 
-```
-copperhead do "move the key input to a different RTC-capable pin"
-```
+<FileBlock name="shell" code={`copperhead do "move the key input to a different RTC-capable pin"`} lang="sh" />
 
 It consults the MCU strapping table it has in memory, picks an RTC-capable pin that
 is not a strapping pin, edits the schematic, updates the pinout and subsystem docs
@@ -31,9 +31,7 @@ specification with every assumption flagged, architecture, part selection,
 schematic, draft layout, gerbers and renders, firmware scaffold, dev plan. Every
 stage is gated by validation tooling before the next one begins.
 
-```
-copperhead create --brief brief.md
-```
+<FileBlock name="shell" code={`copperhead create --brief brief.md`} lang="sh" />
 
 ## What it actually produces
 

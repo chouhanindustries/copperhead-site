@@ -3,6 +3,12 @@
 // GIF. Text is real (selectable, searchable, crisp at any zoom) and the whole
 // thing costs ~6 KB with no runtime library.
 //
+// The window is a shell: the transcript, the pinned dock and the elapsed
+// counter all come in as props, defaulting to the hero's take. The create
+// pipeline post plays a different session through the same object. Anything
+// below that reads like a constant of the hero's run is a default, not an
+// assumption — see the Props interface.
+//
 // The run shown is adding a USB-C power input, not the net rename that
 // scripts/demo.tape records — a landing page wants the change a reader would
 // actually ask for. The *format* is still taken from the source rather than
@@ -28,17 +34,74 @@
 //   · timings run at ~0.6x the real session, so the whole take is ~11s rather
 //     than ~19s. The proportions between beats are unchanged.
 
+// The transcript is a prop, so a second page can play a different session
+// through the same window. Defaults are the hero's take; the create-pipeline
+// post passes its own feed. Everything below is written against the props, not
+// against the hero's numbers.
+//
 // Absolute seconds from the start of the take. The typed command occupies
-// 0–1.6s; the run starts on Enter at 1.7s. Adjust `at` to retime a beat.
-type Row =
+// 0–1.6s; the run starts on Enter at RUN_START. Adjust `at` to retime a beat.
+export type Row =
   | { at: number; kind: 'tool'; name: string; text: string }
-  | { at: number; kind: 'ok'; text: string };
+  | { at: number; kind: 'ok'; text: string }
+  // stageLine() from theme.ts: `stage <name>: <detail>`, dim label, printed at
+  // column 0 by the create pipeline rather than indented like a tool result.
+  | { at: number; kind: 'stage'; name: string; text: string }
+  // outcomeLine() from loop.ts, styled by styleOutcome(): a green head then the
+  // rest of the ` · `-joined line in dim. `text` is everything after the head.
+  // `name` prefixes the row with a dim `stage <name>: ` label, which lets a
+  // pipeline transcript state a stage's outcome in one row instead of a
+  // stage-running row followed by a done row — half the rows, and on a phone,
+  // where the window's height is the only free dimension, half the height.
+  | { at: number; kind: 'done'; name?: string; head?: string; text: string };
+
+export interface TurnState {
+  from: number;
+  to: number;
+  turn: number;
+  tin: string;
+  tout: string;
+  busy: string;
+}
+
+interface Props {
+  command?: string;
+  feed?: Row[];
+  turns?: TurnState[];
+  /** Ceiling the dock quotes as `turn n/<maxTurns>`; the loop's own default is 40. */
+  maxTurns?: number;
+  /** When the run starts, i.e. when Enter is pressed. The elapsed counter starts here. */
+  runStart?: number;
+  /** When finish() replaces the dock with the outcome line. Ends the take. */
+  endAt?: number;
+  /** Elapsed labels, in order. The counter steps through them across the run. */
+  ticks?: string[];
+  outcome?: { head: string; rest: string };
+  /**
+   * Leading for the transcript, which is the only lever on the window's
+   * proportion once its width is pinned: height is rows × leading, and a
+   * transcript with half again as many rows as the hero's needs to close up to
+   * stay landscape. Emitted as an inline custom property, so it also governs at
+   * the narrow and phone steps below — pass it only when the row count makes the
+   * default 1.6 read as a column rather than a window.
+   */
+  leading?: number;
+  /** Third banner line: the repository the session is running in. */
+  cwd?: string;
+  label?: string;
+  /**
+   * Scale the window down on short desktops so it seats under a headline. True
+   * for the hero, where it competes with the fold; false in an article, where
+   * the reader has already scrolled and the transcript should stay legible.
+   */
+  fitViewport?: boolean;
+}
 
 // `kind: 'tool'` reproduces toolLine() from theme.ts: a ✓ when the result reads
 // clean, else a copper ▸. Note run_erc lands on ▸ despite "clean, 0
 // violations": theme.ts disqualifies any line matching /violat/, so the word
 // "violations" vetoes its own zero. Faithful to what ships today.
-const feed: Row[] = [
+const defaultFeed: Row[] = [
   { at: 2.6, kind: 'tool', name: 'read_file', text: 'docs/POWER.md (48 lines)' },
   { at: 3.2, kind: 'tool', name: 'list_nets', text: '41 nets, no VBUS, no CC1/CC2' },
   { at: 4.1, kind: 'tool', name: 'validate_change', text: 'add-usb-c-power valid, edit tools unlocked' },
@@ -55,16 +118,12 @@ const feed: Row[] = [
 
 // The pinned observability row, one entry per turnStart() in ui-demo.ts. Each
 // holds the dock from `from` until the next turn takes over.
-const turns = [
+const defaultTurns: TurnState[] = [
   { from: 1.7, to: 4.4, turn: 1, tin: '900', tout: '120', busy: 'drafting the power proposal' },
   { from: 4.4, to: 6.5, turn: 2, tin: '4.2k', tout: '800', busy: 'placing the receptacle' },
   { from: 6.5, to: 8.9, turn: 3, tin: '9.1k', tout: '1.5k', busy: 'running ERC' },
   { from: 8.9, to: 10.4, turn: 4, tin: '11.8k', tout: '1.9k', busy: 'writing the decision log' },
 ];
-
-const END_AT = 10.4; // finish() replaces the dock with the outcome line
-
-const command = 'add a USB-C power input to the key';
 
 // The fiducial mark, drawn rather than typed. logo.ts sets it in block glyphs —
 //     '   ▄▟▙▄  '  ' ███  ███'  '   ▀▜▛▀  '
@@ -85,13 +144,46 @@ const markRects = [
 
 // The elapsed segment counts to the 17s the canned outcome line reports, so the
 // dock and the finish line agree. 18 stops: 0s…17s.
-const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
+const defaultTicks = Array.from({ length: 18 }, (_, i) => `${i}s`);
+
+const {
+  command = 'add a USB-C power input to the key',
+  feed = defaultFeed,
+  turns: turnsProp,
+  maxTurns = 40,
+  runStart = 1.7,
+  endAt = 10.4,
+  ticks = defaultTicks,
+  outcome = { head: 'done', rest: ' · verified erc · committed 3f2c9a1 · 17s · 12.3k tokens' },
+  leading,
+  cwd = '~/hardware/open-key',
+  label = 'A copperhead terminal session: adding a USB-C power input, with the agent proposing, editing, verifying and logging the change.',
+  fitViewport = true,
+} = Astro.props;
+
+// The default transcript's last turn holds the dock until finish(), so its end
+// follows endAt rather than repeating the hero's 10.4. Supplied turns are the
+// caller's own timeline and pass through untouched.
+const turns =
+  turnsProp ??
+  defaultTurns.map((t, i) => (i === defaultTurns.length - 1 ? { ...t, to: endAt } : t));
+
+// The elapsed counter is a strip of labels stepped one row at a time, so its
+// three numbers are all functions of how many labels there are: one step fewer
+// than labels (the first is showing before the animation starts), and a final
+// offset of that many rows out of the strip's own height. Stated as custom
+// properties because they vary per instance and CSS cannot count children.
+const countSteps = Math.max(ticks.length - 1, 1);
+const vars = [
+  `--run-start:${runStart}`,
+  `--count-dur:${(endAt - runStart).toFixed(2)}`,
+  `--count-n:${countSteps}`,
+  `--count-shift:${((countSteps / ticks.length) * 100).toFixed(4)}`,
+  ...(leading === undefined ? [] : [`--lead:${leading}`]),
+].join(';');
 ---
 
-<figure
-  class="term"
-  aria-label="A copperhead terminal session: renaming a net, with the agent proposing, editing, verifying and logging the change."
->
+<figure class:list={['term', { fold: fitViewport }]} style={vars} aria-label={label}>
   <div class="bar" aria-hidden="true">
     <span class="ring close"></span><span class="ring min"></span><span class="ring max"></span>
     <button class="replay" type="button" hidden>
@@ -119,7 +211,7 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
             <span class="dim"> v0.8.1</span>
           </div>
           <div class="row dim">claude via flag · kicad-cli 9.0.4</div>
-          <div class="row dim">~/hardware/open-key</div>
+          <div class="row dim">{cwd}</div>
         </div>
       </div>
 
@@ -136,15 +228,27 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
       {
         feed.map((r) => (
           <div class="row out" style={`--at:${r.at}`}>
-            {r.kind === 'tool' ? (
+            {r.kind === 'tool' && (
               <>
                 <span class="glyph copper">{'  ▸ '}</span>
                 <span class="dim">{r.name}</span>
                 <span>{'  '}</span>
                 <span>{r.text}</span>
               </>
-            ) : (
-              <span class="ok">{'  '}{r.text}</span>
+            )}
+            {r.kind === 'ok' && <span class="ok">{'  '}{r.text}</span>}
+            {r.kind === 'stage' && (
+              <>
+                <span class="dim">{`stage ${r.name}: `}</span>
+                <span>{r.text}</span>
+              </>
+            )}
+            {r.kind === 'done' && (
+              <>
+                {r.name && <span class="dim">{`stage ${r.name}: `}</span>}
+                <span class="ok">{r.head ?? 'done'}</span>
+                <span class="dim">{r.text}</span>
+              </>
             )}
           </div>
         ))
@@ -155,8 +259,18 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
          never changes height as the turn advances or the run finishes. -->
     <div class="dock">
       {
+        // aria-hidden per turn state: they all occupy the same grid cell and are
+        // hidden from sight by opacity alone, so a reader that ignores the
+        // animation would get every one of them at once — a stack of turn
+        // counters between the transcript and the outcome line. The outcome row
+        // below stays exposed; it is the one carrying information rather than
+        // progress.
         turns.map((t) => (
-          <div class="dockrow" style={`--from:${t.from};--dur:${(t.to - t.from).toFixed(2)}`}>
+          <div
+            class="dockrow"
+            aria-hidden="true"
+            style={`--from:${t.from};--dur:${(t.to - t.from).toFixed(2)}`}
+          >
             <svg class="spin" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" focusable="false">
               <g>
                 <circle cx="8" cy="2.6" r="1.3" opacity="1" />
@@ -169,7 +283,7 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
                 <circle cx="4.18" cy="4.18" r="1.3" opacity="0.12" />
               </g>
             </svg>
-            <span class="seg">turn {t.turn}/40</span>
+            <span class="seg">turn {t.turn}/{maxTurns}</span>
             <span class="seg tok">
               <span class="dim"> · </span>
               <span class="dim">{t.tin} in / {t.tout} out</span>
@@ -192,9 +306,9 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
         ))
       }
 
-      <div class="dockrow outcome" style={`--at:${END_AT}`}>
-        <span class="ok">done</span>
-        <span class="dim"> · verified erc · committed 3f2c9a1 · 17s · 12.3k tokens</span>
+      <div class="dockrow outcome" style={`--at:${endAt}`}>
+        <span class="ok">{outcome.head}</span>
+        <span class="dim">{outcome.rest}</span>
       </div>
     </div>
   </div>
@@ -276,7 +390,14 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
        bottom of this file do nothing but restate it. */
     font-size: 12px;
 
-    --row: 1.6em; /* one text line; the elapsed counter steps by exactly this */
+    /* The transcript's leading, and with it the window's height: rows × this.
+       One variable rather than a line-height and a --row that have to be kept
+       in agreement, because --row is what sizes the blank rows, the banner mark
+       and the elapsed counter's strip — those three desynchronise from the text
+       the moment the two numbers drift apart. Overridable per instance (see the
+       `leading` prop) and at the steps at the bottom of this file. */
+    --lead: 1.6;
+    --row: calc(var(--lead) * 1em); /* one text line; the elapsed counter steps by exactly this */
 
     /* 733 at the 12px base, down from 800 and from the 900 this started at: at
        900 the window ran nearly the full width of the fold and read as a panel
@@ -382,7 +503,7 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
     font-family: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, 'DejaVu Sans Mono',
       'Cascadia Mono', Consolas, monospace;
     font-size: 1em; /* the .term base — see the scale knob there */
-    line-height: 1.6;
+    line-height: var(--lead);
     white-space: pre;
     color: var(--t-text);
   }
@@ -621,19 +742,23 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
     }
   }
 
-  /* 18 stops over the run; steps(17) shows 0s…16s while it runs and lands on
-     17s at the end, which is the figure the outcome line quotes. */
+  /* One step fewer than there are labels: the first is already showing when the
+     run starts, and the last lands at the end on the figure the outcome line
+     quotes. The three numbers come in as custom properties from the frontmatter,
+     which is what lets a different transcript count in minutes rather than
+     seconds without touching this rule. */
   .term[data-anim] .ticks {
-    animation: count 8.7s steps(17, end) 1.7s both;
+    animation: count calc(var(--count-dur) * 1s) steps(var(--count-n), end)
+      calc(var(--run-start) * 1s) both;
   }
 
   /* Percentage rather than `calc(var(--row) * -17)`: a percentage translate
-     resolves against the strip's own height, which is exactly the 18 rows it
+     resolves against the strip's own height, which is exactly the rows it
      contains, so the stop lands on a row boundary at every font size and the
      step never has to agree with a separately-declared line height. */
   @keyframes count {
     to {
-      transform: translateY(-94.4444%); /* 17 of 18 rows */
+      transform: translateY(calc(var(--count-shift) * -1%));
     }
   }
 
@@ -670,19 +795,15 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
 
   /* A narrow viewport tightens the leading as well as the scale: the window is
      no longer free to keep its proportion here because its width is pinned to
-     the column, so the rows have to close up for it to stay landscape.
-     --row moves with the leading because it is what sizes the blank rows, the
-     banner mark and the elapsed counter's strip; changing line-height alone
-     would desynchronise the three from the text. */
+     the column, so the rows have to close up for it to stay landscape. One
+     variable does it — see --lead at the top of this file. An instance that
+     passes the `leading` prop sets it inline and so keeps its own value here,
+     which is the intended trade: a transcript that had to close up for its row
+     count is already tighter than this step would make it. */
   @media (max-width: 900px) {
     .term {
       font-size: 11px;
-      --row: 1.45em;
-    }
-
-    .feed,
-    .dock {
-      line-height: 1.45;
+      --lead: 1.45;
     }
 
     .screen {
@@ -716,7 +837,11 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
      legibility for a fold it was never going to win. Those viewports scroll
      instead, which they already did. ── */
   @media (min-width: 901px) and (max-height: 1000px) {
-    .term {
+    /* Only `.fold` — the window in the hero, which is the one racing a fold.
+       The same rule inside an article would shrink a transcript the reader has
+       already scrolled to, paying legibility for a fold that was never at
+       stake. */
+    .term.fold {
       font-size: 10px; /* 733 → 611 wide, 458 → 382 tall */
     }
   }
@@ -744,17 +869,12 @@ const ticks = Array.from({ length: 18 }, (_, i) => `${i}s`);
        tool names stop being readable at arm's length. */
     .term {
       font-size: 8px;
-      --row: 1.25em;
+      --lead: 1.25;
     }
 
     .screen {
       overflow-x: hidden;
       padding: 1.333em 1.333em 1.111em; /* 12px 12px 10px */
-    }
-
-    .feed,
-    .dock {
-      line-height: 1.25;
     }
 
     .feed {
