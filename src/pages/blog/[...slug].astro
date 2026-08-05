@@ -33,10 +33,12 @@ const jsonLd = {
 ---
 
 <Base
-  title={`${post.data.title}. copperhead.`}
+  title={`copperhead: ${post.data.title}`}
   description={post.data.description}
   path={path}
   ogType="article"
+  ogImage={post.data.ogImage}
+  ogImageAlt={post.data.ogImageAlt}
   publishedTime={post.data.date.toISOString()}
   jsonLd={jsonLd}
 >
@@ -117,6 +119,15 @@ const jsonLd = {
     margin: 0 0 1.4rem;
   }
 
+  /* A paragraph that is one italic run is this blog's caption convention:
+     set it like a figcaption, snug under the figure it annotates. */
+  .prose :global(p:has(> em:only-child)) {
+    margin: 0 0 2.4rem;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+  }
+
   .prose :global(h2) {
     font-size: 1.5rem;
     margin: 3.25rem 0 1.25rem;
@@ -148,14 +159,26 @@ const jsonLd = {
     font-weight: 500;
   }
 
-  /* Terminal block, matching the quickstart section on the home page. */
+  /* Terminal block, on the quickstart's exact metrics (InstallBlock.astro):
+     the dashed ink border, 20px 22px padding, 1.75 leading, and the 13px
+     phone step. One code surface across the site, not two near-misses. */
   .prose :global(pre) {
     background: var(--surface);
-    border: 1px solid var(--line);
-    padding: 1.25rem 1.35rem;
+    border: 1px dashed color-mix(in srgb, var(--text) 20%, transparent);
+    padding: 20px 22px;
     margin: 0 0 1.4rem;
     overflow-x: auto;
-    line-height: 1.7;
+    line-height: 1.75;
+  }
+
+  @media (max-width: 720px) {
+    .prose :global(pre) {
+      padding: 18px 16px;
+    }
+
+    .prose :global(pre code) {
+      font-size: 0.8125rem; /* 13px, the quickstart's phone size */
+    }
   }
 
   .prose :global(:not(pre) > code) {
@@ -205,6 +228,21 @@ const jsonLd = {
 
   .prose :global(td:last-child) {
     color: var(--text-dim);
+  }
+
+  /* Big screens. 760px at 17px is already around 80 characters a line, so
+     widening the column on its own would push the measure past comfortable
+     rather than improve it. Width and type scale move together instead: 18px in
+     an 800px column is the same line length as 17px in 760, on a page that no
+     longer looks marooned in the middle of a large display. */
+  @media (min-width: 1200px) {
+    .wrap {
+      max-width: 800px;
+    }
+
+    .prose {
+      font-size: 1.125rem;
+    }
   }
 
   /* Tables can still exceed the measure on a phone; let this one scroll rather

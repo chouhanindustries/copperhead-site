@@ -1,0 +1,205 @@
+## One file goes in
+
+```bash
+mkdir usb-c-breakout && cd usb-c-breakout
+
+# a sentence: copperhead writes it to brief.md for you
+copperhead create "a USB-C 5V power breakout, 3A, screw terminal and header, power LED"
+
+# or write brief.md yourself, in as much detail as you like, and point at it
+copperhead create --brief brief.md
+```
+
+Either way you end up with one real file on disk. The sentence form just writes
+`brief.md` for you before anything else happens. Two later things depend on that file
+being real. The resume command has to point at a path, and every stage stamps a
+sha256 of the brief into its run metadata, so a brief edited halfway through the
+pipeline shows up as a changed hash instead of quietly moving the target.
+
+Then git gets set up. `create` initializes a repository, sets a repo-local identity,
+writes the baseline `.gitignore`, makes the first commit, and commits the brief on
+top. That is not a convenience. Every stage snapshots HEAD before it starts, and a
+failed run restores that snapshot with a hard reset and a clean, sparing only the
+run's own audit trail. Committing the brief up front is what guarantees the file the
+resume command points at is still there afterwards.
+
+The other two entry points, `do` and `sync`, keep the strict refusal on a dirty
+tree. Those run against a repository you already own, where an implicit initial
+commit would be a surprise rather than a courtesy.
+
+## Eight stages
+
+| Stage        | What it is asked for                                                        | What the gate checks                                |
+| ------------ | --------------------------------------------------------------------------- | --------------------------------------------------- |
+| Spec         | `docs/SPEC.md`, every budget also recorded as a machine-readable constraint | A filled budgets section                            |
+| Architecture | `docs/SUBSYSTEMS.md`, one section per subsystem with the reasoning          | Real prose under a heading                          |
+| Parts        | `docs/BOM.md`, part numbers with datasheet-verifiable justification         | A part chosen, not a placeholder                    |
+| Schematic    | the `.kicad_sch`, built subsystem by subsystem                              | Symbols, agreement, ERC clean                       |
+| Layout       | placement, power and critical nets routed, a draft quality note             | Footprints on the board, draft quality written down |
+| Outputs      | gerbers, drill, DXF, STEP, SVG renders, ordering BOM                        | Gerbers actually on disk                            |
+| Firmware     | `firmware/` with `pins.h` generated from the pinout                         | Source files on disk                                |
+| Dev plan     | bring-up order, test points, risks, prototype order plan                    | A written plan rather than an empty file            |
+
+Each stage is a complete agent run with its own prompt, its own turn budget, and its
+own commit. It is not one long conversation with eight topics in it. A stage that
+cannot pass its gate stops the pipeline and prints the exact command to pick up from
+there.
+
+## The gate is never "the file exists"
+
+This is the part worth reading.
+
+`copperhead init` scaffolds most of those markdown files before an agent writes a
+word. `SPEC.md` ships with a budgets heading and two HTML comments under it.
+`SUBSYSTEMS.md` gets auto-generated per-sheet headings full of `- R1: 10k` bullets
+pulled straight off the schematic. `BOM.md` arrives pre-filled with rows whose part
+number column reads `UNVERIFIED`. `LAYOUT.md` arrives with the literal
+`## Draft quality` heading that stage 5 is supposed to write.
+
+So in a repository that has been through `init`, and that is how copperhead gets
+pointed at an existing board, a gate that only asks whether the file exists marks
+stages complete that have produced nothing. Every gate looks for evidence instead:
+
+- **Spec**: the budgets heading, plus at least one line beneath it that is neither
+  blank nor an HTML comment. A filled section, not an empty placeholder.
+- **Architecture**: a section heading, plus a line of prose that is neither scaffold
+  boilerplate nor one of the auto-generated refdes bullets.
+- **Parts**: at least one BOM row whose part number column is not the `UNVERIFIED`
+  placeholder. Somebody chose something.
+- **Schematic**: symbols exist, the BOM and pinout tables agree with them, and ERC
+  passes.
+
+The schematic gate is three conditions because each one was learned separately.
+Symbols alone lets an empty capture through. Symbols plus agreement still passes on
+a schematic with unconnected pins, which is exactly what a run killed mid-capture
+leaves behind. Treating that as done means layout and outputs both run against a
+board that is not there.
+
+The same check runs again after a stage reports success. An agent can call `finish`
+with every gate green having only planned the work: one edit to a file header, then
+ERC on an empty sheet, which is of course clean. So the run ending well and the
+stage being done are two separate questions, and only the second one advances the
+pipeline.
+
+The gates do share one blind spot. Every text and exit-code check in the pipeline
+can be satisfied by a design that is visibly wrong, and nothing else in the run ever
+looks at the board. So every stage that touches the KiCad files renders the
+schematic and the board to SVG into its own run directory. A render costs nothing
+and closes that gap.
+
+## Resuming is free
+
+Completion is read entirely off the repository, so there is no pipeline state file,
+no checkpoint, no `--resume-from`. Resuming is running the same command again.
+Finished stages announce themselves and get skipped.
+
+One subtlety sits underneath that. If a resumed stage's work is sitting uncommitted,
+which is what a run stopped on a provider usage limit leaves behind, it gets
+committed before the pipeline moves on, so a later stage's rollback cannot wipe it.
+That commit only happens when every dirty path in the tree belongs to copperhead. If
+your own uncommitted work is sitting next to it, the pipeline says so and leaves the
+whole thing alone. Sweeping an engineer's work in progress into an agent's commit is
+worse than the problem it would be solving.
+
+## Inside a single stage
+
+Each stage runs the same loop as any other copperhead run, and the two invariants of
+[Spec-gated in, verification-gated out](/blog/spec-gated-in-verification-gated-out/)
+hold inside every one of them. Nothing starts without a validated change proposal,
+and nothing is done until the tools agree.
+
+The first invariant is structural. The edit tools are not in the tool list the model
+is shown until a proposal has passed validation. Not discouraged in the prompt,
+absent from the catalog. An earlier version advertised them on every turn and
+enforced the lock at call time instead, which saved exactly one turn and traded a
+structural guarantee for it. That was the wrong trade and it was reverted.
+
+The second shows up as a hook on every edit. Touch a `.kicad_sch` and the last ERC
+result is discarded. Touch a `.kicad_pcb` and the last DRC result goes with it. When
+the model then tries to end the run, it gets this back:
+
+```text
+cannot finish yet:
+- ERC has not passed since the last schematic edit (run run_erc)
+- open sync obligations:
+  - [drift] check_drift must run clean after KiCad edits
+```
+
+That refusal arrives as an ordinary tool result, so the model reads it and goes back
+to work. It is not an error condition. It is the loop doing its job.
+
+This is also where DRC gets enforced on the layout stage. The stage gate itself only
+asks whether footprints are on the board, because the board having been touched at
+all is what puts DRC in front of the run's own exit. A layout stage cannot end
+successfully with DRC failing, so the gate does not need to ask twice.
+
+## The schematic stage carries extra scaffolding
+
+An agent cannot create the KiCad files itself. `write_file` refuses KiCad files
+outright, and `edit_file` needs an existing file to anchor into. So immediately
+before stage 4, the pipeline drops an empty schematic, a blank board with a default
+outline, and a project file into place, and wires them into the config.
+
+That scaffold is recreated before every attempt rather than once per stage. A failed
+attempt's rollback deletes it, because at that point it is still untracked, and a
+retry against a missing schematic fails worse than the failure it was recovering
+from.
+
+One more guard is specific to s-expression files. After every text edit to a
+schematic or a board, kicad-cli is asked whether the file still loads. If it does
+not, the edit is reverted with the parser's complaint attached, because a corrupted
+file otherwise fails every later check with an opaque error and nobody can tell
+which edit did it. The exception is a file that was already unloadable before the
+edit. Reverting there would deadlock incremental repair, since every partial fix
+gets undone unless one lucky edit fixes the whole file at once. So that edit is kept
+and the probe output keeps the pressure on.
+
+## When a stage fails
+
+There are two different failures here and they are handled differently.
+
+A run can fail outright: a rate limit with no fallback, repair cycles running out, a
+turn budget at zero. Then the loop rolls the tree back to the snapshot. It stashes
+the touched work first, under a named stash entry you can restore with
+`git stash apply`, so the rollback clears the working tree without destroying
+anything.
+
+The other failure is quieter. The run ends well but the gate says nothing usable
+came out of it. There is no rollback for that one. Whatever the attempt did stays in
+the tree and the next attempt builds on it.
+
+Either way the model then gets asked, on a fresh turn with no tools available,
+whether another attempt is likely to help and what should be done differently. A
+retry runs the stage again with that guidance prepended to the prompt. An abort
+stops the pipeline for a human. Two retries by default, and the diagnosis call's own
+token cost is folded into the stage's total rather than hidden.
+
+When the retries run out, the exact resume command gets printed, along with which
+stage it will pick up at.
+
+## What it costs
+
+Every turn's response is cached on disk against the repository. A retried stage
+replays what it already paid for instead of buying it twice, which is what turns
+"session limit reached" from a failure into a scheduled pause. Wait for the reset,
+run the same command, and the completed turns replay at roughly zero tokens.
+
+At the end you get a per-stage cost table: wall clock, turns, output tokens, cache
+hit rate, with the slowest and the most expensive stage called out. It is written to
+`.copperhead/runs/REPORT.md` and to a JSON file next to it, so successive boards can
+be compared rather than remembered.
+
+## What it does not prove
+
+Worth being straight about. Stages 4 and 5 are verified against a real tool. ERC and
+DRC either pass or they do not, and the pipeline cannot argue with the exit code.
+The document stages check shape. A `SPEC.md` that is well formed and wrong passes
+stage 1, and everything downstream inherits it faithfully.
+
+That is exactly why anything the brief did not say gets flagged `ASSUMED` in the
+spec, and why those flags are worth reading before the schematic stage rather than
+after layout. Correcting an assumption at stage 1 costs a minute. Correcting it at
+stage 6 costs the pipeline.
+
+The full stage reference lives in
+[the create workflow docs](https://docs.copperhead.sh/workflows/create-from-brief/).

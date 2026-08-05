@@ -28,3 +28,7 @@ pnpm-debug.log*
 
 # screenshot output (npm run shots)
 shots/
+
+# diagram working files
+diagrams/
+scripts/.frame-tmp.mjs

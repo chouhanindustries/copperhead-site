@@ -3,6 +3,7 @@ import InstallBlock from "./InstallBlock.astro";
 import TerminalDemo from "./TerminalDemo.astro";
 import { quickstart, links, pkg } from "../config";
 import { stats, compact } from "../stats";
+import { postPath } from "../blog";
 
 // Centred single-column hero in the supermemory.ai shape, top to bottom:
 // announcement chip, 72px headline, 16px subhead, a button pair, the install
@@ -26,12 +27,12 @@ const showStats = stats.stars !== null || stats.downloads !== null;
   <div class="grid-dots" aria-hidden="true"></div>
 
   <div class="wrap">
-    <a class="chip" href={links.antler}>
+    <a class="chip" href={postPath('from-brief-to-gerbers')}>
       <span class="chip-tag"
         ><span class="chip-dot" aria-hidden="true"></span>New</span
       >
       <span class="chip-text"
-        >copperhead: Cursor for Circuit Boards<svg
+        >From brief.md to gerbers<svg
           class="chip-arrow"
           viewBox="0 0 16 16"
           width="12"

@@ -12,6 +12,8 @@ interface Props {
   jsonLd?: Record<string, unknown>;
   /** 'article' for blog posts, so link unfurls read as posts rather than a product page. */
   ogType?: 'website' | 'article';
+  /** Site-root-relative path of a page-specific 1200x630 share image. Defaults to the site card. */
+  ogImage?: string;
   /** Alt text for the social share image. */
   ogImageAlt?: string;
   /** ISO date for article:published_time (blog posts only). */
@@ -24,12 +26,13 @@ const {
   path = '/',
   jsonLd: extraJsonLd,
   ogType = 'website',
+  ogImage: ogImagePath = '/og-image.png',
   ogImageAlt = 'copperhead: an open source AI agent for circuit board design',
   publishedTime,
 } = Astro.props;
 
 const canonical = new URL(path, site).href;
-const ogImage = new URL('/og-image.png', site).href;
+const ogImage = new URL(ogImagePath, site).href;
 
 // The product node stays on every page: it is the thing the whole site is about,
 // and search engines get one consistent description of it wherever they land.
