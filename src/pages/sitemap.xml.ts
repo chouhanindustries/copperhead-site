@@ -2,24 +2,30 @@ import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { site } from '../config';
 import { postPath } from '../blog';
+import { articlePath } from '../research';
 
 // Generated rather than kept in public/, so a new post cannot be forgotten here.
 export const GET: APIRoute = async () => {
   const posts = await getCollection('blog');
+  const articles = await getCollection('research');
 
   const urls = [
     { loc: '/', changefreq: 'weekly', priority: '1.0' },
     { loc: '/pricing/', changefreq: 'monthly', priority: '0.9' },
     { loc: '/blog/', changefreq: 'weekly', priority: '0.8' },
-    // Low priority while it is a placeholder; raise it when there is evidence
-    // on the page to find.
-    { loc: '/research/', changefreq: 'monthly', priority: '0.4' },
+    { loc: '/research/', changefreq: 'monthly', priority: '0.8' },
     { loc: '/blog/faq/', changefreq: 'monthly', priority: '0.7' },
     ...posts.map((p) => ({
       loc: postPath(p.id),
       changefreq: 'monthly',
       priority: '0.6',
       lastmod: p.data.date.toISOString().slice(0, 10),
+    })),
+    ...articles.map((a) => ({
+      loc: articlePath(a.id),
+      changefreq: 'monthly',
+      priority: '0.7',
+      lastmod: a.data.date.toISOString().slice(0, 10),
     })),
   ];
 

@@ -1,0 +1,296 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+import { site, links } from '../../config';
+import { formatDate } from '../../blog';
+import { articlePath } from '../../research';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('research');
+  return articles.map((a) => ({ params: { slug: a.id }, props: { article: a } }));
+}
+
+interface Props {
+  article: CollectionEntry<'research'>;
+}
+
+const { article } = Astro.props;
+const { Content } = await render(article);
+const path = articlePath(article.id);
+
+// TechArticle rather than BlogPosting: these are method and measurement write-ups
+// bound to a repository, and the distinction is worth stating to a crawler.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: article.data.title,
+  description: article.data.description,
+  datePublished: article.data.date.toISOString(),
+  url: new URL(path, site).href,
+  mainEntityOfPage: new URL(path, site).href,
+  author: { '@type': 'Organization', name: 'Chouhan Industries', url: links.chouhan },
+  publisher: { '@type': 'Organization', name: 'Chouhan Industries', url: links.chouhan },
+};
+---
+
+<Base
+  title={`copperhead research: ${article.data.title}`}
+  description={article.data.description}
+  path={path}
+  ogType="article"
+  publishedTime={article.data.date.toISOString()}
+  jsonLd={jsonLd}
+>
+  <Navbar home={false} />
+  <main id="top">
+    <article>
+      <div class="wrap">
+        <header>
+          <div class="meta">
+            <span class="kind">{article.data.kind}</span>
+            <time datetime={article.data.date.toISOString()}>
+              {formatDate(article.data.date)}
+            </time>
+          </div>
+          <h1>{article.data.title}</h1>
+          <p class="standfirst">{article.data.description}</p>
+          {
+            /* The status line sits above the rule rather than in the body, so a
+               reader who never scrolls still knows whether this article reports
+               measurements or only describes how they will be taken. */
+            article.data.status && <p class="status">{article.data.status}</p>
+          }
+        </header>
+
+        <div class="prose">
+          <Content />
+        </div>
+
+        <footer class="end">
+          <a href="/research/">All research</a>
+          <a href={links.repo}>View on GitHub</a>
+        </footer>
+      </div>
+    </article>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  article {
+    padding-block: 179px var(--pad-y);
+  }
+
+  /* Measure is set on the column, not on each element, so code blocks and tables
+     line up with the paragraphs instead of running wide. */
+  .wrap {
+    max-width: 760px;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin-bottom: 1.5rem;
+  }
+
+  .kind {
+    color: var(--copper);
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    color: var(--text-dim);
+    font-size: 1.12rem;
+    margin: 1.5rem 0 0;
+    max-width: 58ch;
+  }
+
+  .status {
+    margin: 1.5rem 0 0;
+    padding: 0.7rem 0.9rem;
+    border-left: 2px solid var(--copper);
+    background: var(--surface);
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--text-dim);
+    max-width: 58ch;
+  }
+
+  .prose {
+    margin-top: 3.5rem;
+    border-top: 1px solid var(--hairline);
+    padding-top: 3.5rem;
+  }
+
+  .prose :global(p) {
+    margin: 0 0 1.4rem;
+  }
+
+  /* A paragraph that is one italic run is this site's caption convention:
+     set it like a figcaption, snug under the figure it annotates. */
+  .prose :global(p:has(> em:only-child)) {
+    margin: 0 0 2.4rem;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+  }
+
+  .prose :global(h2) {
+    font-size: 1.5rem;
+    margin: 3.25rem 0 1.25rem;
+  }
+
+  .prose :global(h3) {
+    font-size: 1.15rem;
+    margin: 2.5rem 0 1rem;
+  }
+
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin: 0 0 1.4rem;
+    padding-left: 1.25rem;
+  }
+
+  .prose :global(li) {
+    margin-bottom: 0.6rem;
+  }
+
+  .prose :global(li)::marker {
+    color: var(--copper);
+    font-family: var(--mono);
+    font-size: 0.85em;
+  }
+
+  .prose :global(strong) {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Terminal block, on the quickstart's exact metrics (InstallBlock.astro):
+     the dashed ink border, 20px 22px padding, 1.75 leading, and the 13px
+     phone step. One code surface across the site, not two near-misses. */
+  .prose :global(pre) {
+    background: var(--surface);
+    border: 1px dashed color-mix(in srgb, var(--text) 20%, transparent);
+    padding: 20px 22px;
+    margin: 0 0 1.4rem;
+    overflow-x: auto;
+    line-height: 1.75;
+  }
+
+  @media (max-width: 720px) {
+    .prose :global(pre) {
+      padding: 18px 16px;
+    }
+
+    .prose :global(pre code) {
+      font-size: 0.8125rem; /* 13px, the quickstart's phone size */
+    }
+  }
+
+  .prose :global(:not(pre) > code) {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    padding: 0.1em 0.4em;
+    font-size: 0.85em;
+  }
+
+  .prose :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--hairline);
+    margin: 0 0 1.4rem;
+  }
+
+  .prose :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 1.4rem;
+    font-size: 0.94rem;
+  }
+
+  .prose :global(th) {
+    text-align: left;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 0 1rem 0.75rem 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .prose :global(td) {
+    padding: 0.85rem 1rem 0.85rem 0;
+    border-bottom: 1px solid var(--hairline);
+    vertical-align: top;
+  }
+
+  .end {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+  }
+
+  /* Big screens. 760px at 17px is already around 80 characters a line, so
+     widening the column on its own would push the measure past comfortable
+     rather than improve it. Width and type scale move together instead: 18px in
+     an 800px column is the same line length as 17px in 760, on a page that no
+     longer looks marooned in the middle of a large display. */
+  @media (min-width: 1200px) {
+    .wrap {
+      max-width: 800px;
+    }
+
+    .prose {
+      font-size: 1.125rem;
+    }
+  }
+
+  /* Tables can exceed the measure on a phone; let the table scroll rather than
+     pushing the page body sideways. */
+  @media (max-width: 720px) {
+    article {
+      padding-block: 139px var(--pad-y);
+    }
+
+    .prose {
+      margin-top: 2.5rem;
+      padding-top: 2.5rem;
+    }
+
+    .standfirst {
+      font-size: 1.05rem;
+    }
+
+    .prose :global(table) {
+      display: block;
+      overflow-x: auto;
+      font-size: 0.9rem;
+    }
+
+    .prose :global(td) {
+      padding-right: 0.85rem;
+      min-width: 7.5rem;
+    }
+  }
+</style>

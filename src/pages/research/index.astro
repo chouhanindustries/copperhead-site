@@ -1,33 +1,51 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
-import { links } from '../../config';
+import { site, links } from '../../config';
+import { formatDate } from '../../blog';
+import { articlePath } from '../../research';
 
-// Placeholder. The nav carries a Research entry, so the page has to exist and
-// has to be honest about being empty. A "coming soon" that lists work already
-// underway is a claim; this one only describes what the section is for and
-// points at the writing that does exist today.
+const articles = (await getCollection('research')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+// What the section still owes. The method article is published, so it is no
+// longer listed here; the two entries left are the ones with no writing behind
+// them yet. Listing work as "coming soon" is itself a claim, so each of these
+// says only what it would contain, not when.
 const planned = [
   {
-    title: 'Benchmarks',
-    body: 'How the agent scores on real boards rather than toy ones: pass rate on ERC and DRC, how often a change lands without human repair, and what a run costs in tokens.',
+    title: 'The first model matrix',
+    body: 'Strict pass rate and cost per passing task, per tier and per model, from the first live run of the suite. Records and the generated leaderboard published alongside, so the table can be recomputed rather than trusted.',
   },
   {
     title: 'Drift measurement',
     body: 'Putting a number on the problem the tool exists to solve: how far a schematic and its documents diverge over the life of a design, measured across open hardware repositories.',
   },
-  {
-    title: 'Evaluation method',
-    body: 'The harness, the fixtures, and the scoring, published so the numbers above can be reproduced and argued with.',
-  },
 ];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'copperhead research',
+  url: new URL('/research/', site).href,
+  hasPart: articles.map((a) => ({
+    '@type': 'TechArticle',
+    headline: a.data.title,
+    description: a.data.description,
+    datePublished: a.data.date.toISOString(),
+    url: new URL(articlePath(a.id), site).href,
+  })),
+};
 ---
 
 <Base
   title="Research · copperhead"
-  description="Benchmarks, drift measurement, and evaluation method for the copperhead PCB agent. Not published yet."
+  description="How copperhead is measured: the benchmark standard, the fixtures, and the scoring, published so the numbers can be reproduced and argued with."
   path="/research/"
+  jsonLd={jsonLd}
 >
   <Navbar home={false} />
   <main id="top">
@@ -37,17 +55,41 @@ const planned = [
           <p class="kind">Research</p>
           <h1>Research</h1>
           <p class="standfirst">
-            Nothing here yet. This is where the evidence will go: the
-            benchmarks, the methodology behind them, and the raw results, so
-            that the claims made everywhere else on this site can be checked.
+            The evidence behind the claims made everywhere else on this site: how
+            the agent is measured, what it is measured against, and eventually what
+            it scores. The method is published first, on purpose. No model matrix
+            has been run yet, so there are no results here.
           </p>
         </header>
+
+        <ul class="articles">
+          {
+            articles.map((a) => (
+              <li>
+                <a href={articlePath(a.id)}>
+                  <div class="meta">
+                    <span class="tag">{a.data.kind}</span>
+                    <time datetime={a.data.date.toISOString()}>
+                      {formatDate(a.data.date)}
+                    </time>
+                  </div>
+                  <h2>{a.data.title}</h2>
+                  <p>{a.data.description}</p>
+                  {a.data.status && <p class="status">{a.data.status}</p>}
+                  <span class="more">Read</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+
+        <h2 class="planned-head">Not written yet</h2>
 
         <ul class="planned">
           {
             planned.map((p) => (
               <li>
-                <h2>{p.title}</h2>
+                <h3>{p.title}</h3>
                 <p>{p.body}</p>
               </li>
             ))
@@ -55,9 +97,9 @@ const planned = [
         </ul>
 
         <p class="meanwhile">
-          In the meantime the <a href={links.blog}>blog</a> carries the argument
-          and the <a href={links.repo}>repo</a> carries the code. Both are the
-          best place to push back on any of it.
+          The <a href={links.blog}>blog</a> carries the argument and the
+          <a href={links.repo}>repo</a> carries the code. Both are the best place to
+          push back on any of it.
         </p>
       </div>
     </article>
@@ -95,12 +137,96 @@ const planned = [
     line-height: 1.55;
   }
 
+  /* Published articles are cards: they are the point of the page and carry the
+     weight. The unwritten list below stays a hairline stack, so the difference
+     between "here" and "not here" is not something you have to read to see. */
+  .articles {
+    list-style: none;
+    max-width: 820px;
+    margin: 4rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 1px;
+    background: var(--hairline);
+    border-block: 1px solid var(--hairline);
+  }
+
+  .articles li a {
+    display: block;
+    background: var(--bg);
+    padding: 2.25rem 0;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .articles li a:hover {
+    background: var(--surface);
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .tag {
+    color: var(--copper);
+  }
+
+  .articles h2 {
+    font-size: clamp(1.35rem, 2.6vw, 1.75rem);
+    max-width: 26ch;
+    text-wrap: balance;
+  }
+
+  .articles p {
+    color: var(--text-dim);
+    max-width: 64ch;
+    margin: 0.85rem 0 0;
+    font-size: 0.97rem;
+    line-height: 1.6;
+  }
+
+  .articles .status {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.02em;
+    margin-top: 0.9rem;
+  }
+
+  .more {
+    display: inline-block;
+    margin-top: 1.15rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--copper);
+  }
+
+  .articles li a:hover .more {
+    color: var(--copper-hi);
+  }
+
+  .planned-head {
+    margin: 4.5rem 0 0;
+    font-family: var(--mono);
+    font-size: 0.6875rem;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
   /* A hairline-separated stack rather than cards: these are notes on work that
      does not exist yet, and a card would give them more weight than that. */
   .planned {
     list-style: none;
     max-width: 820px;
-    margin: 4rem 0 0;
+    margin: 1.5rem 0 0;
     padding: 0;
     border-top: 1px solid var(--line);
   }
@@ -110,7 +236,7 @@ const planned = [
     border-bottom: 1px solid var(--line);
   }
 
-  .planned h2 {
+  .planned h3 {
     font-size: 1.0625rem;
     font-weight: 500;
     letter-spacing: -0.015em;
@@ -131,6 +257,14 @@ const planned = [
     color: var(--text-dim);
   }
 
+  /* Hover fill needs to reach past the text column or it reads as a stray band. */
+  @media (min-width: 721px) {
+    .articles li a {
+      padding-inline: 24px;
+      margin-inline: -24px;
+    }
+  }
+
   @media (max-width: 720px) {
     article {
       padding-block: 120px 80px;
@@ -140,8 +274,12 @@ const planned = [
       font-size: 1.05rem;
     }
 
-    .planned {
+    .articles {
       margin-top: 2.5rem;
+    }
+
+    .articles li a {
+      padding-block: 1.85rem;
     }
 
     .planned li {
