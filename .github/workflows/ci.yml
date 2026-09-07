@@ -40,21 +40,23 @@ jobs:
             code=$(curl -sL -o /dev/null -w "%{http_code}" --max-time 20 \
                    -A "Mozilla/5.0 (compatible; copperhead-linkcheck)" "$url")
             printf '%-64s %s\n' "$url" "$code"
-            # 999 is LinkedIn's bot-block response, not a dead link. npmjs.com
-            # and reddit.com are the same story with a different number: both
-            # serve 403 to every non-browser client, so the hero's install-count
-            # link and the footer's subreddit trip this while both are live.
-            # Reddit answers 200 from a residential address and 403 from a
-            # runner, which is the tell that it is the client being judged and
-            # not the URL. Scoped to those hosts, because a 403 anywhere else is
-            # still worth failing on. registry.npmjs.org and reddit's own
+            # 999 is LinkedIn's bot-block response, not a dead link. npmjs.com,
+            # reddit.com and x.com are the same story with a different number:
+            # all three serve 403 to every non-browser client, so the hero's
+            # install-count link and the footer's subreddit and X links trip
+            # this while all three are live. Reddit and X answer 200 from a
+            # residential address and 403 from a runner, which is the tell that
+            # it is the client being judged and not the URL. X started doing it
+            # on 2026-09-07 after passing on 2026-09-02, with no change to the
+            # link. Scoped to those hosts, because a 403 anywhere else is still
+            # worth failing on. registry.npmjs.org and reddit's own
             # /r/<name>/about.json are the machine-readable endpoints if this
             # ever needs a real check.
             case "$code" in
               2*|3*|999) ;;
               403)
                 case "$url" in
-                  *//www.npmjs.com/*|*//www.reddit.com/*) ;;
+                  *//www.npmjs.com/*|*//www.reddit.com/*|*//x.com/*) ;;
                   *) fail=1 ;;
                 esac
                 ;;
