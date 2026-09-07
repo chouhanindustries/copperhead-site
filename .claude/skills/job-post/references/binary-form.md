@@ -7,10 +7,11 @@ behind `careersApply`. The specs are here, ready to enter field by field:
 - [form-founding-ai-engineer.md](form-founding-ai-engineer.md), live at [binary.so/ejd7Mkv](https://binary.so/ejd7Mkv), and the live form is behind the spec
 - [form-ai-research-intern.md](form-ai-research-intern.md), live at [binary.so/lazoJrH](https://binary.so/lazoJrH)
 - [form-forward-deployed-hardware-engineer.md](form-forward-deployed-hardware-engineer.md), live at [binary.so/3sX6dXu](https://binary.so/3sX6dXu)
+- [form-founding-software-engineer.md](form-founding-software-engineer.md), live at [binary.so/evoDv0z](https://binary.so/evoDv0z)
 - [form-general-application.md](form-general-application.md), the open application
 
 Each file is complete on its own. Building a form should not mean reading two documents
-at once, so the common block is repeated in all three rather than referenced from here.
+at once, so the common block is repeated in every role spec rather than referenced from here.
 
 Binary has no documented public API, so this is dashboard work. An agent can write the
 spec and wire the URL. It cannot build the form and must not claim to have built one.
@@ -28,8 +29,8 @@ A form per role cannot drift that way. It also lets each form ask its own hard q
 first instead of hiding them three conditionals deep, and it gives the hardware contract
 a form that is honestly a gate rather than a general application with extra fields.
 
-The cost is that the common block is duplicated three times, so a change to it has to be
-made three times. That is a worse trade for eleven forms and a better one for three.
+The cost is that the common block is duplicated once per role, so a change to it has to
+be made four times. That is a worse trade for eleven forms and a better one for four.
 
 The general intake form is the exception, and it has to be. It exists for people who do
 not know which role they want, so it carries a role select and therefore carries the
@@ -41,7 +42,7 @@ which is the point of the split.
 Every role form opens with the same eleven questions, in the same order. Two of them are
 doing more work than they look:
 
-**Bengaluru is question three, not question ten.** All three roles are on-site and the
+**Bengaluru is question three, not question ten.** Every role is on-site and the
 hardware listing says outright that remote applications will not be considered. It is
 the largest single filter, and asking it late wastes the time of everyone who answers it
 wrong.

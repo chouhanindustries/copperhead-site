@@ -346,6 +346,87 @@ export const roles: Role[] = [
     // TODO(careers): set to the date this posting actually went live, in
     // YYYY-MM-DD. That is what turns the JobPosting structured data on.
   },
+  {
+    slug: 'founding-software-engineer',
+    title: 'Founding Software Engineer - AI Infrastructure',
+    discipline: 'Engineering',
+    location: 'Bengaluru, India',
+    workplace: 'On-site',
+    address: { locality: 'Bengaluru', region: 'Karnataka', country: 'IN' },
+    commitment: 'Full-time',
+    summary:
+      'Build the agent infrastructure, sandboxes, job pipelines and evaluation harnesses that let AI create, modify and verify real PCB designs reliably.',
+    context:
+      'copperhead’s agents help engineers create, modify and verify real PCB designs using frontier models, deterministic engineering tools and open-source EDA infrastructure. This role builds the infrastructure that makes that reliable: the execution loops, sandboxes, queues, evaluation harnesses and tracing that sit underneath every agent, rather than another thin wrapper around a model API. It is a hands-on engineering role for someone who enjoys building AI systems, backend infrastructure and developer tools from the ground up. You would join at the founding stage, take real ownership from the first day and shape the product, the architecture and the company, most of it in the open alongside the developer and hardware community already using the tool, for a competitive salary and meaningful equity. Whatever you have built before, you should be able to explain what you personally owned, the tradeoffs you made and how the system behaved when something failed.',
+    work: [
+      'Build the agent infrastructure used to create, modify and verify PCB designs.',
+      'Develop reliable tool-use, context management, memory, evaluation and orchestration systems.',
+      'Build stateful execution loops that can plan work, call engineering tools, inspect results and recover from failures.',
+      'Create sandboxed environments for safely operating on real KiCad projects and user files.',
+      'Improve schematic generation, PCB layout, component selection and datasheet understanding.',
+      'Integrate LLMs with KiCad, deterministic verification tools and open-source EDA infrastructure.',
+      'Build job queues, workers, APIs and artifact pipelines for long-running engineering workflows.',
+      'Develop evaluation harnesses and benchmarks for measuring engineering correctness, reliability and regressions.',
+      'Design production-quality backend systems and developer-facing interfaces.',
+      'Improve system reliability, latency, performance, observability and test coverage.',
+      'Build logging and tracing systems that make agent behaviour inspectable and reproducible.',
+      'Own projects from initial exploration and prototyping through production deployment.',
+      'Contribute to technical documentation and open-source engineering practices.',
+      'Help establish copperhead’s engineering culture, architecture and development processes.',
+    ],
+    fit: [
+      'Strong software engineering in Python, TypeScript, Go, Rust or a similar language.',
+      'You have designed, built and operated production backend or infrastructure systems.',
+      'You have built AI products, intelligent agents, model integrations or workflow orchestration systems.',
+      'You understand LLM tool calling, structured outputs, context management and multi-step execution.',
+      'Experience with APIs, databases, background workers, message queues or distributed job-processing systems.',
+      'Familiarity with failure handling: retries, idempotency, timeouts, checkpointing and resumable execution.',
+      'You have used containers and cloud infrastructure to run isolated or compute-intensive workloads.',
+      'You write clean, tested and maintainable production code.',
+      'A strong understanding of system design, performance, security, monitoring and observability.',
+      'You have debugged failures across application code, infrastructure and external services.',
+      'Comfort working through ambiguous technical problems and owning the outcome end to end.',
+      'You can move between fast prototypes and reliable production systems.',
+      'Strong written and verbal communication.',
+      'An interest in electronics, hardware design or PCB engineering, and the ability to pick up an unfamiliar technical domain quickly.',
+    ],
+    fitNote:
+      'The systems you have built and the problems you have solved matter more to us than your exact number of years of experience. Previous PCB design experience is useful and not required. A degree in computer science, engineering or a related field is welcome, and equivalent practical experience counts for just as much.',
+    // The listing had two optional lists, "the kind of experience that stands
+    // out" and "nice to have". Both describe things a candidate may have done
+    // and neither is a requirement, so they are one list here and the items
+    // the two had in common appear once.
+    extra: [
+      'AI agents that call tools and operate on files, codebases or external environments',
+      'Coding agents, developer tools, CI systems or remote execution platforms',
+      'Distributed workers that execute long-running, asynchronous jobs',
+      'Sandboxed code or workflow execution environments, including multi-tenant execution infrastructure',
+      'Evaluation systems for the reliability of probabilistic AI behaviour, structured generation or agent reliability',
+      'Model routing, fallback, caching or provider abstraction layers',
+      'Production systems using PostgreSQL, Redis, queues, object storage and containerised workers',
+      'CLIs, language tooling, compilers, static analysis, intermediate representations or program transformation',
+      'Infrastructure where auditability, reproducibility and failure recovery were important',
+      'Docker, Kubernetes, Terraform or cloud infrastructure',
+      'Experience building developer tools or open-source software',
+      'Familiarity with KiCad or another EDA or CAD tool',
+      'Contributions to technically ambitious open-source projects',
+      'Prior experience at an early-stage startup',
+    ],
+    applyUrl: 'https://binary.so/evoDv0z',
+    applyNote:
+      'Send your LinkedIn, GitHub or personal website, links to projects, technical writing, open-source contributions or products you have shipped, and a short note covering three things.',
+    applySend: [
+      'The hardest infrastructure, AI agent or developer-tooling system you have built',
+      'What you personally owned',
+      'A difficult technical failure you encountered and how you solved it',
+    ],
+    // TODO(careers): the listing promises a competitive salary and meaningful
+    // equity and gives no numbers, so the Pay section does not render. Set it
+    // to the range and equity you are willing to state.
+    published: true,
+    // TODO(careers): set to the date this posting actually went live, in
+    // YYYY-MM-DD. That is what turns the JobPosting structured data on.
+  },
 ];
 
 /** Canonical path for a role page. */

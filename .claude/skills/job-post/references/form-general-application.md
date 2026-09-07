@@ -69,6 +69,9 @@ found out by exactly the people worth hiring.
 > **Forward Deployed Hardware Engineer.** A contract role owning customer boards from
 > requirements through bring-up. This one has hard requirements and its own form.
 >
+> **Founding Software Engineer - AI Infrastructure.** The infrastructure underneath the
+> agents: execution loops, sandboxes, job pipelines, evaluation harnesses and tracing.
+>
 > If none of those is quite you, apply anyway and say so. Roles here get written around a
 > person about as often as the other way round.
 >
@@ -114,7 +117,7 @@ found out by exactly the people worth hiring.
 > on this form asks what you made of it.
 
 **Compensation is the one section that cannot be published as written.** No band exists
-in the repository for any of the three roles, every `pay` field is unset, and inventing
+in the repository for any of the four roles, every `pay` field is unset, and inventing
 one is a promise to a stranger. Fill it in or delete the heading. Do not publish the
 TODO.
 
@@ -149,6 +152,7 @@ Options for question 3, which must match the `title` of every published role in
 - Founding AI Engineer
 - AI Research Intern
 - Forward Deployed Hardware Engineer
+- Founding Software Engineer - AI Infrastructure
 - I am not sure, or none of these
 
 Options for question 4:
