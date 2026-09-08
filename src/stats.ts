@@ -2,8 +2,9 @@
  * Build-time fetch of live adoption stats (GitHub stars, npm installs). Runs in
  * the Astro build (Node), so the numbers are baked into the HTML: no client JS,
  * no layout shift, no visitor-facing rate limits. The refresh cadence is the
- * deploy cadence, so a scheduled Actions run keeps them current (see the
- * `schedule` trigger in .github/workflows/astro.yml).
+ * deploy cadence: Cloudflare's Git integration owns the build, and since it has
+ * no cron of its own, .github/workflows/cloudflare-refresh.yml POSTs a deploy
+ * hook every six hours to keep the numbers current.
  *
  * Every fetch is guarded the same way assets.ts gates on file presence: if the
  * repo or package is not published yet (or an API is down), the value is null
@@ -35,6 +36,27 @@ function warn(message: string): null {
   return null;
 }
 
+/**
+ * The status alone does not say why it failed. GitHub puts the explanation in a
+ * JSON `message` and the quota in the rate limit headers, and those are what
+ * separate an expired token from an unauthorised one from an exhausted budget.
+ * Reading the body consumes the response, which is safe because every caller
+ * here is already on a failure path.
+ */
+async function reason(res: Response): Promise<string> {
+  const limit = res.headers.get('x-ratelimit-limit');
+  const quota = limit ? `, quota ${res.headers.get('x-ratelimit-remaining') ?? '?'}/${limit}` : '';
+  let message = '';
+  try {
+    const body = (await res.json()) as { message?: unknown; error?: unknown };
+    const text = typeof body.message === 'string' ? body.message : body.error;
+    if (typeof text === 'string') message = `, ${text}`;
+  } catch {
+    // a non-JSON error page carries nothing worth quoting
+  }
+  return `HTTP ${res.status} ${res.statusText}${message}${quota}`;
+}
+
 async function fetchRepo(withToken: boolean): Promise<Response> {
   return fetch(`https://api.github.com/repos/${ghSlug}`, {
     headers: {
@@ -48,16 +70,21 @@ async function ghStars(): Promise<number | null> {
   try {
     let res = await fetchRepo(true);
 
-    // An expired or malformed token is worse than no token at all: the repo is
-    // public, so the same request succeeds unauthenticated, but a bad bearer
-    // earns a 401 and takes the stat down until somebody notices. Retry once
-    // without it and spend the anonymous rate limit rather than the star count.
-    if (res.status === 401 && ghToken) {
-      warn('GitHub rejected the token (401), retrying unauthenticated');
+    // A token is worse than no token at all here: the repo is public, so an
+    // anonymous request is the ground truth and the header can only ever take
+    // the stat down. Expired credentials earn a 401. A fine-grained token whose
+    // repository access does not list this repo earns a 404, because GitHub will
+    // not confirm a repo it thinks the caller cannot see. Org SSO enforcement or
+    // a spent quota earns a 403. Keying this retry to 401 alone therefore
+    // rescued one of those three and left the other two looking exactly like a
+    // repo that was never published. So retry once without the header on any
+    // failure and spend the anonymous budget rather than the star count.
+    if (!res.ok && ghToken) {
+      warn(`GitHub refused the token (${await reason(res)}), retrying unauthenticated`);
       res = await fetchRepo(false);
     }
 
-    if (!res.ok) return warn(`no GitHub stars: HTTP ${res.status} ${res.statusText}`);
+    if (!res.ok) return warn(`no GitHub stars: ${await reason(res)}`);
     const data = await res.json();
     if (typeof data.stargazers_count !== 'number') {
       return warn('no GitHub stars: no stargazers_count in the response');
@@ -73,7 +100,7 @@ async function npmDownloads(): Promise<number | null> {
     const res = await fetch(
       `https://api.npmjs.org/downloads/point/last-month/${pkg}`,
     );
-    if (!res.ok) return warn(`no npm installs: HTTP ${res.status} ${res.statusText}`);
+    if (!res.ok) return warn(`no npm installs: ${await reason(res)}`);
     const data = await res.json();
     if (typeof data.downloads !== 'number') {
       return warn('no npm installs: no downloads in the response');
