@@ -65,11 +65,11 @@ const stages = [
 
 <section id="features">
   <div class="wrap">
-    <h2 class="section-title">Nothing commits without its gate.</h2>
+    <h2 class="section-title">Eight stages, start to finish.</h2>
     <p class="section-intro">
-      You write the brief. copperhead runs eight stages against it, each one
-      its own agent run, each one committing only once its gate finds the work
-      on disk. A run that goes wrong stops instead of drifting.
+      You write the brief. copperhead runs the stages in order, and each one
+      has to leave its artifact on disk before the next starts. If a gate
+      fails, the run stops there.
     </p>
 
     <div class="pipeline">
