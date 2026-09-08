@@ -2,7 +2,7 @@
 # for a rolling 14 days, and serves nothing older through any API. The only way
 # to have a year of it is to have been writing it down all along. This workflow
 # is that: once a day it snapshots the traffic API for the copperhead repo,
-# appends the new rows to a long-lived time series, and commits the result to
+# appends the new rows to a long-lived time series and commits the result to
 # this repo's `github-repo-stats` branch.
 #
 # The data lands as CSV under <owner>/<repo>/ghrs-data/ on that branch, which is

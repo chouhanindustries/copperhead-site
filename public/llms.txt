@@ -2,7 +2,7 @@
 
 > copperhead is an open source (Apache-2.0) AI agent for hardware design — "Cursor for circuit boards." Given a plain-English change request or a product brief, it edits real KiCad files (.kicad_sch, .kicad_pcb) in your own git repository, propagates the change into every document that references it (pinout, BOM, subsystem docs, firmware scaffold) and verifies its own work by running `kicad-cli` ERC and DRC until the checks pass. It leaves artifacts on disk, not advice in a chat window.
 
-Built by Animesh Chouhan (Chouhan Industries). Proven on Open Telegraph, a shipping 40×40 mm ESP32-S3 Morse key with a 25 µA deep-sleep budget: building that board produced copperhead, and redesigning the board through copperhead proved it.
+Built by Animesh Chouhan. Proven on Open Telegraph, a shipping 40×40 mm ESP32-S3 Morse key with a 25 µA deep-sleep budget: building that board produced copperhead, and redesigning the board through copperhead proved it.
 
 Two invariants make the loop trustworthy:
 
@@ -48,5 +48,5 @@ Key facts:
 - [Building open hardware with Claude](https://chouhan.ai/building-with-claude): the longer story of how Open Telegraph and copperhead came together
 - [Repository stats](https://copperhead.sh/stats/): the long record of traffic to the copperhead repository, collected daily because GitHub keeps only fourteen days of it
 - [Status](https://copperhead.sh/status/): current status and ninety-day uptime of copperhead's hosted services
-- [Careers](https://copperhead.sh/careers/): open roles at Chouhan Industries, the team building copperhead, and how that team works
+- [Careers](https://copperhead.sh/careers/): open roles at copperhead and how the team works
 - [KiCad](https://www.kicad.org/): the open source ECAD tool copperhead works on

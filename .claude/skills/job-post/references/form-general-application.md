@@ -40,7 +40,7 @@ found out by exactly the people worth hiring.
 > the tools agree: every file mutation is followed by a verification run inside a git
 > snapshot that rolls back if it fails. Spec-gated in, verification-gated out.
 >
-> It was built by Chouhan Industries and proven on Open Telegraph, a 40 by 40 mm
+> It was built by Animesh Chouhan and proven on Open Telegraph, a 40 by 40 mm
 > ESP32-S3 Morse key with a 25 microamp deep-sleep budget. Building that board produced
 > copperhead and redesigning the board through copperhead proved it. Both are public.
 >
@@ -113,11 +113,11 @@ found out by exactly the people worth hiring.
 > ### Before you apply
 >
 > Please install it and try it. `npm i -g copperhead`, and the docs are at
-> docs.copperhead.sh. It is free, it runs locally on your own key, and the last question
+> docs.copperhead.sh. It is free, it runs locally on your own key and the last question
 > on this form asks what you made of it.
 
 **Compensation is the one section that cannot be published as written.** No band exists
-in the repository for any of the four roles, every `pay` field is unset, and inventing
+in the repository for any of the four roles, every `pay` field is unset and inventing
 one is a promise to a stranger. Fill it in or delete the heading. Do not publish the
 TODO.
 

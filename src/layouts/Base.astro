@@ -53,7 +53,7 @@ const appJsonLd = {
   operatingSystem: 'macOS, Linux, Windows',
   license: 'https://www.apache.org/licenses/LICENSE-2.0',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-  author: { '@type': 'Organization', name: 'Chouhan Industries', url: links.chouhan },
+  author: { '@type': 'Organization', name: 'copperhead', url: site, sameAs: links.chouhan },
 };
 
 const jsonLd = extraJsonLd ? [appJsonLd, extraJsonLd] : appJsonLd;
@@ -98,7 +98,7 @@ const jsonLd = extraJsonLd ? [appJsonLd, extraJsonLd] : appJsonLd;
 
         The whole model lives here rather than in the navbar so that the path
         taken before paint and the path taken on a click are the same three
-        lines. Three states, not two: 'light', 'dark', and null for "follow the
+        lines. Three states, not two: 'light', 'dark' and null for "follow the
         OS". Null writes no attribute, which is what keeps the page tracking the
         system preference live if the reader changes it mid-session. */}
     <script is:inline>

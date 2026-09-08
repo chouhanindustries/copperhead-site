@@ -14,7 +14,7 @@ _(Companion to SPEC.md and pitch-script.md. Website copy follows Chouhan voice: 
   - "The agent that lives in your copper." (primary)
   - "From prompt to manufacturable board."
   - "Hardware design at software speed."
-- **Elevator:** copperhead is an open source AI agent that takes a product brief and produces a complete, verified hardware design: schematics, a first-draft board, gerbers, firmware, and a build plan. It works on real KiCad files in your own repo, and nothing is done until the tools agree.
+- **Elevator:** copperhead is an open source AI agent that takes a product brief and produces a complete, verified hardware design: schematics, a first-draft board, gerbers, firmware and a build plan. It works on real KiCad files in your own repo, and nothing is done until the tools agree.
 
 ### Voice
 
@@ -40,7 +40,7 @@ _(Companion to SPEC.md and pitch-script.md. Website copy follows Chouhan voice: 
 
 Stack suggestion: one static HTML page, same infra as chouhan.ai. Section order:
 
-1. **Hero** - wordmark + tagline. H1: "Cursor for circuit boards." Sub: "An open source AI agent that designs, documents, and verifies real PCBs from a prompt. On your files, in your repo." Two buttons: `GitHub` (primary), `Watch the demo` (video). Background: faint animated ratsnest resolving into routed traces.
+1. **Hero** - wordmark + tagline. H1: "Cursor for circuit boards." Sub: "An open source AI agent that designs, documents and verifies real PCBs from a prompt. On your files, in your repo." Two buttons: `GitHub` (primary), `Watch the demo` (video). Background: faint animated ratsnest resolving into routed traces.
 2. **The demo** - the 60-second video, autoplay muted. Caption: "A real board, redesigned in one prompt, checks passing."
 3. **How it works** - the six-step loop from the blog (§4.0 of SPEC.md), as a horizontal stepper: Docs → Propose → Edit → Propagate → Verify → Rationale. One line each.
 4. **Spec-gated in, verification-gated out** - the two invariants as a diptych. Left: "Nothing starts without a spec." Right: "Nothing is done until the tools agree." This is the trust section.
@@ -48,7 +48,7 @@ Stack suggestion: one static HTML page, same infra as chouhan.ai. Section order:
 6. **Proof** - Open Telegraph card: board render, "designed to a 25 µA sleep budget, every decision public", link to repo + blog post.
 7. **Why open** - three lines from the Chouhan philosophy: transparency scales, trust does not. Apache-2.0 badge, KiCad + OpenSpec logos.
 8. **Quickstart** - the four-command install block, copy button.
-9. **Footer** - Chouhan Industries, GitHub, X, license links.
+9. **Footer** - chouhan.ai, GitHub, X, license links.
 
 Copy rule: every claim on the page must be demonstrable in the repo today. Nothing aspirational above the fold.
 
@@ -67,7 +67,7 @@ Copy rule: every claim on the page must be demonstrable in the repo today. Nothi
 
 ### Why customers pay when the tool is free
 
-The design runs locally forever. What's paid is _operational_: hosted compute and keys, team memory (shared constraint libraries), CI enforcement, and the audit trail as a compliance artifact. Same reason GitHub charges while git is free.
+The design runs locally forever. What's paid is _operational_: hosted compute and keys, team memory (shared constraint libraries), CI enforcement and the audit trail as a compliance artifact. Same reason GitHub charges while git is free.
 
 ### Unit economics sanity check
 

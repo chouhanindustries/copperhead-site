@@ -2,7 +2,7 @@
 import { links } from '../config';
 
 // The lower "details" half of the pricing page: the three metering modes, the
-// full feature-comparison table, and the open-core / open-hardware commitments.
+// full feature-comparison table and the open-core / open-hardware commitments.
 // Kept text-first and quiet so the tier cards above stay the headline act.
 
 const modes = [
@@ -44,7 +44,7 @@ const rows: { label: string; cells: string[] }[] = [
 const commitments = [
   {
     title: 'Plain text, in your repo, at every tier',
-    body: 'Paid plans add hosting, collaboration, and governance on top of files you fully own. No proprietary format, no lock-in.',
+    body: 'Paid plans add hosting, collaboration and governance on top of files you fully own. No proprietary format, no lock-in.',
   },
   {
     title: 'Cancel any time',
@@ -118,7 +118,7 @@ const commitments = [
     <p class="index">03 · Open core</p>
     <h2 class="section-title">Open source, and kept that way.</h2>
     <p class="section-intro">
-      Paid plans only ever add hosting, collaboration, and governance on top of
+      Paid plans only ever add hosting, collaboration and governance on top of
       files you already own. They never wall off the work itself.
     </p>
 
@@ -149,7 +149,7 @@ const commitments = [
     </ul>
 
     <p class="closer">
-      Questions on volume, credits, or self-hosting?{' '}
+      Questions on volume, credits or self-hosting?{' '}
       <a href={links.contact}>Talk to us</a> or{' '}
       <a href={links.getStarted}>book a demo call</a>.
     </p>

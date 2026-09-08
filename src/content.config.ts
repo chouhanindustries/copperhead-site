@@ -47,14 +47,14 @@ const blog = defineCollection({
 });
 
 /**
- * Research articles: method, measurement, and results. Separate from the blog
+ * Research articles: method, measurement and results. Separate from the blog
  * because the two make different promises. A blog post argues; a research
  * article is bound to evidence in the benchmark repository and says plainly
  * which of its numbers have been measured and which have not.
  */
 const research = defineCollection({
   // Same underscore convention as the blog: a draft or body partial named _*.md
-  // must not become an article, a route, or a sitemap entry.
+  // must not become an article, a route or a sitemap entry.
   loader: glob({ base: './src/content/research', pattern: ['**/*.{md,mdx}', '!**/_*'] }),
   schema: z.object({
     title: z.string(),

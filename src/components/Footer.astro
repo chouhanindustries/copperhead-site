@@ -3,11 +3,11 @@ import { links } from "../config";
 
 // Footer in supermemory.ai's shape, measured off their /pricing page: a
 // full-bleed dark ground, a statement headline on the left against link columns
-// on the right, a mono uppercase legal line set to the right edge, and an
+// on the right, a mono uppercase legal line set to the right edge and an
 // oversized wordmark bled off both edges and clipped by the page bottom.
 //
 // Where theirs is a flat brand blue, this one is a black-soldermask board seen
-// from above: matte black mask, matte off-white silkscreen legend, and the
+// from above: matte black mask, matte off-white silkscreen legend and the
 // wordmark as exposed copper under it. The palette is literal —
 //   --mask       black soldermask, warm rather than pure #000 (that reads as a
 //                hole in the page; real mask has a little body to it)
@@ -53,7 +53,7 @@ const columns = [
   {
     title: "Company",
     items: [
-      { label: "Chouhan Industries", href: links.chouhan },
+      { label: "chouhan.ai", href: links.chouhan },
       { label: "Careers", href: links.careers },
       ...(links.contact ? [{ label: "Contact", href: links.contact }] : []),
     ],
@@ -82,6 +82,18 @@ const social = [
           label: "LinkedIn",
           href: links.linkedin,
           path: "M3.6 5.9v8.2H.9V5.9h2.7ZM2.25 1.4c.86 0 1.55.7 1.55 1.55 0 .86-.7 1.55-1.55 1.55a1.55 1.55 0 0 1 0-3.1ZM15.1 9.5v4.6h-2.7V9.8c0-1.1-.4-1.86-1.39-1.86-.76 0-1.2.51-1.4 1-.07.18-.09.43-.09.68v4.48H6.83s.04-7.27 0-8.02h2.69v1.14c.36-.55 1-1.33 2.43-1.33 1.78 0 3.11 1.16 3.11 3.66Z",
+        },
+      ]
+    : []),
+  // Instagram is drawn rather than lifted from a brand kit: the outer frame and
+  // the lens are holes punched by winding direction, so it fills with
+  // currentColor like every other glyph in this row.
+  ...(links.instagram
+    ? [
+        {
+          label: "Instagram",
+          href: links.instagram,
+          path: "M5 .6H11A4.4 4.4 0 0 1 15.4 5V11A4.4 4.4 0 0 1 11 15.4H5A4.4 4.4 0 0 1 .6 11V5A4.4 4.4 0 0 1 5 .6ZM5.3 2.1A3.2 3.2 0 0 0 2.1 5.3V10.7A3.2 3.2 0 0 0 5.3 13.9H10.7A3.2 3.2 0 0 0 13.9 10.7V5.3A3.2 3.2 0 0 0 10.7 2.1ZM4.5 8A3.5 3.5 0 1 1 11.5 8A3.5 3.5 0 1 1 4.5 8ZM5.9 8A2.1 2.1 0 1 0 10.1 8A2.1 2.1 0 1 0 5.9 8ZM10.5 4.45A1.05 1.05 0 1 1 12.6 4.45A1.05 1.05 0 1 1 10.5 4.45Z",
         },
       ]
     : []),
@@ -161,7 +173,7 @@ const social = [
     <!-- Their line is a bare copyright. This one keeps the licence terms the
          project actually ships under, which are not decoration. -->
     <p class="legal">
-      <span class="part">© 2026 · Chouhan Industries</span>
+      <span class="part">© 2026 · copperhead</span>
       <span class="sep" aria-hidden="true"> · </span>
       <span class="part">Software <a href={links.license}>Apache-2.0</a></span>
       <span class="sep" aria-hidden="true"> · </span>

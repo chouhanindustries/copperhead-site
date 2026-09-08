@@ -7,7 +7,7 @@ Final copy, section by section, matching the layout in brand-and-business.md §2
 ## Meta / SEO
 
 - **Title:** copperhead. Cursor for circuit boards.
-- **Description:** An open source AI agent that designs, documents, and verifies real PCBs from a prompt. It works on your KiCad files, in your repo, and nothing is done until the checks pass.
+- **Description:** An open source AI agent that designs, documents and verifies real PCBs from a prompt. It works on your KiCad files, in your repo, and nothing is done until the checks pass.
 - **OG image:** board render on near-black with the copperhead wordmark
 - **URL:** copperhead.chouhan.ai (or chouhan.ai/copperhead)
 
@@ -17,7 +17,7 @@ Final copy, section by section, matching the layout in brand-and-business.md §2
 
 **H1:** Cursor for circuit boards.
 
-**Sub:** copperhead is an open source AI agent that designs, documents, and verifies real PCBs from a prompt. On your files, in your repo, with KiCad's own checks as the gate.
+**Sub:** copperhead is an open source AI agent that designs, documents and verifies real PCBs from a prompt. On your files, in your repo, with KiCad's own checks as the gate.
 
 **Buttons:** [View on GitHub] [Watch the demo]
 
@@ -41,7 +41,7 @@ Final copy, section by section, matching the layout in brand-and-business.md §2
 2. **Talk through the change.** You describe what you want. The agent proposes the parts and circuit, and you push back until the reasoning holds up.
 3. **Edit the real files.** Changes go straight into the KiCad schematic and the docs, with the same part names and net names everywhere.
 4. **Propagate.** Change one value and it carries across every file that references it. The boring, easy-to-get-wrong step is the one the agent is best at.
-5. **Check the work.** The agent runs ERC and DRC, reads the errors back, and fixes them.
+5. **Check the work.** The agent runs ERC and DRC, reads the errors back and fixes them.
 6. **Write down why.** Every decision gets a one-line reason next to it, so the next change does not quietly undo it.
 
 ---
@@ -54,7 +54,7 @@ Final copy, section by section, matching the layout in brand-and-business.md §2
 The agent cannot touch a design file until a validated change proposal exists. The edit tools stay locked until it passes. Every edit traces back to a documented intent.
 
 **Right card:** **Nothing is done until the tools agree.**
-Every change is followed by ERC on the schematic and DRC on the board. Violations get read, fixed, and re-run. The agent reports success when the checks do.
+Every change is followed by ERC on the schematic and DRC on the board. Violations get read, fixed and re-run. The agent reports success when the checks do.
 
 **Closing line:** The design cannot drift from its requirements, because drift is a build failure.
 
@@ -86,7 +86,7 @@ Every change is followed by ERC on the schematic and DRC on the board. Violation
 **Section title:** Proven on real copper.
 
 **Card:** [Open Telegraph board render]
-Open Telegraph is a pocket-size Morse key: an ESP32-S3, one button, one RGB LED, and a battery, designed to live inside a 25 microamp sleep budget. It was built with this workflow, and every decision, every trap caught, and every file is public.
+Open Telegraph is a pocket-size Morse key: an ESP32-S3, one button, one RGB LED and a battery, designed to live inside a 25 microamp sleep budget. It was built with this workflow, and every decision, every trap caught, and every file is public.
 
 **Links:** [Read the build story] [Browse the repo]
 
@@ -100,7 +100,7 @@ Hardware engineers trust what they can inspect. copperhead is Apache-2.0, built 
 
 Transparency scales. Trust does not. A closed tool asks you to take its word; an open one hands you the source and invites you to check.
 
-copperhead is a Chouhan Industries project. The same commitment that puts every hardware schematic we make in public applies to the tool that designs them.
+copperhead is an open source project. The same commitment that puts every hardware schematic we make in public applies to the tool that designs them.
 
 ---
 
@@ -116,13 +116,13 @@ copperhead init
 copperhead do "add a second RGB LED on an RTC-capable pin"
 ```
 
-**Under block:** Requires Node 20+ and kicad-cli. The agent refuses to run on a dirty git tree, refuses edits without a validated proposal, and refuses changes that break your documented budgets. You will come to like being told no.
+**Under block:** Requires Node 20+ and kicad-cli. The agent refuses to run on a dirty git tree, refuses edits without a validated proposal and refuses changes that break your documented budgets. You will come to like being told no.
 
 ---
 
 ## 9. Footer
 
-copperhead · a Chouhan Industries project
+copperhead · an open source project
 [GitHub] [Discord] [X] [chouhan.ai]
 Apache-2.0. Hardware designs referenced here are CERN-OHL-S v2.0.
 Built at Antler Crackathon, Bengaluru.
@@ -145,4 +145,4 @@ Built at Antler Crackathon, Bengaluru.
 
 **Title:** Show HN: Copperhead, an open source AI agent that designs real PCBs in your KiCad repo
 
-**Body:** I design open hardware and got tired of the part of the job that is not engineering: keeping five documents, a BOM, and a schematic from drifting apart every time one value changes. So I turned my workflow into an agent. It writes a change proposal first, edits the real KiCad s-expressions surgically, propagates the change across every doc, then runs kicad-cli ERC and DRC and fixes what they flag. It refused to add a pullup that would have leaked 33 uA against my 25 uA sleep budget, and cited the spec line. That was the moment it earned the repo it lives in. Proof board (a pocket Morse key) and the tool are both fully open. Happy to answer anything.
+**Body:** I design open hardware and got tired of the part of the job that is not engineering: keeping five documents, a BOM and a schematic from drifting apart every time one value changes. So I turned my workflow into an agent. It writes a change proposal first, edits the real KiCad s-expressions surgically, propagates the change across every doc, then runs kicad-cli ERC and DRC and fixes what they flag. It refused to add a pullup that would have leaked 33 uA against my 25 uA sleep budget, and cited the spec line. That was the moment it earned the repo it lives in. Proof board (a pocket Morse key) and the tool are both fully open. Happy to answer anything.

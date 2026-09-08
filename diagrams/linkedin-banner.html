@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>copperhead LinkedIn banner</title>
+  <style>
+    /* The LinkedIn company page cover, 1128x191, rendered at 2x by
+       scripts/render-banner.mjs into branding/png/ in both themes.
+
+       Same language as the post cards: a headline in the display face and
+       one piece of copper geometry. Three things about the surface shape
+       the layout, all measured off the live page in these units.
+
+       The page logo (the fiducial tile) sits over the bottom-left of the
+       cover: x 70-245, y 120-191 on desktop. So there is no lockup here,
+       the tile is the mark. On a phone the cover is cropped to its middle
+       555px (about x 286-842) and the tile moves with it, to x 310-440,
+       y 147-191. The headline is the one thing that has to survive both,
+       so it is centred on the cover, two lines, and ends above y 140: on
+       the phone it is the whole banner, on desktop the url and the copper
+       sit outside the crop. LinkedIn prints "copperhead" and the tagline
+       directly under the cover, so the headline is the other tagline from
+       brand-and-business.md rather than "Cursor for circuit boards",
+       which would otherwise appear twice, one above the other, and there
+       is no sub line: the page is the sub. */
+
+    @font-face {
+      font-family: 'Space Grotesk';
+      src: url('../public/fonts/space-grotesk-var.woff2') format('woff2-variations');
+      font-weight: 300 700;
+    }
+
+    @font-face {
+      font-family: 'JetBrains Mono';
+      src: url('../public/fonts/jetbrains-mono-400.woff2') format('woff2');
+      font-weight: 400;
+    }
+
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#FDFCFC, #09090B);
+      --copper: light-dark(#A75F14, #D08F39);
+      --text: light-dark(#0A0A0A, #EDEDEF);
+      --text-dim: light-dark(#57575E, #9B9BA5);
+      --sans: 'Space Grotesk', -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+    }
+
+    .banner {
+      position: relative;
+      width: 1128px;
+      height: 191px;
+      background: var(--bg);
+      font-family: var(--sans);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .copy {
+      position: absolute;
+      left: 50%;
+      top: 40px;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .title {
+      font-size: 44px;
+      font-weight: 500;
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+      text-align: center;
+      white-space: pre-line;
+    }
+
+    .url {
+      margin-top: 12px;
+      font-family: var(--mono);
+      font-size: 15px;
+      letter-spacing: 0.01em;
+      color: var(--text-dim);
+    }
+
+    /* The figure: a QFN footprint and its fan-out, the way a routed board
+       looks in KiCad with only the copper layer on. Six pads a side; the
+       right side runs to the edge as a bus, the top and bottom escape to
+       staggered vias, the left lands on through-hole pads. Silkscreen
+       (the body outline) is copper
+       at half opacity; everything else is the mark's stroke. It lives in
+       the part of the cover the phone crops away. */
+    .motif {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 440px;
+      height: 191px;
+    }
+
+    .motif svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="banner" id="banner">
+    <div class="copy">
+      <div class="title">Hardware as fast
+as software.</div>
+      <div class="url">copperhead.sh</div>
+    </div>
+
+    <div class="motif">
+      <svg viewBox="0 0 440 191" fill="none" stroke="var(--copper)" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+        <!-- shifted so the left pads stay outside the phone crop; the bus
+             overshoots the viewBox and is clipped by the cover -->
+        <g transform="translate(18 0)">
+        <!-- silkscreen: body outline and pin 1 -->
+        <rect x="218" y="64" width="64" height="64" rx="2" opacity="0.5" />
+        <circle cx="226" cy="72" r="2" fill="var(--copper)" stroke="none" />
+        <!-- pads, six a side -->
+        <path d="M227.5 64v-8M227.5 128v8" />
+        <path d="M236.5 64v-8M236.5 128v8" />
+        <path d="M245.5 64v-8M245.5 128v8" />
+        <path d="M254.5 64v-8M254.5 128v8" />
+        <path d="M263.5 64v-8M263.5 128v8" />
+        <path d="M272.5 64v-8M272.5 128v8" />
+        <path d="M218 73.5h-8M282 73.5h8" />
+        <path d="M218 82.5h-8M282 82.5h8" />
+        <path d="M218 91.5h-8M282 91.5h8" />
+        <path d="M218 100.5h-8M282 100.5h8" />
+        <path d="M218 109.5h-8M282 109.5h8" />
+        <path d="M218 118.5h-8M282 118.5h8" />
+        <!-- right side: the bus fans out to the edge, three up, three down -->
+        <path d="M290 73.5H330L360 43.5H460" />
+        <path d="M290 82.5H330L360 52.5H460" />
+        <path d="M290 91.5H330L360 61.5H460" />
+        <path d="M290 100.5H330L360 130.5H460" />
+        <path d="M290 109.5H330L360 139.5H460" />
+        <path d="M290 118.5H330L360 148.5H460" />
+        <!-- top: staggered vias -->
+        <path d="M227.5 56V47.5" />
+        <circle cx="227.5" cy="44" r="3.5" fill="var(--bg)" />
+        <path d="M236.5 56V37.5" />
+        <circle cx="236.5" cy="34" r="3.5" fill="var(--bg)" />
+        <path d="M245.5 56V47.5" />
+        <circle cx="245.5" cy="44" r="3.5" fill="var(--bg)" />
+        <path d="M254.5 56V37.5" />
+        <circle cx="254.5" cy="34" r="3.5" fill="var(--bg)" />
+        <path d="M263.5 56V47.5" />
+        <circle cx="263.5" cy="44" r="3.5" fill="var(--bg)" />
+        <path d="M272.5 56V37.5" />
+        <circle cx="272.5" cy="34" r="3.5" fill="var(--bg)" />
+        <!-- bottom: the same escape, mirrored -->
+        <path d="M227.5 136V143.5" />
+        <circle cx="227.5" cy="147" r="3.5" fill="var(--bg)" />
+        <path d="M236.5 136V153.5" />
+        <circle cx="236.5" cy="157" r="3.5" fill="var(--bg)" />
+        <path d="M245.5 136V143.5" />
+        <circle cx="245.5" cy="147" r="3.5" fill="var(--bg)" />
+        <path d="M254.5 136V153.5" />
+        <circle cx="254.5" cy="157" r="3.5" fill="var(--bg)" />
+        <path d="M263.5 136V143.5" />
+        <circle cx="263.5" cy="147" r="3.5" fill="var(--bg)" />
+        <path d="M272.5 136V153.5" />
+        <circle cx="272.5" cy="157" r="3.5" fill="var(--bg)" />
+        <!-- left: alternate pads run out to pads on the far side, the rest stop at vias -->
+        <path d="M210 73.5H203.5" />
+        <circle cx="200" cy="73.5" r="3.5" fill="var(--bg)" />
+        <path d="M210 82.5H196L176 62.5H158" />
+        <circle cx="152" cy="62.5" r="6" />
+        <path d="M210 91.5H203.5" />
+        <circle cx="200" cy="91.5" r="3.5" fill="var(--bg)" />
+        <path d="M210 100.5H196L176 80.5H158" />
+        <circle cx="152" cy="80.5" r="6" />
+        <path d="M210 109.5H203.5" />
+        <circle cx="200" cy="109.5" r="3.5" fill="var(--bg)" />
+        <path d="M210 118.5H196L176 98.5H158" />
+        <circle cx="152" cy="98.5" r="6" />
+      </svg>
+    </div>
+  </div>
+</body>
+
+</html>

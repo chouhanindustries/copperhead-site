@@ -1,6 +1,6 @@
 ---
 name: job-post
-description: Add, edit or close a role on this site's careers section, in the house voice. Use whenever the task is writing a job post, converting a LinkedIn or ATS listing into the site's schema, editing an existing role, filling in pay or a posting date, or taking a role down. Enforces the two publication gates, the no-invented-facts rule and the same prose rules as the blog. Triggers on "job post", "add a role", "we're hiring", "careers page", "new opening", "job description", "close the role", "take the job down".
+description: Add, edit or close a role on this site's careers section, in the house voice. Use whenever the task is writing a job post, converting a LinkedIn or ATS listing into the site's schema, editing an existing role, filling in pay or a posting date or taking a role down. Enforces the two publication gates, the no-invented-facts rule and the same prose rules as the blog. Triggers on "job post", "add a role", "we're hiring", "careers page", "new opening", "job description", "close the role", "take the job down".
 ---
 
 # Posting a role
@@ -74,11 +74,11 @@ formatting decision. Rewriting its punctuation is.
 Rules 1 to 3 of [blog-post](../blog-post/SKILL.md) apply in full: no em dashes, no
 serial comma, none of the AI tells. Read that file if you have not.
 
-`npm run lint:prose` does **not** cover this copy. It walks the two content
-collections and a role lives in TypeScript, so both rules here are enforced by
-reading. Check the pasted listing for serial commas specifically. Job posts are full
-of them: `plan, generate, modify, and verify` becomes `plan, generate, modify and
-verify`.
+`npm run lint:prose` reads the string literals in `src/careers.ts`, so the serial
+comma rule is enforced on a role the same way it is on a post. Run it before you
+open a PR. Still read the pasted listing yourself. Job posts are full of serial
+commas: `plan, generate, modify, and verify` becomes `plan, generate, modify and
+verify`. The check is a heuristic, not a grammarian.
 
 Beyond that:
 
@@ -139,7 +139,7 @@ when the role closes.
 
 Binary has no documented public API. The form is built and edited by hand in an
 authenticated dashboard, which means an agent cannot do it and should not claim to have
-done it. Write the spec, hand it over, and wire the URL when it comes back.
+done it. Write the spec, hand it over and wire the URL when it comes back.
 
 ## What you may not invent
 

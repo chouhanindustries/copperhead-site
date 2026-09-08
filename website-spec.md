@@ -1,6 +1,6 @@
 # copperhead-site — Website Specification
 
-Single-page marketing site for copperhead. Live at **copperhead.chouhan.ai**. Content is final in website-content.md; visual system in brand-and-business.md §1. This spec covers structure, implementation, and acceptance.
+Single-page marketing site for copperhead. Live at **copperhead.chouhan.ai**. Content is final in website-content.md; visual system in brand-and-business.md §1. This spec covers structure, implementation and acceptance.
 
 ## 1. Goals
 
@@ -38,7 +38,7 @@ Non-goals: docs site (lives in the repo for now), waitlist/payments (later, via 
 ```
 
 - Dark throughout. No light mode in v1
-- **Brand gold:** `--gold` (#C9A84C) is the Chouhan Industries brand gold, taken from the `--gold` variable on [chouhan.ai](https://chouhan.ai). Keep it in sync with the parent site; it doubles here as the ENIG-gold accent and the focus-ring color
+- **Brand gold:** `--gold` (#C9A84C) is the chouhan.ai brand gold, taken from the `--gold` variable on [chouhan.ai](https://chouhan.ai). Keep it in sync with the parent site; it doubles here as the ENIG-gold accent and the focus-ring color
 - **Motif:** thin 1px copper trace lines as section dividers, each terminating in a small via dot (6px circle, copper ring, bg fill). One motif, used consistently, nothing else
 - Wordmark: `copperhead` lowercase in mono, the second "o" drawn as a via (annular ring)
 - Background texture: faint schematic grid dots (2% opacity) on the hero only
@@ -68,7 +68,7 @@ Sticky header: none in v1 (page is short). A minimal top-right `GitHub` link flo
 
 Routes: `/blog/` (index), `/blog/<slug>/` (posts), `/blog/faq/`.
 
-- Posts are markdown in `src/content/blog/`, typed by the collection schema in `src/content.config.ts` (title, description, date, kind). Adding a file is the whole publishing step: index, routing, and sitemap follow from it
+- Posts are markdown in `src/content/blog/`, typed by the collection schema in `src/content.config.ts` (title, description, date, kind). Adding a file is the whole publishing step: index, routing and sitemap follow from it
 - The FAQ is a hand-built page rather than a post, because it carries `FAQPage` JSON-LD and native `<details>` accordions. It is listed on the index alongside the posts
 - Same design system, no new tokens. Post prose styles live in the post route; the measure is 760px against the 1120px page max
 - Structured data: `Blog` on the index, `BlogPosting` per post, `FAQPage` on the FAQ, each alongside the site-wide `SoftwareApplication` node. `og:type` is `article` on posts
@@ -101,7 +101,7 @@ Routes: `/blog/` (index), `/blog/<slug>/` (posts), `/blog/faq/`.
 
 ## 8. Accessibility
 
-- Contrast: copper #D08F39 on #121212 is ~6.8:1, passing AA for normal text — body text is still #EAEAEA; copper reserved for headings, links (underlined), and buttons
+- Contrast: copper #D08F39 on #121212 is ~6.8:1, passing AA for normal text — body text is still #EAEAEA; copper reserved for headings, links (underlined) and buttons
 - All interactive elements keyboard-reachable with visible focus ring (gold outline)
 - Video has captions file (the narration script already exists in pitch-script.md)
 - Semantic landmarks: header/main/footer, one h1, sections with h2

@@ -27,7 +27,8 @@ live in `COPY.md`.
 | `svg/copperhead-lockup.svg` | Mark plus wordmark, for dark backgrounds |
 | `svg/copperhead-lockup-light.svg` | Mark plus wordmark, for light backgrounds |
 | `svg/copperhead-lockup-black.svg`, `-white.svg` | Single-color lockups |
-| `png/` | Raster exports: mark at 64, 256, and 1024 px, tile at 512 px, lockups at 128 and 512 px tall |
+| `png/` | Raster exports: mark at 64, 256 and 1024 px, tile at 512 px, lockups at 128 and 512 px tall |
+| `png/copperhead-linkedin-banner.png`, `-light.png` | The LinkedIn company page cover, 2256 x 382 (2x of the 1128 x 191 LinkedIn asks for). Source is `diagrams/linkedin-banner.html`; regenerate with `node scripts/render-banner.mjs` |
 | `kicad/copperhead-mark-5mm.kicad_mod` | The mark as a KiCad silkscreen footprint, 5 mm square, for putting on boards the agent helped design |
 
 The SVGs are the masters. If a size or color you need is missing, export it
@@ -54,7 +55,7 @@ These match the `--copper` and `--text` tokens in `src/styles/global.css`.
 - Minimum sizes: 16 px for the mark, 90 px wide for the lockup. Below that,
   the ring closes up.
 - The wordmark is always lowercase. Do not set it in another font, recolor the
-  mark outside the palette above, rotate it, or add effects.
+  mark outside the palette above, rotate it or add effects.
 - On photographs or busy backgrounds, use the tile or the single-color
   white/black versions.
 
@@ -68,6 +69,6 @@ of real fiducials so it does not confuse a pick-and-place camera.
 ## Provenance and license
 
 The wordmark is outlined from JetBrains Mono, which is licensed under the
-SIL Open Font License 1.1. The rest of the artwork is original to Chouhan
-Industries. The files in this folder are for identifying copperhead and
+SIL Open Font License 1.1. The rest of the artwork is original to
+copperhead. The files in this folder are for identifying copperhead and
 projects built with it; do not use them to imply endorsement or affiliation.

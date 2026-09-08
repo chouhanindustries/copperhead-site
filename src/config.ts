@@ -34,7 +34,7 @@ export const links = {
   docs: 'https://docs.copperhead.sh/',
   // The hosted platform, copperhead cloud (the copperhead-cloud repo). This
   // site links to it and does nothing else with it: cloud SPEC §3.1 scopes
-  // copperhead-site to "links only" and forbids auth code, a Supabase client,
+  // copperhead-site to "links only" and forbids auth code, a Supabase client
   // or any secret landing here.
   app: 'https://app.copperhead.sh/',
   demoVideo: '/copperhead-demo.mp4',
@@ -73,6 +73,7 @@ export const links = {
   discord: 'https://discord.gg/24zYXuR3Pq',
   x: 'https://x.com/copperheadhq',
   linkedin: 'https://www.linkedin.com/company/copperheadhq',
+  instagram: 'https://www.instagram.com/copperhead.hq/',
   reddit: 'https://www.reddit.com/r/copperheadhq/',
   chouhan: 'https://chouhan.ai',
   kicad: 'https://www.kicad.org/',
@@ -115,16 +116,16 @@ export const quickstart = [
 
 /**
  * The brief.md the quickstart points at, shown beside it (CtaEnd) and in the
- * Antler write-up. Content grounded in the Open Telegraph brief
- * (usecase-copperhead.md): ESP32-S3, BLE HID, the 25 µA sleep budget, the
- * 3.5 mm key jack. One string, so the renderings and their copy buttons
- * cannot drift.
+ * Antler write-up. A deliberately ordinary board: a Bluetooth speaker, an ESP32
+ * doing A2DP into a class-D amp, on a battery and a standby budget. The budget
+ * line is the load-bearing one, since it is what the agent refuses to break.
+ * One string, so the renderings and their copy buttons cannot drift.
  */
-export const morseBrief = `# Pocket Morse key
+export const speakerBrief = `# Pocket Bluetooth speaker
 
-A pocket-size Morse key that types over Bluetooth as a standard keyboard.
+A palm-size Bluetooth speaker that plays for a day on one charge.
 
-- ESP32-S3, BLE HID
+- ESP32, Bluetooth audio (A2DP sink)
+- 3 W class-D amp into a 4 Ω driver
 - Li-Po cell, USB-C charging
-- Sleep current budget: 25 µA
-- 3.5 mm jack for an external paddle`;
+- Standby current budget: 100 µA`;

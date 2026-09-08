@@ -26,15 +26,15 @@ export const groups: FaqGroup[] = [
     items: [
       {
         q: 'What is copperhead?',
-        a: `An open source AI agent that designs, documents, and verifies printed circuit boards. You describe a change or hand it a product brief, and it edits your real KiCad files, updates every document that references them, and runs KiCad's own checks until they pass. <a href="/blog/meet-copperhead/">Longer introduction here</a>.`,
+        a: `An open source AI agent that designs, documents and verifies printed circuit boards. You describe a change or hand it a product brief, and it edits your real KiCad files, updates every document that references them, and runs KiCad's own checks until they pass. <a href="/blog/meet-copperhead/">Longer introduction here</a>.`,
       },
       {
         q: 'What problem does it actually solve?',
-        a: `Drift. A hardware design spreads one decision across a schematic, a bill of materials, a power budget, and several documents, and nothing breaks when they fall out of sync. The inconsistency is found at bring-up, and a respin costs 5,000 to 50,000 dollars and six to eight weeks. <a href="/blog/drift-is-a-build-failure/">The full argument is here</a>.`,
+        a: `Drift. A hardware design spreads one decision across a schematic, a bill of materials, a power budget and several documents, and nothing breaks when they fall out of sync. The inconsistency is found at bring-up, and a respin costs 5,000 to 50,000 dollars and six to eight weeks. <a href="/blog/drift-is-a-build-failure/">The full argument is here</a>.`,
       },
       {
         q: 'Is this a chatbot for circuits?',
-        a: `No. It is a loop that leaves artifacts on disk. A run ends with edited KiCad source, updated documents, passing ERC and DRC, and a commit, not with a transcript you have to act on yourself.`,
+        a: `No. It is a loop that leaves artifacts on disk. A run ends with edited KiCad source, updated documents, passing ERC and DRC and a commit, not with a transcript you have to act on yourself.`,
       },
       {
         q: 'Does it replace a hardware engineer?',
@@ -47,11 +47,11 @@ export const groups: FaqGroup[] = [
     items: [
       {
         q: 'What do I need installed?',
-        a: `Node 20 or newer, <a href="${links.kicad}">KiCad</a> with <code>kicad-cli</code> on your path, and a model API key of your own. Then <code>npm i -g ${pkg}</code>.`,
+        a: `Node 20 or newer, <a href="${links.kicad}">KiCad</a> with <code>kicad-cli</code> on your path and a model API key of your own. Then <code>npm i -g ${pkg}</code>.`,
       },
       {
         q: 'Does it work on a design that already exists?',
-        a: `That is the main case. Point it at a KiCad repository, run <code>copperhead init</code>, and start asking for changes. It can also run the full pipeline from a written brief with <code>copperhead create</code>, but iterating on real designs is what it is best at.`,
+        a: `That is the main case. Point it at a KiCad repository, run <code>copperhead init</code> and start asking for changes. It can also run the full pipeline from a written brief with <code>copperhead create</code>, but iterating on real designs is what it is best at.`,
       },
       {
         q: 'Which EDA tools does it support?',
@@ -72,7 +72,7 @@ export const groups: FaqGroup[] = [
     items: [
       {
         q: 'What will it refuse to do?',
-        a: `It refuses to run on a dirty git tree, refuses to edit any design file before a validated change proposal exists, and refuses changes that break a budget or constraint you have documented, citing the line it would violate. It also never invents a part number it cannot justify from a datasheet.`,
+        a: `It refuses to run on a dirty git tree, refuses to edit any design file before a validated change proposal exists and refuses changes that break a budget or constraint you have documented, citing the line it would violate. It also never invents a part number it cannot justify from a datasheet.`,
       },
       {
         q: 'Will it rewrite my whole schematic?',
@@ -84,11 +84,11 @@ export const groups: FaqGroup[] = [
       },
       {
         q: 'Where does my design data go?',
-        a: `It stays in your own git repository. The agent runs locally, stores nothing on a server, and only sends design context as part of the model API call itself. Run transcripts live in <code>.copperhead/runs/</code> with secret patterns redacted, and the agent never reads paths outside your repository.`,
+        a: `It stays in your own git repository. The agent runs locally, stores nothing on a server and only sends design context as part of the model API call itself. Run transcripts live in <code>.copperhead/runs/</code> with secret patterns redacted, and the agent never reads paths outside your repository.`,
       },
       {
         q: 'What is the license?',
-        a: `The agent is <a href="${links.license}">Apache-2.0</a>. Everything it writes is plain markdown, JSON, and KiCad source in your repository, so there is nothing to be locked into. Our own reference hardware is CERN-OHL-S v2.0.`,
+        a: `The agent is <a href="${links.license}">Apache-2.0</a>. Everything it writes is plain markdown, JSON and KiCad source in your repository, so there is nothing to be locked into. Our own reference hardware is CERN-OHL-S v2.0.`,
       },
       {
         q: 'Is there a hosted version?',

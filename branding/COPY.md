@@ -1,9 +1,9 @@
 # copperhead copy
 
 The written half of the brand. `README.md` in this folder covers the mark,
-the wordmark, and the palette; this file covers the words that go next to
+the wordmark and the palette; this file covers the words that go next to
 them, so the same sentences show up on the site, in the repo, in a store
-listing, and in a social bio instead of being rewritten from memory each
+listing and in a social bio instead of being rewritten from memory each
 time.
 
 Pick the block that fits the space you are filling. Do not mix two of them
@@ -30,7 +30,7 @@ knows what Cursor is. Use the one-liner instead where they might not.
 ## One-liner
 
 > Copperhead is an open-source AI engineering platform that helps hardware
-> teams design, verify, and ship circuit boards.
+> teams design, verify and ship circuit boards.
 
 The default sentence. Repo description, package description, meta
 description, the first line of a cold email. It stands on its own with no
@@ -40,16 +40,16 @@ prior context, which the tagline does not.
 
 > Copperhead turns product requirements into real, editable KiCad designs.
 > It helps with circuit architecture, component selection, schematic
-> capture, PCB layout, documentation, and verification through
+> capture, PCB layout, documentation and verification through
 > deterministic ERC and DRC feedback loops.
 
-Two sentences for an about section, a directory listing, or the top of a
+Two sentences for an about section, a directory listing or the top of a
 README. The list is the point: it names the actual steps of the workflow
 rather than claiming the whole of it.
 
 ## Social bio
 
-> Open-source AI for electronics engineering. Design, document, and verify
+> Open-source AI for electronics engineering. Design, document and verify
 > real PCBs from a written brief.
 
 Sized for the ~160 character bio fields. Pair it with the tile
@@ -68,7 +68,7 @@ Sized for the ~160 character bio fields. Pair it with the tile
 ## Positioning statement
 
 > Copperhead treats every PCB like a codebase: structured intent, traceable
-> decisions, version-controlled changes, executable verification, and
+> decisions, version-controlled changes, executable verification and
 > recoverable workflows.
 
 The internal north star. It is what the other blocks are compressions of,
@@ -80,10 +80,10 @@ belongs on an about page or in a deck, not on the fold.
 
 > Hardware engineering is becoming programmable.
 >
-> Copperhead is the AI-native workspace for designing, reviewing, and
+> Copperhead is the AI-native workspace for designing, reviewing and
 > verifying electronics.
 
-For a launch post, a keynote slide, or anywhere the claim is allowed to be
+For a launch post, a keynote slide or anywhere the claim is allowed to be
 a claim. It leads with the category rather than the product.
 
 ## Developer-focused version
@@ -104,7 +104,7 @@ condition, which is what that reader is checking for.
 > requirements to verified PCB designs while keeping every decision
 > inspectable and every output editable.
 
-Problem then answer, for an investor deck, a grant application, or a press
+Problem then answer, for an investor deck, a grant application or a press
 boilerplate paragraph. The longest block here; if you have room for more
 than this, write something specific instead of padding it.
 
