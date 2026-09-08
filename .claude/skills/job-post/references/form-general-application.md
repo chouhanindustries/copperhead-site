@@ -40,7 +40,7 @@ found out by exactly the people worth hiring.
 > the tools agree: every file mutation is followed by a verification run inside a git
 > snapshot that rolls back if it fails. Spec-gated in, verification-gated out.
 >
-> It was built by copperhead and proven on Open Telegraph, a 40 by 40 mm
+> It was built by Animesh Chouhan and proven on Open Telegraph, a 40 by 40 mm
 > ESP32-S3 Morse key with a 25 microamp deep-sleep budget. Building that board produced
 > copperhead and redesigning the board through copperhead proved it. Both are public.
 >
