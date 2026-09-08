@@ -16,9 +16,12 @@ jobs:
           cache: npm
       - run: npm ci
 
-      # blog-post skill rules 1 and 2: no em dashes, no serial comma, across the
-      # blog and research collections. Runs before the build so a style failure
-      # is not buried under a page render.
+      # blog-post skill rules 1 and 2. The serial comma rule runs over the whole
+      # tree: page copy in .astro, the docs at the root, llms.txt, the skills
+      # and the comments and strings in the scripts. The em dash rule stays on
+      # the two content collections, because a dash is load-bearing punctuation
+      # in a code comment. Runs before the build so a style failure is not
+      # buried under a page render.
       - name: prose lint
         run: npm run lint:prose
 

@@ -154,7 +154,7 @@ if (CHECK) process.exit(0);
 //
 // The width is capped at what the set can actually supply. Scaling a 1,100px
 // screenshot up to a 1,600px canvas invents no detail, it only makes the file
-// bigger and the type softer, and the pipeline downstream is already emitting
+// bigger and the type softer and the pipeline downstream is already emitting
 // a webp per slot. Ask for 1600 and get whatever of it is real.
 const widest = Math.max(...prepared.map((p) => p.region.width));
 const CANVAS = Math.min(WIDTH, widest + MARGIN * 2);

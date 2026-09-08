@@ -1,14 +1,14 @@
 /* copperhead.sh — design system
 
    Type: Space Grotesk throughout — display and text both — with JetBrains Mono
-   for code, the wordmark, and reference numbers, and DM Sans in the nav bar
+   for code, the wordmark and reference numbers, and DM Sans in the nav bar
    alone. IBM Plex Sans used to hold the text role and has been dropped: one
    variable file already carries 300-700, so every step of hierarchy the second
    family was providing is available off its own axis.
 
    DM Sans is the exception that proves that rule rather than a walking back of
    it. It is not a hierarchy step — it is one component matching one reference
-   exactly (see its @font-face below), it is scoped to that component by --nav,
+   exactly (see its @font-face below), it is scoped to that component by --nav
    and at 8.5 KB it costs less than the two Plex weights it did not replace.
 
    All three faces are self-hosted and subset with pyftsubset to the same set —
@@ -78,7 +78,7 @@
   font-display: swap;
 }
 
-/* Theme, in the supermemory.ai shape: a page, near-black or near-white text,
+/* Theme, in the supermemory.ai shape: a page, near-black or near-white text
    and objects separated by hairline greys rather than by luminance. Three
    surface steps only —
 
@@ -90,7 +90,7 @@
    :root block under a media query. The function resolves against the used
    `color-scheme`, which is the one thing the toggle below sets — so the whole
    palette is declared once, the light and dark values sit on the same line
-   where they can be compared, and a token added later cannot be added to one
+   where they can be compared and a token added later cannot be added to one
    theme and forgotten in the other.
 
    It also means the site is correctly themed with JavaScript off: `color-scheme:
@@ -201,7 +201,7 @@
 
 /* The toggle's only job. Pinning color-scheme to one keyword is what makes
    every light-dark() above resolve to that side, so one attribute on <html>
-   swings the palette, the UA chrome, and the theme-color meta together. */
+   swings the palette, the UA chrome and the theme-color meta together. */
 :root[data-theme='light'] {
   color-scheme: light;
 }

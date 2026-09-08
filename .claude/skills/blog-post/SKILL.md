@@ -57,7 +57,10 @@ lists, and for the same reason: it is one more mark the sentence does not need.
 If a list reads ambiguously without it, do not put the comma back. Reorder the items
 or split the sentence, which is the better fix anyway.
 
-`npm run lint:prose` checks this rule and rule 1 over both collections, and CI runs
+`npm run lint:prose` checks this rule over every word in the repository, not just
+the collections: page copy in `.astro`, the docs at the root, `llms.txt`, these
+skills and the comments and strings in the scripts. Rule 1 is checked over the two
+collections alone, because a dash earns its place in a code comment. CI runs
 the same command. It cannot tell a series from two joined clauses, so a sentence it
 flags wrongly gets recorded in `scripts/prose-allow.json`. Read the sentence twice
 before you put it there. If the comma is closing a list of three, delete the comma.

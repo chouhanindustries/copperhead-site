@@ -25,7 +25,7 @@ export interface RoleAddress {
  *
  * Declared above `Role` so the field can be typed against it instead of being
  * a bare string. A free string compiles a typo like 'Full time' straight
- * through: the meta row prints it, the lookup below misses it, and the posting
+ * through: the meta row prints it, the lookup below misses it and the posting
  * loses `employmentType` with nothing failing anywhere to say so.
  */
 const EMPLOYMENT_TYPE = {
@@ -414,7 +414,7 @@ export const roles: Role[] = [
     ],
     applyUrl: 'https://binary.so/evoDv0z',
     applyNote:
-      'Send your LinkedIn, GitHub or personal website, links to projects, technical writing, open-source contributions or products you have shipped, and a short note covering three things.',
+      'Send your LinkedIn, GitHub or personal website, links to projects, technical writing, open-source contributions or products you have shipped and a short note covering three things.',
     applySend: [
       'The hardest infrastructure, AI agent or developer-tooling system you have built',
       'What you personally owned',
@@ -551,7 +551,7 @@ export function jobPostingJsonLd(role: Role): Record<string, unknown> | null {
     ...(salary ? { baseSalary: salary } : {}),
     hiringOrganization: {
       '@type': 'Organization',
-      name: 'Chouhan Industries',
+      name: 'copperhead',
       // The URL Google reconciles the posting against is the site serving it.
       // chouhan.ai is the same organisation and belongs in sameAs, which is the
       // property for exactly that: naming it as the canonical url is what

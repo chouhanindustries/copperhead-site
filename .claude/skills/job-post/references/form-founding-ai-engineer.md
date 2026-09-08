@@ -53,7 +53,7 @@ Options for question 3:
 | 15 | Which reinforcement learning algorithms have you implemented yourself, and what did you apply them to? | Long text | Yes |
 | 16 | Describe an architecture you designed or modified rather than used off the shelf. What did you change, and what did it buy you? | Long text | Yes |
 | 17 | A paper you implemented from its description. What did the paper leave out? | Long text | Yes |
-| 18 | Tell us about something agentic you have built that had to be right rather than impressive. What was it, what broke, and what did you do about it? | Long text | Yes |
+| 18 | Tell us about something agentic you have built that had to be right rather than impressive. What was it, what broke and what did you do about it? | Long text | Yes |
 | 19 | A repository, pull request or system you would point at as your best work | Short text | Yes |
 | 20 | Describe a technical problem you owned end to end when the requirements were not clear. What did you decide, and what did it cost? | Long text | Yes |
 | 21 | What is the most unfamiliar technical domain you have had to get productive in, and how long did that take? | Long text | Yes |

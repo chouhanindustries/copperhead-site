@@ -2,7 +2,7 @@
 import type { Point } from '../repo-stats';
 import { compact } from '../stats';
 
-// A stat tile with a plot: label, headline value, and the series behind it.
+// A stat tile with a plot: label, headline value and the series behind it.
 //
 // The SVG is built here, at build time, and shipped as markup — the same
 // no-client-JS bargain the rest of the site makes. That costs the hover layer an
@@ -10,7 +10,7 @@ import { compact } from '../stats';
 // mean either a script or one invisible hit rect per point, and a year of daily
 // traffic is ~365 of them per chart on a page that carries five charts. The
 // detail those would surface is carried instead by the peak label, the axis
-// ticks, and the full PDF report linked at the foot of the page, and the SVG
+// ticks and the full PDF report linked at the foot of the page, and the SVG
 // gets a title/desc pair so a screen reader is told the shape rather than shown
 // an unlabelled graphic.
 //

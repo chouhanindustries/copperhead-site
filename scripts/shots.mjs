@@ -20,7 +20,7 @@
 // runs out of room.
 //
 // Needs a Chromium. It finds one from PUPPETEER/PLAYWRIGHT caches, a system
-// Chrome, or $CHROME_PATH. Start the dev server first (astro dev --background).
+// Chrome or $CHROME_PATH. Start the dev server first (astro dev --background).
 
 import { chromium } from 'playwright-core';
 import { existsSync, mkdirSync } from 'node:fs';
@@ -127,7 +127,7 @@ for (const theme of THEMES) {
     });
     // Audit runs are hermetic: off-origin requests are aborted at the network
     // layer. That keeps ~150 CI page loads out of the production analytics,
-    // keeps networkidle from waiting on a third party, and has /status/
+    // keeps networkidle from waiting on a third party and has /status/
     // render its no-data state the same way every run. The console filter
     // below is what absorbs the errors these aborts produce.
     if (AUDIT_ONLY) {

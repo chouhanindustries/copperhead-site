@@ -174,12 +174,12 @@ conflicts with the spec, the visual direction won:
   directly and is CSS-only, so it still works with JS disabled.
 - **Trace dividers.** Spec §3 uses them between every section. They appear once,
   above the footer; section boundaries are negative space instead. The via motif
-  still carries identity through the wordmark, the favicon, and the OG image.
+  still carries identity through the wordmark, the favicon and the OG image.
 - **Cards.** Spec §4 calls for cards on the invariants and proof sections. Both
   are borderless now.
 - **Headings** are plain text rather than copper, and the invariants closing line
   is plain rather than gold. Copper is reserved for CTAs, links, the eyebrow
-  labels, and the terminal prompt. This also sidesteps the AA large-text-only
+  labels and the terminal prompt. This also sidesteps the AA large-text-only
   caveat on copper noted in spec §8.
 - **Hero visual.** Added a terminal showing an agent run — the prompt "add a
   USB-C power input to the key" and the tool calls it makes. It is DOM and CSS
@@ -211,8 +211,8 @@ conflicts with the spec, the visual direction won:
 
 Static output in `dist/`, served at [copperhead.sh](https://copperhead.sh/) as Cloudflare
 static assets (see `wrangler.jsonc`). CI builds on push to
-main and fails the build on em-dashes, dead links, or a transfer budget over
-100 KB.
+main and fails the build on serial commas anywhere in the tree (`npm run
+lint:prose`), em-dashes, dead links or a transfer budget over 100 KB.
 
 ## Repo traffic (`/stats/`)
 

@@ -2,13 +2,13 @@
 
 ## Agent Objective
 
-copperhead is an open source AI agent for end-to-end hardware product development. It takes a product brief (requirements, constraints, budgets) and produces a complete, verified electronics design: KiCad schematics, a first-draft PCB layout, gerbers, an orderable BOM, firmware scaffold, and a bring-up plan. It also iterates on existing designs: a single natural-language request ("cut the sleep current", "move the key off a strapping pin") is turned into surgical edits on real KiCad source files, propagated across every design document, and verified with KiCad's own ERC/DRC tooling before anything is reported done.
+copperhead is an open source AI agent for end-to-end hardware product development. It takes a product brief (requirements, constraints, budgets) and produces a complete, verified electronics design: KiCad schematics, a first-draft PCB layout, gerbers, an orderable BOM, firmware scaffold and a bring-up plan. It also iterates on existing designs: a single natural-language request ("cut the sleep current", "move the key off a strapping pin") is turned into surgical edits on real KiCad source files, propagated across every design document and verified with KiCad's own ERC/DRC tooling before anything is reported done.
 
 The problem it solves: hardware design requires holding dozens of cross-cutting constraints simultaneously (power budgets, strapping pins, leakage currents, RF keepouts), and every change touches multiple artifacts that silently drift apart. Drift ships to fabrication at $5–50K and 6–8 weeks per respin.
 
 ## Target Users
 
-- **Hardware engineers using KiCad** (the world's most-used open PCB tool) — professionals and serious hobbyists who want design iteration, doc consistency, and verification automated
+- **Hardware engineers using KiCad** (the world's most-used open PCB tool) — professionals and serious hobbyists who want design iteration, doc consistency and verification automated
 - **Small hardware teams (1–3 EEs)** at crowdfunded-device and early-stage hardware startups, where one respin is existential
 - **Software engineers entering hardware** — technically strong, hardware-inexperienced; the agent's constraint memory and datasheet-trap checks are their guardrails
 
@@ -20,7 +20,7 @@ Technical level is high; interaction is via CLI and a live web viewer, on the us
   **Agent**: Consults the MCU strapping table in memory, selects an RTC-capable non-strapping GPIO, edits the schematic, updates the pinout and subsystem docs, runs ERC until clean, commits with rationale.
 
 - **User**: "Add a 100kΩ pullup on KEY_DAH."
-  **Agent**: Recalls the 25 µA sleep-current budget from constraint memory, calculates the pullup would leak ~33 µA, **refuses the change**, cites the budget's source, and proposes using the MCU's internal pullup released before sleep instead.
+  **Agent**: Recalls the 25 µA sleep-current budget from constraint memory, calculates the pullup would leak ~33 µA, **refuses the change**, cites the budget's source and proposes using the MCU's internal pullup released before sleep instead.
 
 - **User**: "Cut the sleep current."
   **Agent**: Reviews every part's quiescent draw against the budget registry, identifies offenders, proposes substitutions with datasheet rationale, propagates part changes across BOM/docs/schematic, re-verifies.
@@ -44,12 +44,12 @@ Technical level is high; interaction is via CLI and a live web viewer, on the us
 - Never regenerate a whole KiCad file — surgical s-expression edits only
 - Never invent part numbers without datasheet-verifiable justification
 - Never claim fab-readiness beyond "ERC/DRC clean" — the human remains engineer of record
-- Never write API keys or secrets to any file, transcript, or commit
+- Never write API keys or secrets to any file, transcript or commit
 - Never access paths outside the user's repository
 
 ## Role Descriptions
 
-- **Client**: Chouhan Industries — open source hardware company (chouhan.ai); copperhead is our open source (Apache-2.0) design agent
+- **Client**: copperhead — open source hardware project (chouhan.ai); copperhead is our open source (Apache-2.0) design agent
 - **Customer**: hardware teams and individual engineers adopting the agent on their own repositories
 - **User**: the engineer invoking the CLI/viewer — typically also the customer at current stage
 

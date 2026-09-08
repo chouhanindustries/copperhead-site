@@ -5,7 +5,7 @@
  * runs jgehrcke/github-repo-stats once a day to snapshot it and append to CSVs on
  * this repo's `github-repo-stats` branch; this module reads those CSVs during the
  * Astro build so /stats/ ships as static HTML. Same contract as stats.ts: the
- * fetch happens in Node at build time, the numbers are baked into the markup, and
+ * fetch happens in Node at build time, the numbers are baked into the markup and
  * the refresh cadence is the deploy cadence (cloudflare-refresh.yml rebuilds every
  * six hours).
  *
@@ -14,7 +14,7 @@
  * cannot happen until the GHRS_GITHUB_API_TOKEN secret is set — so on a fresh
  * clone, and on every build before that point, this returns null and the page
  * renders a short "not collecting yet" note instead of an empty chart. A missing
- * branch, a failed request, and a malformed CSV all take the same path: no data,
+ * branch, a failed request and a malformed CSV all take the same path: no data,
  * no page furniture pretending otherwise.
  */
 
@@ -246,7 +246,7 @@ async function load(): Promise<RepoStats | null> {
     latestSnapshot('top_paths'),
   ]);
 
-  // Traffic is the spine of the page. Stars, forks, and the two snapshot tables
+  // Traffic is the spine of the page. Stars, forks and the two snapshot tables
   // are each allowed to be missing on their own — ghrs only writes forks.csv
   // once there is a fork, and stargazers.csv once there is a star — but with no
   // traffic series there is no page.
