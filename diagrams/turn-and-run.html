@@ -1,0 +1,332 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <style>
+    @font-face {
+      font-family: 'Space Grotesk';
+      src: url('../public/fonts/space-grotesk-var.woff2') format('woff2-variations');
+      font-weight: 300 700;
+    }
+
+    @font-face {
+      font-family: 'JetBrains Mono';
+      src: url('../public/fonts/jetbrains-mono-400.woff2') format('woff2');
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: 'JetBrains Mono';
+      src: url('../public/fonts/jetbrains-mono-700.woff2') format('woff2');
+      font-weight: 700;
+    }
+
+    :root {
+      color-scheme: light dark;
+      --bg: light-dark(#FFFFFF, #09090B);
+      --panel: light-dark(#FAFAFA, #111114);
+      --surface: light-dark(#F1F1F3, #1A1A1F);
+      --line: light-dark(#E5E5E8, #26262C);
+      --line-hi: light-dark(#D6D6DB, #3A3A43);
+      --copper: light-dark(#A75F14, #D08F39);
+      --copper-soft: light-dark(#F6ECE1, #221A10);
+      --text: light-dark(#0A0A0A, #EDEDEF);
+      --text-dim: light-dark(#57575E, #9B9BA5);
+      --sans: 'Space Grotesk', -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      background: var(--bg);
+    }
+
+    /* One 16:9 canvas, read at half size in an 800px prose column, so nothing
+       here is set below 19px. Time runs left to right from x = 320 to 1500.
+       The spacing is drawn, not measured: the figure shows which lane holds
+       what, and the only duration it names is the do run's limit. */
+    .canvas {
+      position: relative;
+      width: 1600px;
+      height: 900px;
+      background: var(--bg);
+      font-family: var(--sans);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .brand {
+      position: absolute;
+      left: 56px;
+      top: 46px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand svg {
+      display: block;
+    }
+
+    .brand .word {
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: 0.5px;
+    }
+
+    .title {
+      position: absolute;
+      left: 56px;
+      top: 104px;
+      font-size: 44px;
+      font-weight: 600;
+      letter-spacing: -0.6px;
+    }
+
+    .subtitle {
+      position: absolute;
+      left: 56px;
+      right: 56px;
+      top: 166px;
+      font-size: 26px;
+      line-height: 1.45;
+      color: var(--text-dim);
+    }
+
+    .subtitle b {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .subtitle code {
+      font-family: var(--mono);
+      font-size: 24px;
+      color: var(--copper);
+    }
+
+    /* ---------- lane labels ---------- */
+    .lane {
+      position: absolute;
+      left: 56px;
+      width: 262px;
+    }
+
+    .lane .name {
+      font-size: 27px;
+      font-weight: 500;
+    }
+
+    .lane .what {
+      margin-top: 4px;
+      font-family: var(--mono);
+      font-size: 20px;
+      color: var(--text-dim);
+    }
+
+    /* ---------- blocks ---------- */
+    .blk {
+      position: absolute;
+      height: 84px;
+      padding: 12px 18px;
+      border: 1.5px solid var(--line-hi);
+      border-radius: 6px;
+      background: var(--panel);
+    }
+
+    .blk b {
+      display: block;
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .blk i {
+      display: block;
+      margin-top: 4px;
+      font-style: normal;
+      font-size: 21px;
+      color: var(--text-dim);
+    }
+
+    .blk.turn {
+      border-color: var(--copper);
+      background: var(--copper-soft);
+    }
+
+    .blk.run {
+      background: repeating-linear-gradient(135deg, var(--surface) 0 10px, var(--bg) 10px 20px);
+    }
+
+    .blk.run b,
+    .blk.run i {
+      display: inline-block;
+      background: var(--bg);
+      padding-inline: 4px;
+    }
+
+    .blk.idle {
+      border-style: dashed;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .blk.idle i {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    /* ---------- leaders and the axis, drawn under the blocks ---------- */
+    svg.wires {
+      position: absolute;
+      inset: 0;
+      display: block;
+    }
+
+    svg.wires .lead {
+      stroke: var(--text-dim);
+      stroke-width: 2;
+      fill: none;
+    }
+
+    svg.wires .wake {
+      stroke: var(--copper);
+      stroke-width: 3;
+      fill: none;
+    }
+
+    svg.wires .rule,
+    svg.wires .tick {
+      stroke: var(--line-hi);
+      stroke-width: 1.5;
+    }
+
+    svg.wires text {
+      font-family: var(--mono);
+      font-size: 20px;
+      fill: var(--text-dim);
+    }
+
+    svg.wires text.hot {
+      fill: var(--copper);
+    }
+
+    .footer {
+      position: absolute;
+      left: 56px;
+      right: 56px;
+      top: 838px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer .site {
+      font-family: var(--mono);
+      font-size: 21px;
+      color: var(--copper);
+    }
+
+    .footer .said {
+      font-size: 21px;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="canvas">
+
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 32 32">
+        <rect width="32" height="32" fill="#15181c" />
+        <circle cx="16" cy="16" r="5.25" fill="none" stroke="#b87333" stroke-width="2.25" />
+        <path d="M16 5.75v5M16 21.25v5M5.75 16h5M21.25 16h5" stroke="#b87333" stroke-width="2.25" />
+      </svg>
+      <span class="word">copperhead</span>
+    </div>
+
+    <div class="title">Launch the run, end the turn</div>
+    <div class="subtitle">One <code>do</code> run from a conversation. <b>No conductor turn is open while
+      the run works</b>, and the run's result is what opens the next one.</div>
+
+    <svg class="wires" width="1600" height="900" viewBox="0 0 1600 900">
+      <defs>
+        <marker id="dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0 0L10 5L0 10z" fill="light-dark(#57575E, #9B9BA5)" />
+        </marker>
+        <marker id="hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0 0L10 5L0 10z" fill="light-dark(#A75F14, #D08F39)" />
+        </marker>
+      </defs>
+
+      <!-- the message opens turn 1 -->
+      <path class="lead" d="M400 568 V380" marker-end="url(#dim)" />
+      <!-- turn 1 launches the run -->
+      <path class="lead" d="M540 378 V428" marker-end="url(#dim)" />
+      <text x="556" y="410">launch</text>
+      <!-- the run's result lands in the thread -->
+      <path class="lead" d="M1290 516 V566" marker-end="url(#dim)" />
+      <text x="1150" y="548">finished</text>
+      <!-- and that result opens turn 2 -->
+      <path class="wake" d="M1440 568 V382" marker-end="url(#hot)" />
+      <text class="hot" x="1456" y="480">opens</text>
+
+      <!-- time axis -->
+      <path class="rule" d="M320 712 H1500" />
+      <path class="tick" d="M320 712 v10 M1500 712 v10" />
+      <text x="320" y="754">message</text>
+      <text x="1500" y="754" text-anchor="end">up to thirty minutes later</text>
+    </svg>
+
+    <div class="lane" style="top: 292px">
+      <div class="name">Conductor</div>
+      <div class="what">one conversation</div>
+    </div>
+    <div class="blk turn" style="left: 320px; top: 294px; width: 260px">
+      <b>turn 1</b><i>plan, launch, reply</i>
+    </div>
+    <div class="blk idle" style="left: 600px; top: 294px; width: 640px">
+      <i>no turn open</i>
+    </div>
+    <div class="blk turn" style="left: 1260px; top: 294px; width: 240px">
+      <b>turn 2</b><i>read result, report</i>
+    </div>
+
+    <div class="lane" style="top: 432px">
+      <div class="name">Runner</div>
+      <div class="what">one container per run</div>
+    </div>
+    <div class="blk run" style="left: 500px; top: 432px; width: 820px">
+      <b>copperhead do</b><br><i>claim, edit, verify, open a pull request</i>
+    </div>
+
+    <div class="lane" style="top: 572px">
+      <div class="name">Thread</div>
+      <div class="what">what you see</div>
+    </div>
+    <div class="blk" style="left: 320px; top: 572px; width: 260px">
+      <b>message</b><i>from you</i>
+    </div>
+    <div class="blk" style="left: 1260px; top: 572px; width: 240px">
+      <b>run result</b><i>a new item</i>
+    </div>
+
+    <div class="footer">
+      <div class="site">copperhead.sh</div>
+      <div class="said">Drawn, not measured. A do run is allowed thirty minutes and a create run an hour.</div>
+    </div>
+
+  </div>
+</body>
+
+</html>

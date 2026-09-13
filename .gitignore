@@ -35,5 +35,6 @@ shots/
 diagrams/*
 !diagrams/social-flow.html
 !diagrams/post-cards.html
+!diagrams/turn-and-run.html
 scripts/.frame-tmp.mjs
 !diagrams/linkedin-banner.html
