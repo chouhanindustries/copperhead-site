@@ -1,0 +1,246 @@
+---
+title: "What we copied from Claude Code, Codex and opencode"
+description: "Before building a conversational agent on top of the copperhead CLI, we read how Claude Code, Codex and several open-source agent harnesses handle the same problems. This is what we are copying and why."
+date: 2026-09-13
+kind: "Engineering"
+cover: "what-we-copied-from-claude-code-codex-and-opencode"
+coverAlt: "A copperhead title card: one trace drawn twice, the original in grey and the copy in copper below it."
+---
+
+import ThemeFigure from "../../components/ThemeFigure.astro";
+
+We are adding a conversation view to the copperhead console. In the current version,
+every message starts a run. Keyword matching decides what kind. A message that only asks
+to look at the board becomes a `check`. Anything else becomes a `do`. You cannot ask a
+question without starting a job, and the platform cannot show you a plan before it
+starts work.
+
+The next step is an agent that sits above the CLI. It should answer questions, read the
+repository, write a plan and start runs of any of the CLI's four kinds. We call it the
+conductor. Claude Code, Codex and a number of open-source projects already have agents
+like this, so before designing ours we read their docs, their source code where it is
+public and the pull requests where they changed their design.
+
+They mostly agree with each other. Where they differ, one rule in our platform usually
+decides for us, so we start with that rule.
+
+## Where the model key lives
+
+In copperhead's hosted platform, model provider keys live in one place: the gateway that
+every model call goes through. The keys are not in the web app. They are never in the
+container that runs the CLI against your repository, because that container runs code
+from your repository. If you bring your own key, it is stored encrypted where code from
+your repository cannot read it. Each run gets a short-lived credential that the gateway
+accepts until the run ends.
+
+If a harness runs its agent loop inside the sandbox, the model credential has to be in
+the sandbox too. So the first thing we checked in each harness was where the loop runs.
+
+## The loop runs outside the sandbox
+
+Vercel's [open-agents](https://github.com/vercel-labs/open-agents) template states it
+directly: "Chat requests start a workflow run instead of executing the agent inline" and
+"The agent does not run inside the VM." Its lessons-learned notes explain the first
+point: work started inline in a serverless function is not durable. [Open
+SWE](https://github.com/langchain-ai/open-swe) runs its loop on a LangGraph server. The
+sandbox providers it supports, such as Modal, Daytona and E2B, only execute commands.
+
+[smolagents](https://huggingface.co/docs/smolagents/tutorials/secure_code_execution)
+docs describe the same problem from the other direction. They say remote sandboxing
+"doesn't support multi-agents", because a model call made inside the sandbox "would lack
+credentials". OpenHands V1 seems to take the opposite approach. The request that starts
+a conversation sends the agent, including its model settings, to an agent server that
+runs with the workspace. That puts the loop and the credential where commands run. It is
+a reasonable choice for one developer on a laptop, but our key rule does not allow it.
+
+So the conductor will be a long-running service. It runs no customer code, calls models
+through the gateway and does not run inside a web request. Vercel uses a workflow engine
+to make runs durable. We already have that part: runs are queued in Postgres, claimed
+with a lease and cleaned up when a worker stops sending heartbeats.
+
+## Long runs should not keep a turn open
+
+Most of the harnesses we read handle delegation the same way. A task tool starts a child
+session with a fresh context, its own instructions and fewer tools. Only the child's
+final message is returned to the parent. In Claude Code this is the Agent tool. In Codex
+each child is its own thread: `spawn_agent` creates it, and other tools wait on it, send
+it input and close it. In [opencode](https://opencode.ai/docs/agents/) the `task` tool
+creates a linked child session that can be resumed by id.
+
+The harnesses differ in what the parent does while the child is running, which matters
+most for long jobs. When opencode runs a subagent in the background, the tool
+description tells the model "You will be notified when it completes" and tells it not to
+sleep or poll. deepagents polls its async subagents instead. [Its
+docs](https://docs.langchain.com/oss/python/deepagents/async-subagents) list the
+problems this causes: polling right after launch, reporting a stale status from earlier
+in the history, using the wrong task id and running out of workers.
+
+A hosted `do` run can take up to thirty minutes and a `create` run up to an hour.
+Keeping a conversation turn open that long ties up a model context and a server process,
+and it leads to the same polling problems. So the conductor's launch tool starts the run
+and then the turn ends. When the run finishes, its result is added to the thread as a
+new item. That new item starts the next turn.
+
+<ThemeFigure
+  src="/blog/figures/turn-and-run"
+  width={1600}
+  height={900}
+  alt="Three lanes over thirty minutes. Conductor: turn one at the start, labelled plan, launch and reply, then a dashed empty stretch labelled no turn open, then turn two at the end, labelled read the result and report. Runner: one long bar for copperhead do, from claim to exit. Thread: the message at the start and the run result at the end, with an arrow from the result up into turn two."
+>
+  In turn one the conductor writes a plan, starts the run and replies. No conductor turn
+  is open while the runner works. When the run finishes, its result starts turn two.
+</ThemeFigure>
+
+This was the biggest change from our first design, where the launch tool waited inside
+the turn until the run finished.
+
+## One agent instead of a router
+
+Two well-known designs that put a router in front of the agent were retired this year.
+Roo Code's Boomerang orchestrator could not read or write files, use MCP or run
+commands, so it had to delegate everything. Roo was archived in May. Kilo, whose CLI is
+now a fork of opencode, has deprecated its own orchestrator mode because agents with
+full tool access "now support subagents natively".
+
+The first version of Open SWE had a manager graph in front. It sorted each incoming
+message into one of seven routes and passed the work to separate planner and programmer
+graphs. In February the maintainers deleted the manager, planner and programmer graphs
+and rebuilt Open SWE as a single agent on deepagents.
+
+Instead of a router, the new Open SWE limits the agent's tools in code. While plan mode
+is on, middleware rebuilds the tool list before each model call and leaves out the tools
+that make changes until a plan is approved with an `approve_plan` tool. A separate guard
+blocks any push that changes the repository's CI workflow files until a person approves
+it. The model does not have to be told not to edit, because it cannot see the edit
+tools.
+
+The copperhead CLI already works like this. Its edit tools are not in the tool list
+until a change proposal passes validation, and [a
+test](https://github.com/copperheadhq/copperhead/blob/main/test/gating-sync.test.ts)
+checks that the tool list and the gate stay in sync. The conductor will do the same.
+There will be no classifier step, and the tools that start a `do` or `create` run will
+not be in its tool list until you approve its plan. The keyword matching that picks a
+run kind today will be removed.
+
+## Who decides what needs approval
+
+Harnesses disagree on who makes this decision. In Cline the model sets a
+`requires_approval` flag on its own commands. Vercel tried heuristics on shell commands
+and got "too many false-positive approvals". In both cases a model or a heuristic
+decides. That might be acceptable on a laptop, but not in a product that many
+organisations share.
+
+The designs we are copying decide based on the type of tool, and they decide on the
+server. In Codex, an approval is a request from the server to the client that pauses the
+turn. The answer is accept, accept for the session, decline or cancel. All other
+connected clients are notified when it is resolved. In opencode, each tool is set to
+allow, ask or deny. If a person rejects a tool call and adds a message, that message is
+sent back to the model as a correction. The Vercel AI SDK can sign each approval request
+with an HMAC when it is created and check the signature when the answer comes back, so a
+client cannot forge an approval.
+
+Hosted `do` runs are getting an approval step before they push to your repository. Each
+request is stored as a row in the database. It is resolved by a database function that
+checks that the person answering is a member of the organisation, not by a direct write
+from the browser. The conductor will extend this. Plans will get their own approval, in
+addition to pushes. Each approval can be accepted once, accepted for the rest of the
+thread or declined with a note that is sent back to the conductor. Everyone viewing the
+thread sees the answer as soon as it is given.
+
+## Skills use a shared format
+
+A skill is a folder with a `SKILL.md` file that holds a name, a description and
+instructions. The format is published at
+[agentskills.io](https://agentskills.io/specification), which lists Claude Code, Codex,
+GitHub Copilot, Cursor, Gemini CLI, opencode, OpenHands and Goose as tools that support
+it. The name can be 1 to 64 characters of lowercase letters, digits and hyphens. It must
+match the folder name and cannot start or end with a hyphen. The description can be up
+to 1,024 characters. Codex and opencode both look for skills in `.agents/skills`, and
+opencode also reads `.claude/skills`.
+
+Only a skill's name and description are loaded into context until the skill is used.
+Codex limits this list to 2 percent of the context window, or 8,000 characters when the
+window size is unknown. If the list is too long, Codex shortens the descriptions first
+and then drops them. Slash commands are moving into the same system. Codex deprecated
+custom prompts in favour of skills, and Claude Code uses a frontmatter flag to mark a
+skill as user-only or model-only instead of keeping a separate command system.
+
+We will use this format as it is and read skills from `.agents/skills` in the connected
+repository. Our first design had used a new `.copperhead/skills` folder. A slash command
+will be a skill that a person can run, plus a few built-in commands. A skill can limit
+the conductor's tools but cannot add new ones. OpenHands can load a skill when the agent
+opens files that match a path pattern. The first skill we want to write loads footprint
+rules whenever a `.kicad_pcb` file is opened.
+
+## Threads, turns and items
+
+Codex has the most complete protocol of the projects we read. A thread contains turns,
+and a turn contains items such as an agent message, a plan, a command execution, a file
+change or a context compaction. Each item sends a started event, then deltas, then a
+completed event. The completed version is the final one. Starting a turn returns
+immediately, and a running turn can be steered or interrupted.
+
+In these designs the server keeps the state, and clients can connect and disconnect.
+opencode works this way even on a laptop: it runs one server with one event stream, and
+its terminal interface is just another client. Goose removed its REST server in July and
+now serves the Agent Client Protocol over HTTP and WebSocket.
+
+The conversation view we have built already stores each finished turn as blocks and
+streams run events to the browser. What is missing is a fixed list of item types. We
+want the conductor's turns and the runs it starts to render from the same types, and we
+want the CLI's [run protocol
+stream](https://github.com/copperheadhq/copperhead/issues/258) to emit them too.
+
+## Prompt caching and compaction
+
+OpenAI's January write-up of the Codex agent loop describes each request as the previous
+request plus new items at the end. Changing the tool list, the model, the sandbox or the
+working directory in the middle of a thread breaks the prompt cache, so Codex sends
+configuration changes as new messages instead. Codex stores compaction as an item in the
+history, and Claude Code marks it with a boundary event. The Claude Agent SDK can stop a
+loop after a set number of turns or a set spend. It reports the cost with the result.
+
+The models we meter are billed per token, so cache misses cost money directly. When the
+conductor loads a skill, it will add the skill's text as a message and leave the tool
+list unchanged. Compaction will be stored as a block like everything else. Each
+conductor turn will have a limit on model calls and on spend, checked against the
+organisation's allowance before any model call.
+
+## Whether to adopt an existing agent loop
+
+We looked at adopting one of these loops directly. The Claude Agent SDK has the most
+mature loop, with skills, subagents and a session store. But it is made for Claude
+models and built around file and shell tools that the conductor should not have. Our
+gateway serves models from several providers through one OpenAI-compatible route. The
+Codex App Server has the best protocol, but it is a Rust binary that expects to run
+inside the environment it works on. Its API is also still changing: `thread/rollback`
+was removed this month.
+
+That leaves two options: the Vercel AI SDK's tool loop or a small loop of our own. The
+AI SDK is TypeScript like the rest of our platform, works with any provider through the
+gateway's OpenAI-compatible route and has tool approval built in. We would still build
+stored approvals, persistence and budgets ourselves, so the two options are about the
+same amount of work. We have not picked one yet. Either way, we will use Codex's item
+types and the open skill format.
+
+## What is still open
+
+None of this is built yet. This post describes a design and how our research changed it.
+It does not describe a working system.
+
+We read documentation and source code. We did not run these systems. openai.com blocked
+our requests, so we read OpenAI's posts about Codex through secondary summaries. The
+caching details above come from those summaries. We checked the protocol and skills
+details against the Codex source at commit `1715e55`. That source has already changed in
+one way since the January write-up: its WebSocket path now sends a previous response id,
+which the write-up said Codex avoided. Our claim about where OpenHands V1 sends model
+settings comes from the request that starts a conversation. We did not trace it end to
+end.
+
+We checked every claim about another project a second time against its source or docs on
+13 September, and we corrected or removed the ones that did not hold up. These projects
+change often, so some details here may already be out of date.
+
+Two questions are still open on our side: how to bill a conversation that does not start
+a run, and whether plan approval should always be required or be a setting each
+organisation chooses.
